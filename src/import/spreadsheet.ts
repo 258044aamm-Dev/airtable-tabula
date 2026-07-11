@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import { readSheet } from "read-excel-file/browser";
 import {
 	CellValue,
 	Field,
@@ -12,30 +12,24 @@ import {
 	createSelectOption,
 } from "../data/store";
 
-export function spreadsheetToTable(
-	buffer: ArrayBuffer,
-	fileName: string
-): TableDocument {
-	const workbook = XLSX.read(buffer, {
-		type: "array",
-		cellDates: true,
-		raw: false,
-	});
-	const sheetName = workbook.SheetNames[0];
-	if (!sheetName) {
-		throw new Error("Spreadsheet has no sheets");
-	}
-	const sheet = workbook.Sheets[sheetName];
-	const matrix = XLSX.utils.sheet_to_json<(string | number | boolean | Date | null)[]>(
-		sheet,
-		{
-			header: 1,
-			defval: "",
-			blankrows: false,
-			raw: false,
-		}
-	) as unknown[][];
+export async function spreadsheetToTable(file: File): Promise<TableDocument> {
+	const matrix = await fileToMatrix(file);
+	return matrixToTable(matrix, file.name);
+}
 
+async function fileToMatrix(file: File): Promise<unknown[][]> {
+	const name = file.name.toLowerCase();
+	if (name.endsWith(".csv")) {
+		return parseCsv(await file.text());
+	}
+	if (name.endsWith(".xlsx")) {
+		const data = await readSheet(file);
+		return data as unknown[][];
+	}
+	throw new Error("Unsupported file type. Use .csv or .xlsx");
+}
+
+function matrixToTable(matrix: unknown[][], fileName: string): TableDocument {
 	if (!matrix.length) {
 		throw new Error("Spreadsheet is empty");
 	}
@@ -45,7 +39,6 @@ export function spreadsheetToTable(
 		return label || `Column ${i + 1}`;
 	});
 
-	// Ensure unique header names
 	const seen = new Map<string, number>();
 	const headers = headerRow.map((name) => {
 		const count = seen.get(name) ?? 0;
@@ -72,9 +65,7 @@ export function spreadsheetToTable(
 				id,
 				name: col.name,
 				type: "singleSelect" as const,
-				options: unique.map((name, i) =>
-					createSelectOption(name, undefined)
-				),
+				options: unique.map((name) => createSelectOption(name, undefined)),
 			};
 		}
 		if (col.type === "checkbox") {
@@ -97,7 +88,7 @@ export function spreadsheetToTable(
 		return { id: createId("r"), cells };
 	});
 
-	const baseName = fileName.replace(/\.(csv|xlsx|xls)$/i, "") || "Imported";
+	const baseName = fileName.replace(/\.(csv|xlsx)$/i, "") || "Imported";
 
 	return {
 		version: 1,
@@ -110,6 +101,65 @@ export function spreadsheetToTable(
 	};
 }
 
+/** Minimal RFC 4180-ish CSV parser (quoted fields, escaped quotes). */
+export function parseCsv(text: string): string[][] {
+	const rows: string[][] = [];
+	let row: string[] = [];
+	let cell = "";
+	let i = 0;
+	let inQuotes = false;
+	const s = text.replace(/^\uFEFF/, "");
+
+	while (i < s.length) {
+		const c = s[i];
+		if (inQuotes) {
+			if (c === '"') {
+				if (s[i + 1] === '"') {
+					cell += '"';
+					i += 2;
+					continue;
+				}
+				inQuotes = false;
+				i += 1;
+				continue;
+			}
+			cell += c;
+			i += 1;
+			continue;
+		}
+		if (c === '"') {
+			inQuotes = true;
+			i += 1;
+			continue;
+		}
+		if (c === ",") {
+			row.push(cell);
+			cell = "";
+			i += 1;
+			continue;
+		}
+		if (c === "\r") {
+			i += 1;
+			continue;
+		}
+		if (c === "\n") {
+			row.push(cell);
+			rows.push(row);
+			row = [];
+			cell = "";
+			i += 1;
+			continue;
+		}
+		cell += c;
+		i += 1;
+	}
+	if (cell.length > 0 || row.length > 0) {
+		row.push(cell);
+		rows.push(row);
+	}
+	return rows;
+}
+
 function inferFieldType(samples: unknown[]): FieldType {
 	if (samples.length === 0) return "text";
 
@@ -119,7 +169,6 @@ function inferFieldType(samples: unknown[]): FieldType {
 	if (samples.every((s) => isDateLike(s))) return "date";
 
 	const unique = uniqueStrings(samples);
-	// Low-cardinality text → single select (helpful for Status-like columns)
 	if (
 		unique.length >= 2 &&
 		unique.length <= 20 &&
@@ -162,7 +211,6 @@ function isDateLike(v: unknown): boolean {
 	if (v instanceof Date && !Number.isNaN(v.getTime())) return true;
 	const s = String(v).trim();
 	if (!s) return false;
-	// ISO or common date-only
 	if (/^\d{4}-\d{2}-\d{2}/.test(s)) return true;
 	if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(s)) {
 		const t = Date.parse(s);
@@ -185,6 +233,7 @@ function coerceCell(field: Field, raw: unknown): CellValue {
 			return ["true", "yes", "y", "1", "checked"].includes(s);
 		}
 		case "number": {
+			if (typeof raw === "number" && !Number.isNaN(raw)) return raw;
 			const s = String(raw).trim().replace(/,/g, "").replace(/%$/, "");
 			const n = Number(s);
 			return Number.isNaN(n) ? null : n;
@@ -215,7 +264,8 @@ export function pickSpreadsheetFile(): Promise<File | null> {
 	return new Promise((resolve) => {
 		const input = activeDocument.createElement("input");
 		input.type = "file";
-		input.accept = ".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+		input.accept =
+			".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 		input.onchange = () => {
 			const file = input.files?.[0] ?? null;
 			resolve(file);
@@ -223,8 +273,4 @@ export function pickSpreadsheetFile(): Promise<File | null> {
 		input.addEventListener("cancel", () => resolve(null));
 		input.click();
 	});
-}
-
-export async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
-	return file.arrayBuffer();
 }

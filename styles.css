@@ -45,27 +45,27 @@
 	border-bottom: 1px solid var(--at-border);
 }
 
-.tabula-title {
+.tabula-root .tabula-title {
 	font-size: 18px;
 	font-weight: 600;
 	letter-spacing: -0.035em;
-	border: none !important;
-	background: transparent !important;
-	box-shadow: none !important;
-	padding: 4px 6px !important;
+	border: none;
+	background: transparent;
+	box-shadow: none;
+	padding: 4px 6px;
 	min-width: 140px;
 	flex: 1 1 auto;
-	border-radius: var(--at-radius-sm) !important;
-	color: var(--at-fg) !important;
+	border-radius: var(--at-radius-sm);
+	color: var(--at-fg);
 }
 
-.tabula-title:hover {
-	background: var(--at-hover) !important;
+.tabula-root .tabula-title:hover {
+	background: var(--at-hover);
 }
 
-.tabula-title:focus {
-	background: var(--at-hover) !important;
-	outline: 1px solid var(--at-border-strong) !important;
+.tabula-root .tabula-title:focus {
+	background: var(--at-hover);
+	outline: 1px solid var(--at-border-strong);
 }
 
 .tabula-toolbar-actions {
@@ -488,17 +488,17 @@
 	user-select: none;
 }
 
-.tabula-th-name {
-	border: none !important;
-	background: transparent !important;
-	box-shadow: none !important;
+.tabula-root .tabula-th-name {
+	border: none;
+	background: transparent;
+	box-shadow: none;
 	font-weight: 600;
 	font-size: 12px;
 	letter-spacing: -0.02em;
-	padding: 0 !important;
+	padding: 0;
 	min-width: 0;
 	flex: 1;
-	color: var(--at-fg) !important;
+	color: var(--at-fg);
 }
 
 .tabula-th-type {
@@ -561,13 +561,13 @@
 	color: var(--text-error);
 }
 
-.tabula-row-num,
-.tabula-row-actions {
-	min-width: 44px !important;
+.tabula-root .tabula-grid .tabula-row-num,
+.tabula-root .tabula-grid .tabula-row-actions {
+	min-width: 44px;
 	width: 44px;
 	text-align: center;
 	color: var(--at-muted);
-	background: var(--at-surface-2) !important;
+	background: var(--at-surface-2);
 	font-variant-numeric: tabular-nums;
 	font-size: 12px;
 }
@@ -590,21 +590,21 @@
 	min-height: 56px;
 }
 
-.tabula-cell-input {
+.tabula-root .tabula-cell-input {
 	width: 100%;
-	border: none !important;
-	border-radius: 0 !important;
-	background: transparent !important;
-	box-shadow: none !important;
-	padding: 8px 10px !important;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	padding: 8px 10px;
 	height: auto;
 	font-size: 13px;
 	letter-spacing: -0.011em;
 }
 
-.tabula-cell-input:focus {
-	outline: none !important;
-	box-shadow: inset 0 0 0 1px var(--at-fg) !important;
+.tabula-root .tabula-cell-input:focus {
+	outline: none;
+	box-shadow: inset 0 0 0 1px var(--at-fg);
 }
 
 .tabula-checkbox-cell {
@@ -695,13 +695,12 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	color: var(--at-fg);
-	text-decoration: underline;
-	text-underline-offset: 2px;
-	text-decoration-color: var(--at-border-strong);
+	text-decoration: none;
+	border-bottom: 1px solid var(--at-border-strong);
 }
 
 .tabula-link-cell a:hover {
-	text-decoration-color: var(--at-fg);
+	border-bottom-color: var(--at-fg);
 }
 
 .tabula-attachments {
@@ -733,17 +732,17 @@
 	flex: 1;
 }
 
-.tabula-empty {
-	padding: 40px 16px !important;
+.tabula-root .tabula-grid td.tabula-empty {
+	padding: 40px 16px;
 	text-align: center;
 	color: var(--at-muted);
 	font-size: 13px;
 	letter-spacing: -0.01em;
 }
 
-.tabula-group-row td {
-	background: var(--at-surface-2) !important;
-	padding: 8px 12px !important;
+.tabula-root .tabula-grid .tabula-group-row td {
+	background: var(--at-surface-2);
+	padding: 8px 12px;
 	font-weight: 600;
 	font-size: 12px;
 	letter-spacing: -0.02em;

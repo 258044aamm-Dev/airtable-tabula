@@ -12,7 +12,6 @@ import { DEFAULT_SETTINGS, PluginSettings } from "./settings";
 import { TabulaSettingTab } from "./ui/SettingsTab";
 import {
 	pickSpreadsheetFile,
-	readFileAsArrayBuffer,
 	spreadsheetToTable,
 } from "./import/spreadsheet";
 
@@ -68,8 +67,7 @@ export default class TabulaPlugin extends Plugin {
 		if (!file) return;
 
 		try {
-			const buffer = await readFileAsArrayBuffer(file);
-			const doc = spreadsheetToTable(buffer, file.name);
+			const doc = await spreadsheetToTable(file);
 			const created = await this.writeTableFile(doc.name, serializeTableDocument(doc));
 			await this.app.workspace.getLeaf(true).openFile(created);
 			new Notice(`Imported ${doc.rows.length} rows from ${file.name}`);

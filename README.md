@@ -6,7 +6,7 @@ Each table is a `.tabula` file (JSON) opened in a spreadsheet-style grid.
 
 ## Features
 
-- **Import CSV / Excel** — turn a `.csv`, `.xlsx`, or `.xls` file into a table in one command
+- **Import CSV / Excel** — turn a `.csv` or `.xlsx` file into a table in one command
 - **Field types** — text, long text, number, currency, percent, duration, rating, checkbox, date, date & time, URL, email, phone, single/multi select, attachments, auto number, created / last modified
 - **Selects** — colored tags, searchable dropdowns, create-on-type, option manager
 - **Views** — search, filter builder + query string, multi-sort, group by, hide fields, column resize/reorder, freeze primary column, row height
@@ -33,7 +33,7 @@ Then enable the plugin and use **Create new table** or **Import CSV / Excel as t
 ## Import CSV / Excel
 
 1. Command palette → **Import CSV / Excel as table**
-2. Pick a `.csv`, `.xlsx`, or `.xls` file from your computer
+2. Pick a `.csv` or `.xlsx` file from your computer
 
 What happens:
 
