@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Field, isSelectField } from "../data/types";
 
 interface Props {
@@ -15,13 +15,14 @@ interface Props {
 
 export function FieldHeaderMenu(props: Props) {
 	const ref = useRef<HTMLDivElement>(null);
+	const [confirmDelete, setConfirmDelete] = useState(false);
 
 	useEffect(() => {
 		const onDoc = (e: MouseEvent) => {
 			if (!ref.current?.contains(e.target as Node)) props.onClose();
 		};
-		document.addEventListener("mousedown", onDoc);
-		return () => document.removeEventListener("mousedown", onDoc);
+		activeDocument.addEventListener("mousedown", onDoc);
+		return () => activeDocument.removeEventListener("mousedown", onDoc);
 	}, [props]);
 
 	return (
@@ -46,9 +47,28 @@ export function FieldHeaderMenu(props: Props) {
 			<button type="button" onClick={props.onInsertRight}>
 				Insert right
 			</button>
-			<button type="button" className="is-danger" onClick={props.onDelete}>
-				Delete field
-			</button>
+			{confirmDelete ? (
+				<>
+					<button
+						type="button"
+						className="is-danger"
+						onClick={props.onDelete}
+					>
+						Confirm delete
+					</button>
+					<button type="button" onClick={() => setConfirmDelete(false)}>
+						Cancel
+					</button>
+				</>
+			) : (
+				<button
+					type="button"
+					className="is-danger"
+					onClick={() => setConfirmDelete(true)}
+				>
+					Delete field
+				</button>
+			)}
 		</div>
 	);
 }

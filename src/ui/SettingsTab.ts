@@ -13,10 +13,12 @@ export class TabulaSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Airtable Tabula" });
-		containerEl.createEl("p", {
-			text: "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read — and access to your bases.",
-		});
+		new Setting(containerEl).setName("Airtable Tabula").setHeading();
+
+		new Setting(containerEl)
+			.setDesc(
+				"Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read — and access to your bases."
+			);
 
 		new Setting(containerEl)
 			.setName("Airtable personal access token")

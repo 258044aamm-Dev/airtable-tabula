@@ -23,7 +23,7 @@ export function LinkSyncModal({ token, doc, onClose, onLinked }: Props) {
 
 	useEffect(() => {
 		let cancelled = false;
-		(async () => {
+		void (async () => {
 			try {
 				const client = new AirtableClient(token);
 				const list = await client.listBases();
@@ -51,7 +51,7 @@ export function LinkSyncModal({ token, doc, onClose, onLinked }: Props) {
 		let cancelled = false;
 		setLoadingTables(true);
 		setError(null);
-		(async () => {
+		void (async () => {
 			try {
 				const client = new AirtableClient(token);
 				const list = await client.getTables(baseId);

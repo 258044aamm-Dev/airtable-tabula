@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type JSX } from "react";
 import {
 	CellValue,
 	Field,
@@ -228,7 +228,7 @@ function FieldHeader({
 						setMenuOpen(false);
 					}}
 					onDelete={() => {
-						if (confirm(`Delete field "${field.name}"?`)) onDelete(field.id);
+						onDelete(field.id);
 						setMenuOpen(false);
 					}}
 				/>

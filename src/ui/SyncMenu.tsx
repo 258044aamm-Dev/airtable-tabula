@@ -30,8 +30,8 @@ export function SyncMenu({
 		const onDoc = (e: MouseEvent) => {
 			if (!ref.current?.contains(e.target as Node)) setOpen(false);
 		};
-		document.addEventListener("mousedown", onDoc);
-		return () => document.removeEventListener("mousedown", onDoc);
+		activeDocument.addEventListener("mousedown", onDoc);
+		return () => activeDocument.removeEventListener("mousedown", onDoc);
 	}, [open]);
 
 	const label = linked

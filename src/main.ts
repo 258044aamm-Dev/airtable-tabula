@@ -31,9 +31,9 @@ export default class TabulaPlugin extends Plugin {
 		this.addSettingTab(new TabulaSettingTab(this.app, this));
 
 		this.addCommand({
-			id: "create-airtable-tabula-table",
+			id: "create-table",
 			name: "Create new table",
-			callback: () => this.createNewTable(),
+			callback: () => void this.createNewTable(),
 		});
 
 		this.addCommand({
@@ -47,12 +47,16 @@ export default class TabulaPlugin extends Plugin {
 		});
 	}
 
-	async onunload(): Promise<void> {
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_TABULA);
-	}
-
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const data: unknown = await this.loadData();
+		const token =
+			typeof data === "object" &&
+			data !== null &&
+			"airtableToken" in data &&
+			typeof (data as { airtableToken: unknown }).airtableToken === "string"
+				? (data as { airtableToken: string }).airtableToken
+				: DEFAULT_SETTINGS.airtableToken;
+		this.settings = { airtableToken: token };
 	}
 
 	async saveSettings(): Promise<void> {

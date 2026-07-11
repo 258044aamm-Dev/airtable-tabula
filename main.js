@@ -1093,7 +1093,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState8(initialState) {
+        function useState10(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1896,7 +1896,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo3;
         exports.useReducer = useReducer;
         exports.useRef = useRef7;
-        exports.useState = useState8;
+        exports.useState = useState10;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2443,7 +2443,7 @@ var require_react_dom_development = __commonJS({
         var HostPortal = 4;
         var HostComponent = 5;
         var HostText = 6;
-        var Fragment2 = 7;
+        var Fragment4 = 7;
         var Mode = 8;
         var ContextConsumer = 9;
         var ContextProvider = 10;
@@ -3600,7 +3600,7 @@ var require_react_dom_development = __commonJS({
               return "DehydratedFragment";
             case ForwardRef:
               return getWrappedName$1(type, type.render, "ForwardRef");
-            case Fragment2:
+            case Fragment4:
               return "Fragment";
             case HostComponent:
               return type;
@@ -12029,7 +12029,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-            if (current2 === null || current2.tag !== Fragment2) {
+            if (current2 === null || current2.tag !== Fragment4) {
               var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
               created.return = returnFiber;
               return created;
@@ -12432,7 +12432,7 @@ var require_react_dom_development = __commonJS({
               if (child.key === key) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
-                  if (child.tag === Fragment2) {
+                  if (child.tag === Fragment4) {
                     deleteRemainingChildren(returnFiber, child.sibling);
                     var existing = useFiber(child, element.props.children);
                     existing.return = returnFiber;
@@ -17908,7 +17908,7 @@ var require_react_dom_development = __commonJS({
               var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
               return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
             }
-            case Fragment2:
+            case Fragment4:
               return updateFragment(current2, workInProgress2, renderLanes2);
             case Mode:
               return updateMode(current2, workInProgress2, renderLanes2);
@@ -18180,7 +18180,7 @@ var require_react_dom_development = __commonJS({
             case SimpleMemoComponent:
             case FunctionComponent:
             case ForwardRef:
-            case Fragment2:
+            case Fragment4:
             case Mode:
             case Profiler:
             case ContextConsumer:
@@ -22441,7 +22441,7 @@ var require_react_dom_development = __commonJS({
           return fiber;
         }
         function createFiberFromFragment(elements, mode, lanes, key) {
-          var fiber = createFiber(Fragment2, elements, key, mode);
+          var fiber = createFiber(Fragment4, elements, key, mode);
           fiber.lanes = lanes;
           return fiber;
         }
@@ -24501,10 +24501,10 @@ __export(main_exports, {
   default: () => TabulaPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian4 = require("obsidian");
+var import_obsidian5 = require("obsidian");
 
 // src/views/TableView.ts
-var import_obsidian2 = require("obsidian");
+var import_obsidian3 = require("obsidian");
 
 // src/data/types.ts
 var SELECT_COLORS = [
@@ -24690,7 +24690,35 @@ function createField(type, name) {
       return { id, name: label, type, symbol: "$" };
     case "rating":
       return { id, name: label, type, max: 5 };
-    default:
+    case "text":
+      return { id, name: label, type };
+    case "longText":
+      return { id, name: label, type };
+    case "number":
+      return { id, name: label, type };
+    case "percent":
+      return { id, name: label, type };
+    case "duration":
+      return { id, name: label, type };
+    case "checkbox":
+      return { id, name: label, type };
+    case "date":
+      return { id, name: label, type };
+    case "datetime":
+      return { id, name: label, type };
+    case "url":
+      return { id, name: label, type };
+    case "email":
+      return { id, name: label, type };
+    case "phone":
+      return { id, name: label, type };
+    case "attachment":
+      return { id, name: label, type };
+    case "autoNumber":
+      return { id, name: label, type };
+    case "createdTime":
+      return { id, name: label, type };
+    case "lastModifiedTime":
       return { id, name: label, type };
   }
 }
@@ -24783,7 +24811,38 @@ function normalizeField(field) {
     const max = typeof field.max === "number" ? field.max : 5;
     return { id, name, type, max };
   }
-  return { id, name, type };
+  switch (type) {
+    case "text":
+      return { id, name, type };
+    case "longText":
+      return { id, name, type };
+    case "number":
+      return { id, name, type };
+    case "percent":
+      return { id, name, type };
+    case "duration":
+      return { id, name, type };
+    case "checkbox":
+      return { id, name, type };
+    case "date":
+      return { id, name, type };
+    case "datetime":
+      return { id, name, type };
+    case "url":
+      return { id, name, type };
+    case "email":
+      return { id, name, type };
+    case "phone":
+      return { id, name, type };
+    case "attachment":
+      return { id, name, type };
+    case "autoNumber":
+      return { id, name, type };
+    case "createdTime":
+      return { id, name, type };
+    case "lastModifiedTime":
+      return { id, name, type };
+  }
 }
 function normalizeOption(option) {
   return {
@@ -24861,12 +24920,15 @@ function normalizeFilterGroup(group) {
   }
   return {
     logic: group.logic === "or" ? "or" : "and",
-    conditions: Array.isArray(group.conditions) ? group.conditions.map((c) => ({
-      id: typeof c.id === "string" ? c.id : createId("c"),
-      fieldId: typeof c.fieldId === "string" ? c.fieldId : "",
-      operator: c.operator ?? "equals",
-      value: c.value
-    })) : []
+    conditions: Array.isArray(group.conditions) ? group.conditions.map((c) => {
+      const operator = c.operator ?? "equals";
+      return {
+        id: typeof c.id === "string" ? c.id : createId("c"),
+        fieldId: typeof c.fieldId === "string" ? c.fieldId : "",
+        operator,
+        value: c.value
+      };
+    }) : []
   };
 }
 function normalizeSync(sync) {
@@ -24937,11 +24999,11 @@ function parseDuration(input) {
 
 // src/ui/mount.tsx
 var import_client = __toESM(require_client());
-var import_react9 = __toESM(require_react());
+var import_react10 = __toESM(require_react());
 
 // src/ui/TableApp.tsx
-var import_react8 = __toESM(require_react());
-var import_obsidian = require("obsidian");
+var import_react9 = __toESM(require_react());
+var import_obsidian2 = require("obsidian");
 
 // src/data/query.ts
 var TEXT_OPS = ["contains", "equals", "isEmpty", "isNotEmpty"];
@@ -25406,6 +25468,7 @@ function optionLabel(field, value) {
 }
 
 // src/sync/airtableClient.ts
+var import_obsidian = require("obsidian");
 var AirtableApiError = class extends Error {
   constructor(status, message) {
     super(message);
@@ -25418,22 +25481,23 @@ var AirtableClient = class {
     this.token = token;
   }
   async request(path, init = {}) {
-    const res = await fetch(`https://api.airtable.com/v0${path}`, {
-      ...init,
+    const res = await (0, import_obsidian.requestUrl)({
+      url: `https://api.airtable.com/v0${path}`,
+      method: init.method ?? "GET",
       headers: {
         Authorization: `Bearer ${this.token}`,
-        "Content-Type": "application/json",
-        ...init.headers ?? {}
-      }
+        "Content-Type": "application/json"
+      },
+      body: init.body,
+      throw: false
     });
-    const text = await res.text();
     let body = null;
     try {
-      body = text ? JSON.parse(text) : null;
+      body = res.text ? JSON.parse(res.text) : null;
     } catch {
-      body = text;
+      body = res.text;
     }
-    if (!res.ok) {
+    if (res.status >= 400) {
       const msg = typeof body === "object" && body && "error" in body && typeof body.error?.message === "string" ? body.error.message : `Airtable error ${res.status}`;
       throw new AirtableApiError(res.status, msg);
     }
@@ -25588,7 +25652,38 @@ function airtableFieldToLocal(rf) {
   if (type === "rating") {
     return { id, name, type, max: rf.options?.max ?? 5 };
   }
-  return { id, name, type };
+  switch (type) {
+    case "text":
+      return { id, name, type };
+    case "longText":
+      return { id, name, type };
+    case "number":
+      return { id, name, type };
+    case "percent":
+      return { id, name, type };
+    case "duration":
+      return { id, name, type };
+    case "checkbox":
+      return { id, name, type };
+    case "date":
+      return { id, name, type };
+    case "datetime":
+      return { id, name, type };
+    case "url":
+      return { id, name, type };
+    case "email":
+      return { id, name, type };
+    case "phone":
+      return { id, name, type };
+    case "attachment":
+      return { id, name, type };
+    case "autoNumber":
+      return { id, name, type };
+    case "createdTime":
+      return { id, name, type };
+    case "lastModifiedTime":
+      return { id, name, type };
+  }
 }
 function createLinkConfig(baseId, baseName, table, doc, replaceSchema) {
   let fields = doc.fields;
@@ -25630,7 +25725,6 @@ async function pullFromAirtable(client, doc) {
   const table = tables.find((t) => t.id === sync.tableId);
   if (!table) throw new Error("Linked Airtable table not found");
   const records = await client.listRecords(sync.baseId, sync.tableId);
-  const remoteById = new Map(records.map((r) => [r.id, r]));
   let fields = doc.fields.map((f) => ensureSelectOptionsFromRemote(f, table, sync));
   const reverseRecord = new Map(
     Object.entries(sync.recordMap).map(([localId, remoteId]) => [remoteId, localId])
@@ -25860,11 +25954,11 @@ function MenuSelect({
     const onKey = (e) => {
       if (e.key === "Escape") setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
+    activeDocument.addEventListener("mousedown", onDoc);
+    activeDocument.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
+      activeDocument.removeEventListener("mousedown", onDoc);
+      activeDocument.removeEventListener("keydown", onKey);
     };
   }, [open]);
   const triggerClass = variant === "control" ? "tabula-menu-trigger" : variant === "button-primary" ? "tabula-btn tabula-btn-primary tabula-menu-btn" : "tabula-btn tabula-menu-btn";
@@ -26447,8 +26541,8 @@ function SelectEditor({
         setQ("");
       }
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    activeDocument.addEventListener("mousedown", onDoc);
+    return () => activeDocument.removeEventListener("mousedown", onDoc);
   }, []);
   const toggle = (optionId) => {
     if (field.type === "singleSelect") {
@@ -26909,12 +27003,13 @@ var import_react4 = __toESM(require_react());
 var import_jsx_runtime8 = __toESM(require_jsx_runtime());
 function FieldHeaderMenu(props) {
   const ref = (0, import_react4.useRef)(null);
+  const [confirmDelete, setConfirmDelete] = (0, import_react4.useState)(false);
   (0, import_react4.useEffect)(() => {
     const onDoc = (e) => {
       if (!ref.current?.contains(e.target)) props.onClose();
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    activeDocument.addEventListener("mousedown", onDoc);
+    return () => activeDocument.removeEventListener("mousedown", onDoc);
   }, [props]);
   return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-field-menu", ref, role: "menu", children: [
     /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onSortAsc, children: "Sort A \u2192 Z" }),
@@ -26923,7 +27018,26 @@ function FieldHeaderMenu(props) {
     isSelectField(props.field) && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onManageOptions, children: "Manage options\u2026" }),
     /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onInsertLeft, children: "Insert left" }),
     /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onInsertRight, children: "Insert right" }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", className: "is-danger", onClick: props.onDelete, children: "Delete field" })
+    confirmDelete ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        "button",
+        {
+          type: "button",
+          className: "is-danger",
+          onClick: props.onDelete,
+          children: "Confirm delete"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: () => setConfirmDelete(false), children: "Cancel" })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "button",
+      {
+        type: "button",
+        className: "is-danger",
+        onClick: () => setConfirmDelete(true),
+        children: "Delete field"
+      }
+    )
   ] });
 }
 
@@ -27121,7 +27235,7 @@ function FieldHeader({
           setMenuOpen(false);
         },
         onDelete: () => {
-          if (confirm(`Delete field "${field.name}"?`)) onDelete(field.id);
+          onDelete(field.id);
           setMenuOpen(false);
         }
       }
@@ -27176,8 +27290,10 @@ function fieldTypeLabel(field) {
 }
 
 // src/ui/OptionManager.tsx
+var import_react6 = __toESM(require_react());
 var import_jsx_runtime10 = __toESM(require_jsx_runtime());
 function OptionManager({ field, onClose, onChange, onRemoveOption }) {
+  const [pendingDeleteId, setPendingDeleteId] = (0, import_react6.useState)(null);
   const updateOption = (optionId, patch) => {
     onChange({
       ...field,
@@ -27259,16 +27375,37 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
               children: "\u2193"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+          pendingDeleteId === opt.id ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_jsx_runtime10.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+              "button",
+              {
+                className: "tabula-btn tabula-icon-btn is-danger",
+                type: "button",
+                title: "Confirm delete",
+                onClick: () => {
+                  onRemoveOption(opt.id);
+                  setPendingDeleteId(null);
+                },
+                children: "\u2713"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+              "button",
+              {
+                className: "tabula-btn tabula-icon-btn",
+                type: "button",
+                title: "Cancel",
+                onClick: () => setPendingDeleteId(null),
+                children: "\u21A9"
+              }
+            )
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
             "button",
             {
               className: "tabula-btn tabula-icon-btn",
               type: "button",
-              onClick: () => {
-                if (confirm(`Delete option "${opt.name}"?`)) {
-                  onRemoveOption(opt.id);
-                }
-              },
+              title: "Delete option",
+              onClick: () => setPendingDeleteId(opt.id),
               children: "\xD7"
             }
           )
@@ -27280,7 +27417,7 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
 }
 
 // src/ui/SyncMenu.tsx
-var import_react6 = __toESM(require_react());
+var import_react7 = __toESM(require_react());
 var import_jsx_runtime11 = __toESM(require_jsx_runtime());
 function SyncMenu({
   linked,
@@ -27292,15 +27429,15 @@ function SyncMenu({
   onPush,
   onUnlink
 }) {
-  const [open, setOpen] = (0, import_react6.useState)(false);
-  const ref = (0, import_react6.useRef)(null);
-  (0, import_react6.useEffect)(() => {
+  const [open, setOpen] = (0, import_react7.useState)(false);
+  const ref = (0, import_react7.useRef)(null);
+  (0, import_react7.useEffect)(() => {
     if (!open) return;
     const onDoc = (e) => {
       if (!ref.current?.contains(e.target)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    activeDocument.addEventListener("mousedown", onDoc);
+    return () => activeDocument.removeEventListener("mousedown", onDoc);
   }, [open]);
   const label = linked ? sync?.tableName ? `Sync \xB7 ${sync.tableName}` : "Sync \xB7 Linked" : "Sync";
   return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-menu-select", ref, children: [
@@ -27398,21 +27535,21 @@ function SyncMenu({
 }
 
 // src/ui/LinkSyncModal.tsx
-var import_react7 = __toESM(require_react());
+var import_react8 = __toESM(require_react());
 var import_jsx_runtime12 = __toESM(require_jsx_runtime());
 function LinkSyncModal({ token, doc, onClose, onLinked }) {
-  const [bases, setBases] = (0, import_react7.useState)([]);
-  const [tables, setTables] = (0, import_react7.useState)([]);
-  const [baseId, setBaseId] = (0, import_react7.useState)(doc.sync?.baseId ?? "");
-  const [tableId, setTableId] = (0, import_react7.useState)(doc.sync?.tableId ?? "");
-  const [replaceSchema, setReplaceSchema] = (0, import_react7.useState)(!doc.fields.length || doc.rows.length === 0);
-  const [loading, setLoading] = (0, import_react7.useState)(true);
-  const [loadingTables, setLoadingTables] = (0, import_react7.useState)(false);
-  const [error, setError] = (0, import_react7.useState)(null);
-  const [busy, setBusy] = (0, import_react7.useState)(false);
-  (0, import_react7.useEffect)(() => {
+  const [bases, setBases] = (0, import_react8.useState)([]);
+  const [tables, setTables] = (0, import_react8.useState)([]);
+  const [baseId, setBaseId] = (0, import_react8.useState)(doc.sync?.baseId ?? "");
+  const [tableId, setTableId] = (0, import_react8.useState)(doc.sync?.tableId ?? "");
+  const [replaceSchema, setReplaceSchema] = (0, import_react8.useState)(!doc.fields.length || doc.rows.length === 0);
+  const [loading, setLoading] = (0, import_react8.useState)(true);
+  const [loadingTables, setLoadingTables] = (0, import_react8.useState)(false);
+  const [error, setError] = (0, import_react8.useState)(null);
+  const [busy, setBusy] = (0, import_react8.useState)(false);
+  (0, import_react8.useEffect)(() => {
     let cancelled = false;
-    (async () => {
+    void (async () => {
       try {
         const client = new AirtableClient(token);
         const list = await client.listBases();
@@ -27431,7 +27568,7 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
       cancelled = true;
     };
   }, [token]);
-  (0, import_react7.useEffect)(() => {
+  (0, import_react8.useEffect)(() => {
     if (!baseId) {
       setTables([]);
       return;
@@ -27439,7 +27576,7 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
     let cancelled = false;
     setLoadingTables(true);
     setError(null);
-    (async () => {
+    void (async () => {
       try {
         const client = new AirtableClient(token);
         const list = await client.getTables(baseId);
@@ -27559,17 +27696,17 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
 // src/ui/TableApp.tsx
 var import_jsx_runtime13 = __toESM(require_jsx_runtime());
 function TableApp({ doc, onChange, airtableToken = "" }) {
-  const [showFilters, setShowFilters] = (0, import_react8.useState)(
+  const [showFilters, setShowFilters] = (0, import_react9.useState)(
     doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
   );
-  const [showSorts, setShowSorts] = (0, import_react8.useState)(doc.view.sorts.length > 0);
-  const [showHide, setShowHide] = (0, import_react8.useState)(false);
-  const [optionFieldId, setOptionFieldId] = (0, import_react8.useState)(null);
-  const [queryError, setQueryError] = (0, import_react8.useState)();
-  const [selectedRowId, setSelectedRowId] = (0, import_react8.useState)(null);
-  const [showLinkModal, setShowLinkModal] = (0, import_react8.useState)(false);
-  const [syncBusy, setSyncBusy] = (0, import_react8.useState)(false);
-  const groups = (0, import_react8.useMemo)(() => getGroupedRows(doc), [doc]);
+  const [showSorts, setShowSorts] = (0, import_react9.useState)(doc.view.sorts.length > 0);
+  const [showHide, setShowHide] = (0, import_react9.useState)(false);
+  const [optionFieldId, setOptionFieldId] = (0, import_react9.useState)(null);
+  const [queryError, setQueryError] = (0, import_react9.useState)();
+  const [selectedRowId, setSelectedRowId] = (0, import_react9.useState)(null);
+  const [showLinkModal, setShowLinkModal] = (0, import_react9.useState)(false);
+  const [syncBusy, setSyncBusy] = (0, import_react9.useState)(false);
+  const groups = (0, import_react9.useMemo)(() => getGroupedRows(doc), [doc]);
   const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
   const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
   const hasToken = Boolean(airtableToken.trim());
@@ -27731,10 +27868,10 @@ function TableApp({ doc, onChange, airtableToken = "" }) {
       const client = new AirtableClient(airtableToken.trim());
       const next = await pullFromAirtable(client, doc);
       updateDoc(next);
-      new import_obsidian.Notice(`Pulled ${next.rows.length} rows from Airtable`);
+      new import_obsidian2.Notice(`Pulled ${next.rows.length} rows from Airtable`);
     } catch (e) {
       console.error(e);
-      new import_obsidian.Notice(e instanceof Error ? e.message : "Pull failed");
+      new import_obsidian2.Notice(e instanceof Error ? e.message : "Pull failed");
     } finally {
       setSyncBusy(false);
     }
@@ -27746,10 +27883,10 @@ function TableApp({ doc, onChange, airtableToken = "" }) {
       const client = new AirtableClient(airtableToken.trim());
       const next = await pushToAirtable(client, doc);
       updateDoc(next);
-      new import_obsidian.Notice(`Pushed ${doc.rows.length} rows to Airtable`);
+      new import_obsidian2.Notice(`Pushed ${doc.rows.length} rows to Airtable`);
     } catch (e) {
       console.error(e);
-      new import_obsidian.Notice(e instanceof Error ? e.message : "Push failed");
+      new import_obsidian2.Notice(e instanceof Error ? e.message : "Push failed");
     } finally {
       setSyncBusy(false);
     }
@@ -27843,7 +27980,7 @@ function TableApp({ doc, onChange, airtableToken = "" }) {
         onClose: () => setShowLinkModal(false),
         onLinked: (next) => {
           updateDoc(next);
-          new import_obsidian.Notice(
+          new import_obsidian2.Notice(
             `Linked to ${next.sync?.baseName ?? "base"} / ${next.sync?.tableName ?? "table"}`
           );
         }
@@ -27855,17 +27992,17 @@ function TableApp({ doc, onChange, airtableToken = "" }) {
 // src/ui/mount.tsx
 function mountTableApp(container, props) {
   const root = (0, import_client.createRoot)(container);
-  root.render((0, import_react9.createElement)(TableApp, props));
+  root.render((0, import_react10.createElement)(TableApp, props));
   return root;
 }
 function updateTableApp(root, props) {
-  root.render((0, import_react9.createElement)(TableApp, props));
+  root.render((0, import_react10.createElement)(TableApp, props));
 }
 
 // src/views/TableView.ts
 var VIEW_TYPE_TABULA = "airtable-tabula-view";
 var TABULA_EXTENSION = "tabula";
-var TableView = class extends import_obsidian2.TextFileView {
+var TableView = class extends import_obsidian3.TextFileView {
   constructor(leaf, plugin) {
     super(leaf);
     this.reactRoot = null;
@@ -27971,8 +28108,8 @@ var DEFAULT_SETTINGS = {
 };
 
 // src/ui/SettingsTab.ts
-var import_obsidian3 = require("obsidian");
-var TabulaSettingTab = class extends import_obsidian3.PluginSettingTab {
+var import_obsidian4 = require("obsidian");
+var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -27980,11 +28117,11 @@ var TabulaSettingTab = class extends import_obsidian3.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Airtable Tabula" });
-    containerEl.createEl("p", {
-      text: "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
-    });
-    new import_obsidian3.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
+    new import_obsidian4.Setting(containerEl).setName("Airtable Tabula").setHeading();
+    new import_obsidian4.Setting(containerEl).setDesc(
+      "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
+    );
+    new import_obsidian4.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
       text.inputEl.type = "password";
       text.inputEl.autocomplete = "off";
       text.setPlaceholder("pat\u2026");
@@ -54964,7 +55101,7 @@ function coerceCell(field, raw) {
 }
 function pickSpreadsheetFile() {
   return new Promise((resolve) => {
-    const input = document.createElement("input");
+    const input = activeDocument.createElement("input");
     input.type = "file";
     input.accept = ".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     input.onchange = () => {
@@ -54980,7 +55117,7 @@ async function readFileAsArrayBuffer(file) {
 }
 
 // src/main.ts
-var TabulaPlugin = class extends import_obsidian4.Plugin {
+var TabulaPlugin = class extends import_obsidian5.Plugin {
   constructor() {
     super(...arguments);
     this.settings = { ...DEFAULT_SETTINGS };
@@ -54994,9 +55131,9 @@ var TabulaPlugin = class extends import_obsidian4.Plugin {
     this.registerExtensions([TABULA_EXTENSION], VIEW_TYPE_TABULA);
     this.addSettingTab(new TabulaSettingTab(this.app, this));
     this.addCommand({
-      id: "create-airtable-tabula-table",
+      id: "create-table",
       name: "Create new table",
-      callback: () => this.createNewTable()
+      callback: () => void this.createNewTable()
     });
     this.addCommand({
       id: "import-spreadsheet",
@@ -55007,11 +55144,10 @@ var TabulaPlugin = class extends import_obsidian4.Plugin {
       void this.createNewTable();
     });
   }
-  async onunload() {
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_TABULA);
-  }
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const data = await this.loadData();
+    const token = typeof data === "object" && data !== null && "airtableToken" in data && typeof data.airtableToken === "string" ? data.airtableToken : DEFAULT_SETTINGS.airtableToken;
+    this.settings = { airtableToken: token };
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -55024,10 +55160,10 @@ var TabulaPlugin = class extends import_obsidian4.Plugin {
       const doc = spreadsheetToTable(buffer, file.name);
       const created = await this.writeTableFile(doc.name, serializeTableDocument(doc));
       await this.app.workspace.getLeaf(true).openFile(created);
-      new import_obsidian4.Notice(`Imported ${doc.rows.length} rows from ${file.name}`);
+      new import_obsidian5.Notice(`Imported ${doc.rows.length} rows from ${file.name}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian4.Notice(e instanceof Error ? e.message : "Import failed");
+      new import_obsidian5.Notice(e instanceof Error ? e.message : "Import failed");
     }
   }
   async createNewTable() {
@@ -55035,10 +55171,10 @@ var TabulaPlugin = class extends import_obsidian4.Plugin {
     try {
       const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
       await this.app.workspace.getLeaf(true).openFile(file);
-      new import_obsidian4.Notice(`Created ${file.basename}`);
+      new import_obsidian5.Notice(`Created ${file.basename}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian4.Notice("Failed to create table");
+      new import_obsidian5.Notice("Failed to create table");
     }
   }
   async writeTableFile(baseName, content) {

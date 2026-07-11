@@ -4,7 +4,6 @@ import {
 	FieldType,
 	Row,
 	SELECT_COLORS,
-	SelectColor,
 	SyncConfig,
 	TableDocument,
 	emptyCellValue,
@@ -15,7 +14,6 @@ import { createId, createSelectOption, nowIso } from "../data/store";
 import {
 	AirtableClient,
 	AirtableField,
-	AirtableRecord,
 	AirtableTable,
 } from "./airtableClient";
 
@@ -102,7 +100,7 @@ function airtableFieldToLocal(rf: AirtableField): Field {
 			options: choices.map((c, i) => ({
 				id: createId("o"),
 				name: c.name,
-				color: (SELECT_COLORS[i % SELECT_COLORS.length] ?? "gray") as SelectColor,
+				color: SELECT_COLORS[i % SELECT_COLORS.length] ?? "gray",
 			})),
 		};
 	}
@@ -112,7 +110,38 @@ function airtableFieldToLocal(rf: AirtableField): Field {
 	if (type === "rating") {
 		return { id, name, type, max: rf.options?.max ?? 5 };
 	}
-	return { id, name, type } as Field;
+	switch (type) {
+		case "text":
+			return { id, name, type };
+		case "longText":
+			return { id, name, type };
+		case "number":
+			return { id, name, type };
+		case "percent":
+			return { id, name, type };
+		case "duration":
+			return { id, name, type };
+		case "checkbox":
+			return { id, name, type };
+		case "date":
+			return { id, name, type };
+		case "datetime":
+			return { id, name, type };
+		case "url":
+			return { id, name, type };
+		case "email":
+			return { id, name, type };
+		case "phone":
+			return { id, name, type };
+		case "attachment":
+			return { id, name, type };
+		case "autoNumber":
+			return { id, name, type };
+		case "createdTime":
+			return { id, name, type };
+		case "lastModifiedTime":
+			return { id, name, type };
+	}
 }
 
 export function createLinkConfig(
@@ -168,7 +197,6 @@ export async function pullFromAirtable(
 	if (!table) throw new Error("Linked Airtable table not found");
 
 	const records = await client.listRecords(sync.baseId, sync.tableId);
-	const remoteById = new Map(records.map((r) => [r.id, r]));
 
 	// Ensure select options exist for mapped select fields
 	let fields = doc.fields.map((f) => ensureSelectOptionsFromRemote(f, table, sync));

@@ -47,8 +47,8 @@ export function SelectEditor({
 				setQ("");
 			}
 		};
-		document.addEventListener("mousedown", onDoc);
-		return () => document.removeEventListener("mousedown", onDoc);
+		activeDocument.addEventListener("mousedown", onDoc);
+		return () => activeDocument.removeEventListener("mousedown", onDoc);
 	}, []);
 
 	const toggle = (optionId: string) => {
