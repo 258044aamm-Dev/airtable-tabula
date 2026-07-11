@@ -1,0 +1,73 @@
+name: Release
+
+# Push a version tag matching manifest.json (e.g. 0.1.6) to build, attest,
+# and publish main.js / manifest.json / styles.css.
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify manifest version matches tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          MANIFEST_VERSION="$(node -e 'process.stdout.write(require("./manifest.json").version)')"
+          if [ "$MANIFEST_VERSION" != "$VERSION" ]; then
+            echo "manifest.json version ($MANIFEST_VERSION) does not match tag ($VERSION)"
+            exit 1
+          fi
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            styles.css
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          NOTES="$(cat <<EOF
+          ## $VERSION
+
+          Built and attested from this repository via GitHub Actions.
+          Verify with: \`gh attestation verify main.js -R MehulG/airtable-tabula\`
+          EOF
+          )"
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            gh release upload "$VERSION" main.js manifest.json styles.css --clobber
+          else
+            gh release create "$VERSION" \
+              --title "$VERSION" \
+              --notes "$NOTES" \
+              main.js manifest.json styles.css
+          fi
