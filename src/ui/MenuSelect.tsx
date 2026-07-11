@@ -49,11 +49,11 @@ export function MenuSelect({
 		const onKey = (e: KeyboardEvent) => {
 			if (e.key === "Escape") setOpen(false);
 		};
-		document.addEventListener("mousedown", onDoc);
-		document.addEventListener("keydown", onKey);
+		activeDocument.addEventListener("mousedown", onDoc);
+		activeDocument.addEventListener("keydown", onKey);
 		return () => {
-			document.removeEventListener("mousedown", onDoc);
-			document.removeEventListener("keydown", onKey);
+			activeDocument.removeEventListener("mousedown", onDoc);
+			activeDocument.removeEventListener("keydown", onKey);
 		};
 	}, [open]);
 

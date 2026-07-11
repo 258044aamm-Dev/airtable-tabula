@@ -213,7 +213,7 @@ function coerceCell(field: Field, raw: unknown): CellValue {
 
 export function pickSpreadsheetFile(): Promise<File | null> {
 	return new Promise((resolve) => {
-		const input = document.createElement("input");
+		const input = activeDocument.createElement("input");
 		input.type = "file";
 		input.accept = ".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 		input.onchange = () => {

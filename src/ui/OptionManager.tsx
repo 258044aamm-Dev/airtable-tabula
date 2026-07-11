@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
 	SELECT_COLORS,
 	SelectColor,
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export function OptionManager({ field, onClose, onChange, onRemoveOption }: Props) {
+	const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
 	const updateOption = (optionId: string, patch: Partial<SelectOption>) => {
 		onChange({
 			...field,
@@ -101,17 +104,38 @@ export function OptionManager({ field, onClose, onChange, onRemoveOption }: Prop
 							>
 								↓
 							</button>
-							<button
-								className="tabula-btn tabula-icon-btn"
-								type="button"
-								onClick={() => {
-									if (confirm(`Delete option "${opt.name}"?`)) {
-										onRemoveOption(opt.id);
-									}
-								}}
-							>
-								×
-							</button>
+							{pendingDeleteId === opt.id ? (
+								<>
+									<button
+										className="tabula-btn tabula-icon-btn is-danger"
+										type="button"
+										title="Confirm delete"
+										onClick={() => {
+											onRemoveOption(opt.id);
+											setPendingDeleteId(null);
+										}}
+									>
+										✓
+									</button>
+									<button
+										className="tabula-btn tabula-icon-btn"
+										type="button"
+										title="Cancel"
+										onClick={() => setPendingDeleteId(null)}
+									>
+										↩
+									</button>
+								</>
+							) : (
+								<button
+									className="tabula-btn tabula-icon-btn"
+									type="button"
+									title="Delete option"
+									onClick={() => setPendingDeleteId(opt.id)}
+								>
+									×
+								</button>
+							)}
 						</div>
 					))}
 				</div>

@@ -1,3 +1,5 @@
+import { requestUrl } from "obsidian";
+
 export interface AirtableBase {
 	id: string;
 	name: string;
@@ -41,23 +43,27 @@ export class AirtableApiError extends Error {
 export class AirtableClient {
 	constructor(private token: string) {}
 
-	private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
-		const res = await fetch(`https://api.airtable.com/v0${path}`, {
-			...init,
+	private async request<T>(
+		path: string,
+		init: { method?: string; body?: string } = {}
+	): Promise<T> {
+		const res = await requestUrl({
+			url: `https://api.airtable.com/v0${path}`,
+			method: init.method ?? "GET",
 			headers: {
 				Authorization: `Bearer ${this.token}`,
 				"Content-Type": "application/json",
-				...(init.headers ?? {}),
 			},
+			body: init.body,
+			throw: false,
 		});
-		const text = await res.text();
 		let body: unknown = null;
 		try {
-			body = text ? JSON.parse(text) : null;
+			body = res.text ? JSON.parse(res.text) : null;
 		} catch {
-			body = text;
+			body = res.text;
 		}
-		if (!res.ok) {
+		if (res.status >= 400) {
 			const msg =
 				typeof body === "object" &&
 				body &&

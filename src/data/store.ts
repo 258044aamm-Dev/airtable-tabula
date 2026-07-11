@@ -2,7 +2,6 @@ import {
 	CellValue,
 	Field,
 	FieldType,
-	FilterCondition,
 	FilterGroup,
 	FilterOperator,
 	Row,
@@ -132,8 +131,36 @@ export function createField(type: FieldType, name?: string): Field {
 			return { id, name: label, type, symbol: "$" };
 		case "rating":
 			return { id, name: label, type, max: 5 };
-		default:
-			return { id, name: label, type } as Field;
+		case "text":
+			return { id, name: label, type };
+		case "longText":
+			return { id, name: label, type };
+		case "number":
+			return { id, name: label, type };
+		case "percent":
+			return { id, name: label, type };
+		case "duration":
+			return { id, name: label, type };
+		case "checkbox":
+			return { id, name: label, type };
+		case "date":
+			return { id, name: label, type };
+		case "datetime":
+			return { id, name: label, type };
+		case "url":
+			return { id, name: label, type };
+		case "email":
+			return { id, name: label, type };
+		case "phone":
+			return { id, name: label, type };
+		case "attachment":
+			return { id, name: label, type };
+		case "autoNumber":
+			return { id, name: label, type };
+		case "createdTime":
+			return { id, name: label, type };
+		case "lastModifiedTime":
+			return { id, name: label, type };
 	}
 }
 
@@ -226,7 +253,7 @@ export function serializeTableDocument(doc: TableDocument): string {
 function normalizeField(field: Partial<Field>): Field {
 	const id = typeof field.id === "string" ? field.id : createId("f");
 	const name = typeof field.name === "string" ? field.name : "Field";
-	const type = (field.type ?? "text") as FieldType;
+	const type: FieldType = field.type ?? "text";
 	if (type === "singleSelect" || type === "multiSelect") {
 		const options = Array.isArray((field as { options?: SelectOption[] }).options)
 			? (field as { options: SelectOption[] }).options.map(normalizeOption)
@@ -245,7 +272,38 @@ function normalizeField(field: Partial<Field>): Field {
 			typeof (field as RatingLike).max === "number" ? (field as RatingLike).max : 5;
 		return { id, name, type, max };
 	}
-	return { id, name, type } as Field;
+	switch (type) {
+		case "text":
+			return { id, name, type };
+		case "longText":
+			return { id, name, type };
+		case "number":
+			return { id, name, type };
+		case "percent":
+			return { id, name, type };
+		case "duration":
+			return { id, name, type };
+		case "checkbox":
+			return { id, name, type };
+		case "date":
+			return { id, name, type };
+		case "datetime":
+			return { id, name, type };
+		case "url":
+			return { id, name, type };
+		case "email":
+			return { id, name, type };
+		case "phone":
+			return { id, name, type };
+		case "attachment":
+			return { id, name, type };
+		case "autoNumber":
+			return { id, name, type };
+		case "createdTime":
+			return { id, name, type };
+		case "lastModifiedTime":
+			return { id, name, type };
+	}
 }
 
 interface CurrencyLike {
@@ -333,7 +391,7 @@ function normalizeView(view: Partial<ViewState> | undefined): ViewState {
 		},
 		columnWidths:
 			view.columnWidths && typeof view.columnWidths === "object"
-				? (view.columnWidths as Record<string, number>)
+				? view.columnWidths
 				: {},
 		rowHeight,
 		frozenPrimary:
@@ -348,12 +406,15 @@ function normalizeFilterGroup(group: Partial<FilterGroup> | undefined): FilterGr
 	return {
 		logic: group.logic === "or" ? "or" : "and",
 		conditions: Array.isArray(group.conditions)
-			? group.conditions.map((c) => ({
-					id: typeof c.id === "string" ? c.id : createId("c"),
-					fieldId: typeof c.fieldId === "string" ? c.fieldId : "",
-					operator: (c.operator ?? "equals") as FilterOperator,
-					value: c.value,
-				}))
+			? group.conditions.map((c) => {
+					const operator: FilterOperator = c.operator ?? "equals";
+					return {
+						id: typeof c.id === "string" ? c.id : createId("c"),
+						fieldId: typeof c.fieldId === "string" ? c.fieldId : "",
+						operator,
+						value: c.value,
+					};
+				})
 			: [],
 	};
 }
@@ -367,13 +428,9 @@ function normalizeSync(sync: Partial<SyncConfig> | null | undefined): SyncConfig
 		tableId: sync.tableId,
 		tableName: typeof sync.tableName === "string" ? sync.tableName : undefined,
 		fieldMap:
-			sync.fieldMap && typeof sync.fieldMap === "object"
-				? (sync.fieldMap as Record<string, string>)
-				: {},
+			sync.fieldMap && typeof sync.fieldMap === "object" ? sync.fieldMap : {},
 		recordMap:
-			sync.recordMap && typeof sync.recordMap === "object"
-				? (sync.recordMap as Record<string, string>)
-				: {},
+			sync.recordMap && typeof sync.recordMap === "object" ? sync.recordMap : {},
 		lastPulledAt: typeof sync.lastPulledAt === "string" ? sync.lastPulledAt : undefined,
 		lastPushedAt: typeof sync.lastPushedAt === "string" ? sync.lastPushedAt : undefined,
 	};
