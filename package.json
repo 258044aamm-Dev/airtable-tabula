@@ -1,6 +1,6 @@
 {
 	"name": "airtable-tabula",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"description": "Local Airtable-like tables with selects, filters, query, CSV/Excel import, and optional Airtable sync",
 	"main": "main.js",
 	"scripts": {
@@ -27,7 +27,6 @@
 		"@types/node": "^20.11.0",
 		"@types/react": "^18.3.12",
 		"@types/react-dom": "^18.3.1",
-		"@types/xlsx": "^0.0.35",
 		"esbuild": "^0.25.0",
 		"obsidian": "^1.7.2",
 		"tslib": "^2.8.1",
@@ -36,6 +35,6 @@
 	"dependencies": {
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"xlsx": "^0.18.5"
+		"read-excel-file": "^9.3.1"
 	}
 }
