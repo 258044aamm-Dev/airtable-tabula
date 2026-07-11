@@ -1,0 +1,10 @@
+{
+	"id": "tabula",
+	"name": "Tabula",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Local Airtable-like tables for Obsidian — selects, filters, query, and optional Airtable sync.",
+	"author": "MehulG",
+	"authorUrl": "https://github.com/MehulG",
+	"isDesktopOnly": false
+}
