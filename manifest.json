@@ -1,9 +1,9 @@
 {
 	"id": "airtable-tabula",
 	"name": "Airtable Tabula",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"minAppVersion": "1.5.0",
-	"description": "Local Airtable-like tables for Obsidian — selects, filters, query, CSV/Excel import, and optional Airtable sync.",
+	"description": "Local Airtable-like tables with selects, filters, query, CSV/Excel import, and optional Airtable sync.",
 	"author": "MehulG",
 	"authorUrl": "https://github.com/MehulG",
 	"isDesktopOnly": false
