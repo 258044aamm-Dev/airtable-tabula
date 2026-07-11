@@ -26,12 +26,12 @@ export default class TabulaPlugin extends Plugin {
 		this.addSettingTab(new TabulaSettingTab(this.app, this));
 
 		this.addCommand({
-			id: "create-tabula-table",
+			id: "create-airtable-tabula-table",
 			name: "Create new table",
 			callback: () => this.createNewTable(),
 		});
 
-		this.addRibbonIcon("table", "Create Tabula table", () => {
+		this.addRibbonIcon("table", "Create Airtable Tabula table", () => {
 			void this.createNewTable();
 		});
 	}

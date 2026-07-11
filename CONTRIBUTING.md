@@ -1,4 +1,4 @@
-# Contributing to Tabula
+# Contributing to Airtable Tabula
 
 Thanks for contributing.
 

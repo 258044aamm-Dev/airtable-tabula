@@ -63,7 +63,7 @@ export function SyncMenu({
 				<div className="tabula-menu-popover align-right" role="menu">
 					{!hasToken && (
 						<div className="tabula-menu-hint">
-							Add a personal access token in Settings → Tabula.
+							Add a personal access token in Settings → Airtable Tabula.
 						</div>
 					)}
 					{hasToken && !linked && (

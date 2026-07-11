@@ -8,7 +8,7 @@ import {
 import { mountTableApp, updateTableApp } from "../ui/mount";
 import type TabulaPlugin from "../main";
 
-export const VIEW_TYPE_TABULA = "tabula-view";
+export const VIEW_TYPE_TABULA = "airtable-tabula-view";
 export const TABULA_EXTENSION = "tabula";
 
 export class TableView extends TextFileView {

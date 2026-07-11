@@ -1,6 +1,6 @@
 {
-	"name": "tabula",
-	"version": "0.1.0",
+	"name": "airtable-tabula",
+	"version": "0.1.1",
 	"description": "Local Airtable-like tables for Obsidian with optional Airtable sync",
 	"main": "main.js",
 	"scripts": {
@@ -11,10 +11,10 @@
 	"keywords": ["obsidian", "plugin", "table", "database", "airtable", "tabula"],
 	"license": "MIT",
 	"author": "MehulG",
-	"homepage": "https://github.com/MehulG/tabula",
+	"homepage": "https://github.com/MehulG/airtable-tabula",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/MehulG/tabula.git"
+		"url": "https://github.com/MehulG/airtable-tabula.git"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.0",

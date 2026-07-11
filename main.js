@@ -27320,7 +27320,7 @@ function SyncMenu({
       }
     ),
     open && /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-menu-popover align-right", role: "menu", children: [
-      !hasToken && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-menu-hint", children: "Add a personal access token in Settings \u2192 Tabula." }),
+      !hasToken && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-menu-hint", children: "Add a personal access token in Settings \u2192 Airtable Tabula." }),
       hasToken && !linked && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
         "button",
         {
@@ -27863,7 +27863,7 @@ function updateTableApp(root, props) {
 }
 
 // src/views/TableView.ts
-var VIEW_TYPE_TABULA = "tabula-view";
+var VIEW_TYPE_TABULA = "airtable-tabula-view";
 var TABULA_EXTENSION = "tabula";
 var TableView = class extends import_obsidian2.TextFileView {
   constructor(leaf, plugin) {
@@ -27980,7 +27980,7 @@ var TabulaSettingTab = class extends import_obsidian3.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Tabula" });
+    containerEl.createEl("h2", { text: "Airtable Tabula" });
     containerEl.createEl("p", {
       text: "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
     });
@@ -28012,11 +28012,11 @@ var TabulaPlugin = class extends import_obsidian4.Plugin {
     this.registerExtensions([TABULA_EXTENSION], VIEW_TYPE_TABULA);
     this.addSettingTab(new TabulaSettingTab(this.app, this));
     this.addCommand({
-      id: "create-tabula-table",
+      id: "create-airtable-tabula-table",
       name: "Create new table",
       callback: () => this.createNewTable()
     });
-    this.addRibbonIcon("table", "Create Tabula table", () => {
+    this.addRibbonIcon("table", "Create Airtable Tabula table", () => {
       void this.createNewTable();
     });
   }
