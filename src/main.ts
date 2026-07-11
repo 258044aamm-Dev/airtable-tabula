@@ -48,13 +48,11 @@ export default class TabulaPlugin extends Plugin {
 
 	async loadSettings(): Promise<void> {
 		const data: unknown = await this.loadData();
-		const token =
-			typeof data === "object" &&
-			data !== null &&
-			"airtableToken" in data &&
-			typeof (data as { airtableToken: unknown }).airtableToken === "string"
-				? (data as { airtableToken: string }).airtableToken
-				: DEFAULT_SETTINGS.airtableToken;
+		let token = DEFAULT_SETTINGS.airtableToken;
+		if (typeof data === "object" && data !== null && "airtableToken" in data) {
+			const raw = Reflect.get(data, "airtableToken");
+			if (typeof raw === "string") token = raw;
+		}
 		this.settings = { airtableToken: token };
 	}
 

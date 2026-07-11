@@ -23,8 +23,7 @@ async function fileToMatrix(file: File): Promise<unknown[][]> {
 		return parseCsv(await file.text());
 	}
 	if (name.endsWith(".xlsx")) {
-		const data = await readSheet(file);
-		return data as unknown[][];
+		return await readSheet(file);
 	}
 	throw new Error("Unsupported file type. Use .csv or .xlsx");
 }

@@ -28117,7 +28117,7 @@ var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian4.Setting(containerEl).setName("Airtable Tabula").setHeading();
+    new import_obsidian4.Setting(containerEl).setName("Airtable sync").setHeading();
     new import_obsidian4.Setting(containerEl).setDesc(
       "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
     );
@@ -31989,8 +31989,7 @@ async function fileToMatrix(file) {
     return parseCsv(await file.text());
   }
   if (name.endsWith(".xlsx")) {
-    const data = await readSheet(file);
-    return data;
+    return await readSheet(file);
   }
   throw new Error("Unsupported file type. Use .csv or .xlsx");
 }
@@ -32241,7 +32240,11 @@ var TabulaPlugin = class extends import_obsidian5.Plugin {
   }
   async loadSettings() {
     const data = await this.loadData();
-    const token = typeof data === "object" && data !== null && "airtableToken" in data && typeof data.airtableToken === "string" ? data.airtableToken : DEFAULT_SETTINGS.airtableToken;
+    let token = DEFAULT_SETTINGS.airtableToken;
+    if (typeof data === "object" && data !== null && "airtableToken" in data) {
+      const raw = Reflect.get(data, "airtableToken");
+      if (typeof raw === "string") token = raw;
+    }
     this.settings = { airtableToken: token };
   }
   async saveSettings() {

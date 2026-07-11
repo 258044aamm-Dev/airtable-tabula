@@ -13,7 +13,7 @@ export class TabulaSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl).setName("Airtable Tabula").setHeading();
+		new Setting(containerEl).setName("Airtable sync").setHeading();
 
 		new Setting(containerEl)
 			.setDesc(
