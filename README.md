@@ -22,9 +22,17 @@ ln -s /absolute/path/to/airtable-tabula /path/to/vault/.obsidian/plugins/airtabl
 ```
 
 4. Settings → Community plugins → enable **Airtable Tabula**
-5. Command palette → **Create new table**
+5. Command palette → **Create new table** or **Import CSV / Excel as table**
 
 Required files: `main.js`, `manifest.json`, `styles.css`.
+
+## Import CSV / Excel
+
+Command palette → **Import CSV / Excel as table**, then pick a `.csv`, `.xlsx`, or `.xls` file.
+
+- First row becomes column headers
+- Types are inferred (text, number, date, checkbox, single select for low-cardinality columns)
+- Creates a new `.tabula` file in your vault
 
 ## Optional Airtable sync
 
