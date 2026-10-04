@@ -1093,7 +1093,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState10(initialState) {
+        function useState11(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1105,7 +1105,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect7(create, deps) {
+        function useEffect9(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1117,11 +1117,11 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useLayoutEffect(create, deps);
         }
-        function useCallback(callback, deps) {
+        function useCallback2(callback, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
-        function useMemo3(create, deps) {
+        function useMemo4(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useMemo(create, deps);
         }
@@ -1884,19 +1884,19 @@ var require_react_development = __commonJS({
         exports.memo = memo;
         exports.startTransition = startTransition;
         exports.unstable_act = act;
-        exports.useCallback = useCallback;
+        exports.useCallback = useCallback2;
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect7;
+        exports.useEffect = useEffect9;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect;
-        exports.useMemo = useMemo3;
+        exports.useMemo = useMemo4;
         exports.useReducer = useReducer;
         exports.useRef = useRef7;
-        exports.useState = useState10;
+        exports.useState = useState11;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -24473,11 +24473,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx14 = jsxWithValidationDynamic;
-        var jsxs14 = jsxWithValidationStatic;
+        var jsx15 = jsxWithValidationDynamic;
+        var jsxs15 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx14;
-        exports.jsxs = jsxs14;
+        exports.jsx = jsx15;
+        exports.jsxs = jsxs15;
       })();
     }
   }
@@ -24589,6 +24589,19 @@ var counter = 0;
 function createId(prefix) {
   counter += 1;
   return `${prefix}_${Date.now().toString(36)}_${counter.toString(36)}`;
+}
+function reorderById(items, fromId, toId, side) {
+  if (fromId === toId) return items;
+  const fromIndex = items.findIndex((item) => item.id === fromId);
+  if (fromIndex < 0 || !items.some((item) => item.id === toId)) return items;
+  const next = [...items];
+  const [moved] = next.splice(fromIndex, 1);
+  const targetIndex = next.findIndex((item) => item.id === toId);
+  if (targetIndex < 0) return items;
+  const insertIndex = targetIndex + (side === "after" ? 1 : 0);
+  if (insertIndex === fromIndex) return items;
+  next.splice(insertIndex, 0, moved);
+  return next;
 }
 function nowIso() {
   return (/* @__PURE__ */ new Date()).toISOString();
@@ -24999,3140 +25012,11 @@ function parseDuration(input) {
 
 // src/ui/mount.tsx
 var import_client = __toESM(require_client());
+var import_react11 = __toESM(require_react());
+
+// src/ui/TableApp.tsx
 var import_react10 = __toESM(require_react());
-
-// src/ui/TableApp.tsx
-var import_react9 = __toESM(require_react());
 var import_obsidian2 = require("obsidian");
-
-// src/data/query.ts
-var TEXT_OPS = ["contains", "equals", "isEmpty", "isNotEmpty"];
-var NUMBER_OPS = ["equals", "gt", "lt", "isEmpty"];
-var CHECKBOX_OPS = ["isTrue", "isFalse"];
-var DATE_OPS = ["equals", "before", "after", "isEmpty"];
-var SINGLE_OPS = ["is", "isNot", "isAnyOf", "isEmpty"];
-var MULTI_OPS = [
-  "contains",
-  "containsAll",
-  "containsAny",
-  "isEmpty"
-];
-var ATTACH_OPS = ["isEmpty", "isNotEmpty", "contains"];
-function operatorsForField(field) {
-  switch (field.type) {
-    case "text":
-    case "longText":
-    case "url":
-    case "email":
-    case "phone":
-      return TEXT_OPS;
-    case "number":
-    case "currency":
-    case "percent":
-    case "duration":
-    case "rating":
-    case "autoNumber":
-      return NUMBER_OPS;
-    case "checkbox":
-      return CHECKBOX_OPS;
-    case "date":
-    case "datetime":
-    case "createdTime":
-    case "lastModifiedTime":
-      return DATE_OPS;
-    case "singleSelect":
-      return SINGLE_OPS;
-    case "multiSelect":
-      return MULTI_OPS;
-    case "attachment":
-      return ATTACH_OPS;
-  }
-}
-function operatorLabel(op) {
-  const labels = {
-    contains: "contains",
-    equals: "equals",
-    isEmpty: "is empty",
-    isNotEmpty: "is not empty",
-    gt: ">",
-    lt: "<",
-    isTrue: "is checked",
-    isFalse: "is unchecked",
-    before: "is before",
-    after: "is after",
-    is: "is",
-    isNot: "is not",
-    isAnyOf: "is any of",
-    containsAll: "contains all of",
-    containsAny: "contains any of"
-  };
-  return labels[op];
-}
-function getVisibleRows(doc) {
-  const { search, filters, sorts } = doc.view;
-  let rows = doc.rows.filter((row) => matchesSearch(doc, row, search));
-  rows = rows.filter((row) => matchesFilterGroup(doc, row, filters));
-  if (sorts.length > 0) {
-    rows = [...rows].sort((a, b) => compareRows(doc, a, b, sorts));
-  }
-  return rows;
-}
-function getGroupedRows(doc) {
-  const rows = getVisibleRows(doc);
-  const fieldId = doc.view.groupBy.fieldId;
-  if (!fieldId) {
-    return [{ key: "all", label: "", rows }];
-  }
-  const field = doc.fields.find((f) => f.id === fieldId);
-  if (!field) {
-    return [{ key: "all", label: "", rows }];
-  }
-  const map = /* @__PURE__ */ new Map();
-  for (const row of rows) {
-    const { key, label } = groupKeyForCell(field, row.cells[field.id]);
-    const existing = map.get(key);
-    if (existing) existing.rows.push(row);
-    else map.set(key, { key, label, rows: [row] });
-  }
-  return Array.from(map.values());
-}
-function groupKeyForCell(field, value) {
-  if (value == null || value === "" || Array.isArray(value) && value.length === 0) {
-    return { key: "__empty__", label: "(Empty)" };
-  }
-  if (isSelectField(field)) {
-    if (field.type === "singleSelect") {
-      const opt = field.options.find((o) => o.id === value);
-      return { key: String(value), label: opt?.name ?? String(value) };
-    }
-    const ids = Array.isArray(value) ? value : [];
-    const labels = ids.map(
-      (id) => field.options.find((o) => o.id === id)?.name ?? id
-    );
-    return { key: ids.slice().sort().join(","), label: labels.join(", ") || "(Empty)" };
-  }
-  if (field.type === "checkbox") {
-    return {
-      key: value ? "true" : "false",
-      label: value ? "Checked" : "Unchecked"
-    };
-  }
-  if (field.type === "rating") {
-    return { key: String(value), label: `${value} \u2605` };
-  }
-  return { key: String(value), label: String(value) };
-}
-function matchesSearch(doc, row, search) {
-  const q = search.trim().toLowerCase();
-  if (!q) return true;
-  for (const field of doc.fields) {
-    const value = row.cells[field.id];
-    if (isTextLikeField(field)) {
-      if (String(value ?? "").toLowerCase().includes(q)) return true;
-    } else if (isNumericField(field)) {
-      if (value != null && String(value).toLowerCase().includes(q)) return true;
-    } else if (field.type === "attachment") {
-      const paths = Array.isArray(value) ? value : [];
-      if (paths.some((p) => p.toLowerCase().includes(q))) return true;
-    } else if (isSelectField(field)) {
-      const ids = field.type === "singleSelect" ? typeof value === "string" ? [value] : [] : Array.isArray(value) ? value : [];
-      for (const id of ids) {
-        const opt = field.options.find((o) => o.id === id);
-        if (opt && opt.name.toLowerCase().includes(q)) return true;
-      }
-    }
-  }
-  return false;
-}
-function matchesFilterGroup(doc, row, group) {
-  const active = group.conditions.filter((c) => c.fieldId);
-  if (active.length === 0) return true;
-  if (group.logic === "and") {
-    return active.every((c) => matchesCondition(doc, row, c));
-  }
-  return active.some((c) => matchesCondition(doc, row, c));
-}
-function matchesCondition(doc, row, condition) {
-  const field = doc.fields.find((f) => f.id === condition.fieldId);
-  if (!field) return true;
-  const value = row.cells[field.id];
-  const op = condition.operator;
-  const target = condition.value;
-  if (isTextLikeField(field)) {
-    const text = String(value ?? "");
-    if (op === "isEmpty") return text.trim() === "";
-    if (op === "isNotEmpty") return text.trim() !== "";
-    if (op === "equals") return text.toLowerCase() === String(target ?? "").toLowerCase();
-    if (op === "contains") {
-      return text.toLowerCase().includes(String(target ?? "").toLowerCase());
-    }
-    if (op === "before") return text !== "" && text < String(target ?? "");
-    if (op === "after") return text !== "" && text > String(target ?? "");
-    return true;
-  }
-  if (isNumericField(field)) {
-    const num = typeof value === "number" ? value : null;
-    if (op === "isEmpty") return num == null;
-    if (num == null) return false;
-    const t = typeof target === "number" ? target : Number(target);
-    if (Number.isNaN(t)) return false;
-    if (op === "equals") return num === t;
-    if (op === "gt") return num > t;
-    if (op === "lt") return num < t;
-    return true;
-  }
-  if (field.type === "checkbox") {
-    const checked = Boolean(value);
-    if (op === "isTrue") return checked;
-    if (op === "isFalse") return !checked;
-    return true;
-  }
-  if (field.type === "singleSelect") {
-    const id = typeof value === "string" ? value : null;
-    if (op === "isEmpty") return id == null;
-    if (op === "is") return id === target;
-    if (op === "isNot") return id !== target;
-    if (op === "isAnyOf") {
-      const list = Array.isArray(target) ? target : [];
-      return id != null && list.includes(id);
-    }
-    return true;
-  }
-  if (field.type === "multiSelect" || field.type === "attachment") {
-    const ids = Array.isArray(value) ? value : [];
-    if (op === "isEmpty") return ids.length === 0;
-    if (op === "isNotEmpty") return ids.length > 0;
-    if (op === "contains") {
-      return typeof target === "string" && ids.some((x) => x.includes(String(target)));
-    }
-    const list = Array.isArray(target) ? target : typeof target === "string" ? target.split(",").map((s) => s.trim()).filter(Boolean) : [];
-    if (op === "containsAny") return list.some((id) => ids.includes(id));
-    if (op === "containsAll") return list.every((id) => ids.includes(id));
-    return true;
-  }
-  return true;
-}
-function compareRows(doc, a, b, sorts) {
-  for (const sort of sorts) {
-    const field = doc.fields.find((f) => f.id === sort.fieldId);
-    if (!field) continue;
-    const av = a.cells[field.id];
-    const bv = b.cells[field.id];
-    const cmp = compareValues(field, av, bv);
-    if (cmp !== 0) return sort.direction === "asc" ? cmp : -cmp;
-  }
-  return 0;
-}
-function compareValues(field, a, b) {
-  if (isNumericField(field)) {
-    const an = typeof a === "number" ? a : Number.NEGATIVE_INFINITY;
-    const bn = typeof b === "number" ? b : Number.NEGATIVE_INFINITY;
-    return an - bn;
-  }
-  if (field.type === "checkbox") {
-    return Number(Boolean(a)) - Number(Boolean(b));
-  }
-  if (isSelectField(field)) {
-    const nameOf = (v) => {
-      if (field.type === "singleSelect") {
-        const opt = field.options.find((o) => o.id === v);
-        return opt?.name ?? "";
-      }
-      const ids = Array.isArray(v) ? v : [];
-      return ids.map((id) => field.options.find((o) => o.id === id)?.name ?? "").join(", ");
-    };
-    return nameOf(a).localeCompare(nameOf(b));
-  }
-  if (field.type === "attachment") {
-    const as = Array.isArray(a) ? a.join(", ") : "";
-    const bs = Array.isArray(b) ? b.join(", ") : "";
-    return as.localeCompare(bs);
-  }
-  return String(a ?? "").localeCompare(String(b ?? ""));
-}
-function parseQueryString(query, fields) {
-  const trimmed = query.trim();
-  if (!trimmed) {
-    return {
-      ok: true,
-      query: "",
-      group: { logic: "and", conditions: [] }
-    };
-  }
-  const tokens = tokenizeQuery(trimmed);
-  const conditions = [];
-  for (const token of tokens) {
-    const match = token.match(/^([^:]+):(.*)$/);
-    if (!match) {
-      return {
-        ok: false,
-        query,
-        group: { logic: "and", conditions: [] },
-        error: `Invalid token "${token}". Use field:value`
-      };
-    }
-    const fieldName = match[1].trim();
-    let rawValue = match[2];
-    const field = fields.find(
-      (f) => f.name.toLowerCase() === fieldName.toLowerCase()
-    );
-    if (!field) {
-      return {
-        ok: false,
-        query,
-        group: { logic: "and", conditions: [] },
-        error: `Unknown field "${fieldName}"`
-      };
-    }
-    let operator = "equals";
-    if (rawValue.startsWith("~")) {
-      operator = "contains";
-      rawValue = rawValue.slice(1);
-    } else if (rawValue.startsWith(">")) {
-      operator = "gt";
-      rawValue = rawValue.slice(1);
-    } else if (rawValue.startsWith("<")) {
-      operator = "lt";
-      rawValue = rawValue.slice(1);
-    } else if (rawValue.startsWith("!")) {
-      operator = "isNot";
-      rawValue = rawValue.slice(1);
-    }
-    if (rawValue === "" || rawValue.toLowerCase() === "empty") {
-      conditions.push({
-        id: createId("c"),
-        fieldId: field.id,
-        operator: "isEmpty"
-      });
-      continue;
-    }
-    const condition = buildConditionFromQuery(field, operator, rawValue);
-    if (!condition) {
-      return {
-        ok: false,
-        query,
-        group: { logic: "and", conditions: [] },
-        error: `Unsupported query for field "${field.name}"`
-      };
-    }
-    conditions.push(condition);
-  }
-  return {
-    ok: true,
-    query,
-    group: { logic: "and", conditions }
-  };
-}
-function tokenizeQuery(input) {
-  const tokens = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < input.length; i++) {
-    const ch3 = input[i];
-    if (ch3 === '"') {
-      inQuotes = !inQuotes;
-      continue;
-    }
-    if (ch3 === " " && !inQuotes) {
-      if (current) tokens.push(current);
-      current = "";
-      continue;
-    }
-    current += ch3;
-  }
-  if (current) tokens.push(current);
-  return tokens;
-}
-function buildConditionFromQuery(field, requestedOp, rawValue) {
-  const id = createId("c");
-  const parts = rawValue.split(",").map((s) => s.trim()).filter(Boolean);
-  if (isTextLikeField(field)) {
-    let finalOp = "equals";
-    if (requestedOp === "contains") finalOp = "contains";
-    else if (requestedOp === "gt" && (field.type === "date" || field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime")) {
-      finalOp = "after";
-    } else if (requestedOp === "lt" && (field.type === "date" || field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime")) {
-      finalOp = "before";
-    }
-    return { id, fieldId: field.id, operator: finalOp, value: rawValue };
-  }
-  if (isNumericField(field)) {
-    const num = Number(rawValue);
-    if (Number.isNaN(num)) return null;
-    const op = requestedOp === "gt" || requestedOp === "lt" ? requestedOp : "equals";
-    return { id, fieldId: field.id, operator: op, value: num };
-  }
-  if (field.type === "checkbox") {
-    const truthy = ["true", "1", "yes", "checked"].includes(rawValue.toLowerCase());
-    return {
-      id,
-      fieldId: field.id,
-      operator: truthy ? "isTrue" : "isFalse"
-    };
-  }
-  if (field.type === "singleSelect") {
-    if (parts.length > 1 || requestedOp === "isAnyOf") {
-      const ids = resolveOptionIds(field.options, parts);
-      return { id, fieldId: field.id, operator: "isAnyOf", value: ids };
-    }
-    const optId = resolveOptionId(field.options, rawValue);
-    if (!optId) return null;
-    return {
-      id,
-      fieldId: field.id,
-      operator: requestedOp === "isNot" ? "isNot" : "is",
-      value: optId
-    };
-  }
-  if (field.type === "multiSelect") {
-    const ids = resolveOptionIds(field.options, parts.length ? parts : [rawValue]);
-    if (ids.length === 0) return null;
-    if (ids.length === 1 && requestedOp !== "containsAny" && requestedOp !== "containsAll") {
-      return { id, fieldId: field.id, operator: "contains", value: ids[0] };
-    }
-    return {
-      id,
-      fieldId: field.id,
-      operator: requestedOp === "containsAll" ? "containsAll" : "containsAny",
-      value: ids
-    };
-  }
-  if (field.type === "attachment") {
-    return { id, fieldId: field.id, operator: "contains", value: rawValue };
-  }
-  return null;
-}
-function resolveOptionId(options, name) {
-  const found = options.find(
-    (o) => o.name.toLowerCase() === name.toLowerCase() || o.id === name
-  );
-  return found?.id ?? null;
-}
-function resolveOptionIds(options, names) {
-  return names.map((n) => resolveOptionId(options, n)).filter((id) => id != null);
-}
-function filtersToQueryString(group, fields) {
-  const parts = [];
-  for (const condition of group.conditions) {
-    const field = fields.find((f) => f.id === condition.fieldId);
-    if (!field) continue;
-    const name = field.name.includes(" ") ? `"${field.name}"` : field.name;
-    if (condition.operator === "isEmpty") {
-      parts.push(`${name}:empty`);
-      continue;
-    }
-    if (condition.operator === "isNotEmpty") continue;
-    if (condition.operator === "contains" && (field.type === "text" || field.type === "longText" || field.type === "url" || field.type === "email" || field.type === "phone")) {
-      parts.push(`${name}:~${String(condition.value ?? "")}`);
-      continue;
-    }
-    if (condition.operator === "gt") {
-      parts.push(`${name}:>${String(condition.value ?? "")}`);
-      continue;
-    }
-    if (condition.operator === "lt") {
-      parts.push(`${name}:<${String(condition.value ?? "")}`);
-      continue;
-    }
-    if (condition.operator === "isNot") {
-      const label = optionLabel(field, condition.value ?? null);
-      parts.push(`${name}:!${label}`);
-      continue;
-    }
-    if (condition.operator === "isAnyOf" || condition.operator === "containsAny" || condition.operator === "containsAll") {
-      const ids = Array.isArray(condition.value) ? condition.value : [];
-      const labels = ids.map((id) => optionLabel(field, id));
-      parts.push(`${name}:${labels.join(",")}`);
-      continue;
-    }
-    if (field.type === "checkbox") {
-      parts.push(
-        `${name}:${condition.operator === "isTrue" ? "true" : "false"}`
-      );
-      continue;
-    }
-    if (isSelectField(field)) {
-      parts.push(`${name}:${optionLabel(field, condition.value ?? null)}`);
-      continue;
-    }
-    parts.push(`${name}:${String(condition.value ?? "")}`);
-  }
-  return parts.join(" ");
-}
-function optionLabel(field, value) {
-  if (!isSelectField(field)) return String(value ?? "");
-  if (typeof value === "string") {
-    return field.options.find((o) => o.id === value)?.name ?? value;
-  }
-  return String(value ?? "");
-}
-
-// src/sync/airtableClient.ts
-var import_obsidian = require("obsidian");
-var AirtableApiError = class extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-    this.name = "AirtableApiError";
-  }
-};
-var AirtableClient = class {
-  constructor(token) {
-    this.token = token;
-  }
-  async request(path, init = {}) {
-    const res = await (0, import_obsidian.requestUrl)({
-      url: `https://api.airtable.com/v0${path}`,
-      method: init.method ?? "GET",
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        "Content-Type": "application/json"
-      },
-      body: init.body,
-      throw: false
-    });
-    let body = null;
-    try {
-      body = res.text ? JSON.parse(res.text) : null;
-    } catch {
-      body = res.text;
-    }
-    if (res.status >= 400) {
-      const msg = typeof body === "object" && body && "error" in body && typeof body.error?.message === "string" ? body.error.message : `Airtable error ${res.status}`;
-      throw new AirtableApiError(res.status, msg);
-    }
-    return body;
-  }
-  async listBases() {
-    const bases = [];
-    let offset;
-    do {
-      const q = offset ? `?offset=${encodeURIComponent(offset)}` : "";
-      const page = await this.request(
-        `/meta/bases${q}`
-      );
-      bases.push(...page.bases);
-      offset = page.offset;
-    } while (offset);
-    return bases;
-  }
-  async getTables(baseId) {
-    const data = await this.request(
-      `/meta/bases/${baseId}/tables`
-    );
-    return data.tables;
-  }
-  async listRecords(baseId, tableId) {
-    const records = [];
-    let offset;
-    do {
-      const params = new URLSearchParams({ pageSize: "100" });
-      if (offset) params.set("offset", offset);
-      const page = await this.request(
-        `/${baseId}/${tableId}?${params.toString()}`
-      );
-      records.push(...page.records);
-      offset = page.offset;
-    } while (offset);
-    return records;
-  }
-  async createRecords(baseId, tableId, records) {
-    const created = [];
-    for (let i = 0; i < records.length; i += 10) {
-      const chunk = records.slice(i, i + 10);
-      const page = await this.request(
-        `/${baseId}/${tableId}`,
-        {
-          method: "POST",
-          body: JSON.stringify({ records: chunk, typecast: true })
-        }
-      );
-      created.push(...page.records);
-    }
-    return created;
-  }
-  async updateRecords(baseId, tableId, records) {
-    const updated = [];
-    for (let i = 0; i < records.length; i += 10) {
-      const chunk = records.slice(i, i + 10);
-      const page = await this.request(
-        `/${baseId}/${tableId}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ records: chunk, typecast: true })
-        }
-      );
-      updated.push(...page.records);
-    }
-    return updated;
-  }
-};
-
-// src/sync/syncEngine.ts
-var AIRTABLE_TO_LOCAL = {
-  singleLineText: "text",
-  multilineText: "longText",
-  richText: "longText",
-  number: "number",
-  currency: "currency",
-  percent: "percent",
-  duration: "duration",
-  rating: "rating",
-  checkbox: "checkbox",
-  date: "date",
-  dateTime: "datetime",
-  url: "url",
-  email: "email",
-  phoneNumber: "phone",
-  singleSelect: "singleSelect",
-  multipleSelects: "multiSelect",
-  multipleAttachments: "attachment",
-  autoNumber: "autoNumber",
-  createdTime: "createdTime",
-  lastModifiedTime: "lastModifiedTime"
-};
-var LOCAL_WRITABLE = [
-  "text",
-  "longText",
-  "number",
-  "currency",
-  "percent",
-  "duration",
-  "rating",
-  "checkbox",
-  "date",
-  "datetime",
-  "url",
-  "email",
-  "phone",
-  "singleSelect",
-  "multiSelect",
-  "attachment"
-];
-function mapAirtableType(type) {
-  return AIRTABLE_TO_LOCAL[type] ?? "text";
-}
-function buildFieldMap(localFields, remoteFields) {
-  const map = {};
-  const used = /* @__PURE__ */ new Set();
-  for (const local of localFields) {
-    const match = remoteFields.find(
-      (r) => !used.has(r.id) && r.name.toLowerCase() === local.name.toLowerCase()
-    );
-    if (match) {
-      map[local.id] = match.id;
-      used.add(match.id);
-    }
-  }
-  return map;
-}
-function fieldsFromAirtableTable(table) {
-  return table.fields.map((rf) => airtableFieldToLocal(rf));
-}
-function airtableFieldToLocal(rf) {
-  const type = mapAirtableType(rf.type);
-  const id = createId("f");
-  const name = rf.name;
-  if (type === "singleSelect" || type === "multiSelect") {
-    const choices = rf.options?.choices ?? [];
-    return {
-      id,
-      name,
-      type,
-      options: choices.map((c, i) => ({
-        id: createId("o"),
-        name: c.name,
-        color: SELECT_COLORS[i % SELECT_COLORS.length] ?? "gray"
-      }))
-    };
-  }
-  if (type === "currency") {
-    return { id, name, type, symbol: rf.options?.symbol ?? "$" };
-  }
-  if (type === "rating") {
-    return { id, name, type, max: rf.options?.max ?? 5 };
-  }
-  switch (type) {
-    case "text":
-      return { id, name, type };
-    case "longText":
-      return { id, name, type };
-    case "number":
-      return { id, name, type };
-    case "percent":
-      return { id, name, type };
-    case "duration":
-      return { id, name, type };
-    case "checkbox":
-      return { id, name, type };
-    case "date":
-      return { id, name, type };
-    case "datetime":
-      return { id, name, type };
-    case "url":
-      return { id, name, type };
-    case "email":
-      return { id, name, type };
-    case "phone":
-      return { id, name, type };
-    case "attachment":
-      return { id, name, type };
-    case "autoNumber":
-      return { id, name, type };
-    case "createdTime":
-      return { id, name, type };
-    case "lastModifiedTime":
-      return { id, name, type };
-  }
-}
-function createLinkConfig(baseId, baseName, table, doc, replaceSchema) {
-  let fields = doc.fields;
-  let rows = doc.rows;
-  if (replaceSchema) {
-    fields = fieldsFromAirtableTable(table);
-    rows = [];
-  }
-  const fieldMap = buildFieldMap(fields, table.fields);
-  if (replaceSchema) {
-    fields.forEach((f, i) => {
-      const rf = table.fields[i];
-      if (rf) fieldMap[f.id] = rf.id;
-    });
-  }
-  const sync = {
-    baseId,
-    baseName,
-    tableId: table.id,
-    tableName: table.name,
-    fieldMap,
-    recordMap: {}
-  };
-  return {
-    doc: {
-      ...doc,
-      name: replaceSchema ? table.name : doc.name,
-      fields,
-      rows,
-      sync
-    },
-    sync
-  };
-}
-async function pullFromAirtable(client, doc) {
-  const sync = doc.sync;
-  if (!sync) throw new Error("Table is not linked to Airtable");
-  const tables = await client.getTables(sync.baseId);
-  const table = tables.find((t) => t.id === sync.tableId);
-  if (!table) throw new Error("Linked Airtable table not found");
-  const records = await client.listRecords(sync.baseId, sync.tableId);
-  let fields = doc.fields.map((f) => ensureSelectOptionsFromRemote(f, table, sync));
-  const reverseRecord = new Map(
-    Object.entries(sync.recordMap).map(([localId, remoteId]) => [remoteId, localId])
-  );
-  const nextRecordMap = { ...sync.recordMap };
-  const rowsById = new Map(doc.rows.map((r) => [r.id, r]));
-  const nextRows = [];
-  const seenLocal = /* @__PURE__ */ new Set();
-  for (const record of records) {
-    const existingLocalId = reverseRecord.get(record.id);
-    const localId = existingLocalId ?? createId("r");
-    seenLocal.add(localId);
-    nextRecordMap[localId] = record.id;
-    const prev = rowsById.get(localId);
-    const cells = {};
-    for (const field of fields) {
-      const airFieldId = sync.fieldMap[field.id];
-      if (!airFieldId) {
-        cells[field.id] = prev?.cells[field.id] ?? emptyCellValue(field.type);
-        continue;
-      }
-      const airField = table.fields.find((f) => f.id === airFieldId);
-      const raw = record.fields[airField?.name ?? ""];
-      cells[field.id] = fromAirtableValue(field, raw);
-    }
-    nextRows.push({ id: localId, cells });
-  }
-  for (const row of doc.rows) {
-    if (!seenLocal.has(row.id) && !sync.recordMap[row.id]) {
-      nextRows.push(row);
-    }
-  }
-  return {
-    ...doc,
-    fields,
-    rows: nextRows,
-    sync: {
-      ...sync,
-      recordMap: nextRecordMap,
-      lastPulledAt: nowIso()
-    }
-  };
-}
-function ensureSelectOptionsFromRemote(field, table, sync) {
-  if (!isSelectField(field)) return field;
-  const airFieldId = sync.fieldMap[field.id];
-  if (!airFieldId) return field;
-  const airField = table.fields.find((f) => f.id === airFieldId);
-  const choices = airField?.options?.choices ?? [];
-  if (choices.length === 0) return field;
-  const options = [...field.options];
-  for (const choice of choices) {
-    if (!options.some((o) => o.name.toLowerCase() === choice.name.toLowerCase())) {
-      options.push(createSelectOption(choice.name));
-    }
-  }
-  return { ...field, options };
-}
-async function pushToAirtable(client, doc) {
-  const sync = doc.sync;
-  if (!sync) throw new Error("Table is not linked to Airtable");
-  const tables = await client.getTables(sync.baseId);
-  const table = tables.find((t) => t.id === sync.tableId);
-  if (!table) throw new Error("Linked Airtable table not found");
-  const toCreate = [];
-  const toUpdate = [];
-  for (const row of doc.rows) {
-    const fields = rowToAirtableFields(row, doc.fields, sync, table);
-    const remoteId = sync.recordMap[row.id];
-    if (remoteId) toUpdate.push({ id: remoteId, fields });
-    else toCreate.push({ localId: row.id, fields });
-  }
-  const nextRecordMap = { ...sync.recordMap };
-  if (toUpdate.length) {
-    await client.updateRecords(sync.baseId, sync.tableId, toUpdate);
-  }
-  if (toCreate.length) {
-    const created = await client.createRecords(
-      sync.baseId,
-      sync.tableId,
-      toCreate.map((c) => ({ fields: c.fields }))
-    );
-    created.forEach((rec, i) => {
-      nextRecordMap[toCreate[i].localId] = rec.id;
-    });
-  }
-  return {
-    ...doc,
-    sync: {
-      ...sync,
-      recordMap: nextRecordMap,
-      lastPushedAt: nowIso()
-    }
-  };
-}
-function rowToAirtableFields(row, fields, sync, table) {
-  const out = {};
-  for (const field of fields) {
-    if (isReadOnlyField(field)) continue;
-    if (!LOCAL_WRITABLE.includes(field.type)) continue;
-    const airFieldId = sync.fieldMap[field.id];
-    if (!airFieldId) continue;
-    const airField = table.fields.find((f) => f.id === airFieldId);
-    if (!airField) continue;
-    if (["formula", "rollup", "lookup", "count", "autoNumber", "createdTime", "lastModifiedTime", "button"].includes(
-      airField.type
-    )) {
-      continue;
-    }
-    const value = toAirtableValue(field, row.cells[field.id]);
-    if (value !== void 0) {
-      out[airField.name] = value;
-    }
-  }
-  return out;
-}
-function fromAirtableValue(field, raw) {
-  if (raw == null) return emptyCellValue(field.type);
-  switch (field.type) {
-    case "text":
-    case "longText":
-    case "url":
-    case "email":
-    case "phone":
-    case "date":
-      return String(raw);
-    case "datetime":
-    case "createdTime":
-    case "lastModifiedTime":
-      return String(raw);
-    case "number":
-    case "currency":
-    case "percent":
-    case "duration":
-    case "rating":
-    case "autoNumber":
-      return typeof raw === "number" ? raw : Number(raw);
-    case "checkbox":
-      return Boolean(raw);
-    case "singleSelect": {
-      if (!isSelectField(field)) return null;
-      const name = String(raw);
-      const opt = field.options.find(
-        (o) => o.name.toLowerCase() === name.toLowerCase()
-      );
-      return opt?.id ?? null;
-    }
-    case "multiSelect": {
-      if (!isSelectField(field)) return [];
-      const names = Array.isArray(raw) ? raw.map(String) : [];
-      return names.map(
-        (n) => field.options.find((o) => o.name.toLowerCase() === n.toLowerCase())?.id
-      ).filter((id) => Boolean(id));
-    }
-    case "attachment": {
-      if (!Array.isArray(raw)) return [];
-      return raw.map((item) => {
-        if (typeof item === "string") return item;
-        if (item && typeof item === "object" && "url" in item) {
-          return String(item.url);
-        }
-        return null;
-      }).filter((u) => Boolean(u));
-    }
-  }
-}
-function toAirtableValue(field, value) {
-  switch (field.type) {
-    case "text":
-    case "longText":
-    case "url":
-    case "email":
-    case "phone":
-    case "date":
-      return value == null || value === "" ? null : String(value);
-    case "datetime":
-      return value == null || value === "" ? null : String(value);
-    case "number":
-    case "currency":
-    case "percent":
-    case "duration":
-    case "rating":
-      return typeof value === "number" ? value : null;
-    case "checkbox":
-      return Boolean(value);
-    case "singleSelect": {
-      if (!isSelectField(field) || typeof value !== "string") return null;
-      return field.options.find((o) => o.id === value)?.name ?? null;
-    }
-    case "multiSelect": {
-      if (!isSelectField(field) || !Array.isArray(value)) return [];
-      return value.map((id) => field.options.find((o) => o.id === id)?.name).filter((n) => Boolean(n));
-    }
-    case "attachment": {
-      if (!Array.isArray(value) || value.length === 0) return [];
-      return value.map((url) => ({ url }));
-    }
-    default:
-      return void 0;
-  }
-}
-
-// src/ui/MenuSelect.tsx
-var import_react = __toESM(require_react());
-var import_jsx_runtime = __toESM(require_jsx_runtime());
-function MenuSelect({
-  label,
-  value,
-  options,
-  onChange,
-  title,
-  ariaLabel,
-  className = "",
-  variant = "control",
-  triggerLabel,
-  align = "left"
-}) {
-  const [open, setOpen] = (0, import_react.useState)(false);
-  const rootRef = (0, import_react.useRef)(null);
-  const selected = options.find((o) => o.value === value);
-  const display = triggerLabel ?? (variant === "control" ? selected?.label ?? "\u2026" : triggerLabel ?? selected?.label ?? "\u2026");
-  (0, import_react.useEffect)(() => {
-    if (!open) return;
-    const onDoc = (e) => {
-      if (!rootRef.current?.contains(e.target)) setOpen(false);
-    };
-    const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    activeDocument.addEventListener("mousedown", onDoc);
-    activeDocument.addEventListener("keydown", onKey);
-    return () => {
-      activeDocument.removeEventListener("mousedown", onDoc);
-      activeDocument.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-  const triggerClass = variant === "control" ? "tabula-menu-trigger" : variant === "button-primary" ? "tabula-btn tabula-btn-primary tabula-menu-btn" : "tabula-btn tabula-menu-btn";
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-    "div",
-    {
-      className: `tabula-menu-select ${className}`,
-      ref: rootRef,
-      title,
-      children: [
-        variant === "control" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-          "button",
-          {
-            type: "button",
-            className: `tabula-inline-control ${triggerClass}`,
-            "aria-label": ariaLabel ?? label,
-            "aria-expanded": open,
-            "aria-haspopup": "listbox",
-            onClick: () => setOpen((v) => !v),
-            children: [
-              label && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "tabula-menu-label", children: label }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "tabula-menu-value", children: display }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
-            ]
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-          "button",
-          {
-            type: "button",
-            className: triggerClass,
-            "aria-label": ariaLabel ?? triggerLabel,
-            "aria-expanded": open,
-            "aria-haspopup": "listbox",
-            onClick: () => setOpen((v) => !v),
-            children: [
-              display,
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
-            ]
-          }
-        ),
-        open && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          "div",
-          {
-            className: `tabula-menu-popover align-${align}`,
-            role: "listbox",
-            "aria-label": ariaLabel ?? label,
-            children: options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-              "button",
-              {
-                type: "button",
-                role: "option",
-                "aria-selected": opt.value === value,
-                disabled: opt.disabled,
-                className: `tabula-menu-option ${opt.value === value ? "is-selected" : ""}`,
-                onClick: () => {
-                  if (opt.disabled) return;
-                  onChange(opt.value);
-                  setOpen(false);
-                },
-                children: [
-                  opt.label,
-                  opt.value === value && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "tabula-menu-check", "aria-hidden": "true", children: "\u2713" })
-                ]
-              },
-              opt.value || "__empty"
-            ))
-          }
-        )
-      ]
-    }
-  );
-}
-
-// src/ui/Toolbar.tsx
-var import_jsx_runtime2 = __toESM(require_jsx_runtime());
-function Toolbar(props) {
-  const { doc } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "tabula-toolbar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-      "input",
-      {
-        className: "tabula-title",
-        value: doc.name,
-        onChange: (e) => props.onRename(e.target.value),
-        "aria-label": "Table name"
-      }
-    ),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "tabula-toolbar-actions", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-        "input",
-        {
-          className: "tabula-search",
-          type: "search",
-          placeholder: "Search\u2026",
-          value: doc.view.search,
-          onChange: (e) => props.onSearch(e.target.value),
-          "aria-label": "Search rows"
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
-        "button",
-        {
-          className: `tabula-btn ${props.showFilters ? "is-active" : ""}`,
-          onClick: props.onToggleFilters,
-          type: "button",
-          "aria-pressed": props.showFilters,
-          title: "Show filter and query panel",
-          children: [
-            "Filter",
-            doc.view.filters.conditions.length > 0 ? ` (${doc.view.filters.conditions.length})` : ""
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
-        "button",
-        {
-          className: `tabula-btn ${props.showSorts || doc.view.sorts.length > 0 ? "is-active" : ""}`,
-          onClick: props.onToggleSorts,
-          type: "button",
-          "aria-pressed": props.showSorts,
-          title: "Show sort panel",
-          children: [
-            "Sort",
-            doc.view.sorts.length ? ` (${doc.view.sorts.length})` : ""
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-        MenuSelect,
-        {
-          label: "Group",
-          title: "Group rows by field",
-          ariaLabel: "Group by field",
-          value: doc.view.groupBy.fieldId ?? "",
-          onChange: (v) => props.onGroupBy(v || null),
-          options: [
-            { value: "", label: "None" },
-            ...doc.fields.map((f) => ({ value: f.id, label: f.name }))
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
-        "button",
-        {
-          className: `tabula-btn ${props.showHide ? "is-active" : ""}`,
-          onClick: props.onToggleHide,
-          type: "button",
-          "aria-pressed": props.showHide,
-          title: "Show or hide columns",
-          children: [
-            "Hide",
-            doc.view.hiddenFieldIds.length ? ` (${doc.view.hiddenFieldIds.length})` : ""
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-        MenuSelect,
-        {
-          label: "Height",
-          title: "Row height",
-          ariaLabel: "Row height",
-          value: doc.view.rowHeight,
-          onChange: (v) => props.onRowHeight(v),
-          options: [
-            { value: "short", label: "Short" },
-            { value: "medium", label: "Medium" },
-            { value: "tall", label: "Tall" }
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-        MenuSelect,
-        {
-          label: "Freeze",
-          title: "Keep the first column fixed while scrolling",
-          ariaLabel: "Freeze primary column",
-          value: doc.view.frozenPrimary ? "on" : "off",
-          onChange: (v) => {
-            const next = v === "on";
-            if (next !== doc.view.frozenPrimary) props.onToggleFrozen();
-          },
-          options: [
-            { value: "on", label: "On" },
-            { value: "off", label: "Off" }
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
-      props.syncControl,
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-        "button",
-        {
-          className: "tabula-btn tabula-btn-primary",
-          onClick: props.onAddRow,
-          type: "button",
-          title: "Add a new row",
-          children: "+ Row"
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-        MenuSelect,
-        {
-          variant: "button",
-          triggerLabel: "+ Field",
-          title: "Add a column",
-          ariaLabel: "Add field type",
-          value: "",
-          align: "right",
-          onChange: (type) => {
-            if (type) props.onAddField(type);
-          },
-          options: ALL_FIELD_TYPES.map((ft) => ({
-            value: ft.type,
-            label: ft.label
-          }))
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "tabula-count", children: [
-        props.rowCount,
-        props.rowCount !== doc.rows.length ? ` / ${doc.rows.length}` : "",
-        " rows"
-      ] })
-    ] })
-  ] });
-}
-
-// src/ui/FilterBar.tsx
-var import_jsx_runtime3 = __toESM(require_jsx_runtime());
-function FilterBar({
-  doc,
-  queryError,
-  onQueryChange,
-  onFiltersChange
-}) {
-  const { filters, query } = doc.view;
-  const updateCondition = (id, patch) => {
-    onFiltersChange({
-      ...filters,
-      conditions: filters.conditions.map(
-        (c) => c.id === id ? { ...c, ...patch } : c
-      )
-    });
-  };
-  const addCondition = () => {
-    const field = doc.fields[0];
-    if (!field) return;
-    const ops = operatorsForField(field);
-    onFiltersChange({
-      ...filters,
-      conditions: [
-        ...filters.conditions,
-        {
-          id: createId("c"),
-          fieldId: field.id,
-          operator: ops[0],
-          value: ""
-        }
-      ]
-    });
-  };
-  const removeCondition = (id) => {
-    onFiltersChange({
-      ...filters,
-      conditions: filters.conditions.filter((c) => c.id !== id)
-    });
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-filter-bar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-query-row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "tabula-query-label", children: "Query" }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        "input",
-        {
-          className: `tabula-query-input ${queryError ? "has-error" : ""}`,
-          value: query,
-          placeholder: "status:Done tags:urgent,design name:~ship",
-          onChange: (e) => onQueryChange(e.target.value),
-          spellCheck: false
-        }
-      ),
-      queryError && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-query-error", children: queryError })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-filter-controls", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        MenuSelect,
-        {
-          value: filters.logic,
-          ariaLabel: "Filter logic",
-          onChange: (logic) => onFiltersChange({
-            ...filters,
-            logic: logic === "or" ? "or" : "and"
-          }),
-          options: [
-            { value: "and", label: "Match all (AND)" },
-            { value: "or", label: "Match any (OR)" }
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "tabula-btn", type: "button", onClick: addCondition, children: "+ Condition" }),
-      filters.conditions.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        "button",
-        {
-          className: "tabula-btn",
-          type: "button",
-          onClick: () => onFiltersChange({ logic: filters.logic, conditions: [] }),
-          children: "Clear"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "tabula-conditions", children: filters.conditions.map((condition) => {
-      const field = doc.fields.find((f) => f.id === condition.fieldId);
-      const ops = field ? operatorsForField(field) : [];
-      const needsValue = !["isEmpty", "isNotEmpty", "isTrue", "isFalse"].includes(
-        condition.operator
-      );
-      return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-condition", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          MenuSelect,
-          {
-            value: condition.fieldId,
-            ariaLabel: "Filter field",
-            onChange: (fieldId) => {
-              const nextField = doc.fields.find((f) => f.id === fieldId);
-              const nextOps = nextField ? operatorsForField(nextField) : [];
-              updateCondition(condition.id, {
-                fieldId,
-                operator: nextOps[0],
-                value: ""
-              });
-            },
-            options: doc.fields.map((f) => ({ value: f.id, label: f.name }))
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          MenuSelect,
-          {
-            value: condition.operator,
-            ariaLabel: "Filter operator",
-            onChange: (operator) => updateCondition(condition.id, {
-              operator
-            }),
-            options: ops.map((op) => ({
-              value: op,
-              label: operatorLabel(op)
-            }))
-          }
-        ),
-        needsValue && field && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          ConditionValueInput,
-          {
-            field,
-            condition,
-            onChange: (value) => updateCondition(condition.id, { value })
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          "button",
-          {
-            className: "tabula-btn tabula-icon-btn",
-            type: "button",
-            onClick: () => removeCondition(condition.id),
-            "aria-label": "Remove condition",
-            children: "\xD7"
-          }
-        )
-      ] }, condition.id);
-    }) })
-  ] });
-}
-function ConditionValueInput({
-  field,
-  condition,
-  onChange
-}) {
-  if (field.type === "singleSelect" || field.type === "multiSelect") {
-    if (condition.operator === "isAnyOf" || condition.operator === "containsAny" || condition.operator === "containsAll") {
-      const selected = Array.isArray(condition.value) ? condition.value : [];
-      return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "tabula-multi-filter", children: field.options.map((opt) => {
-        const checked = selected.includes(opt.id);
-        return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "tabula-check-label", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-            "input",
-            {
-              type: "checkbox",
-              checked,
-              onChange: () => {
-                onChange(
-                  checked ? selected.filter((id) => id !== opt.id) : [...selected, opt.id]
-                );
-              }
-            }
-          ),
-          opt.name
-        ] }, opt.id);
-      }) });
-    }
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-      MenuSelect,
-      {
-        value: typeof condition.value === "string" ? condition.value : "",
-        ariaLabel: "Filter value",
-        onChange: (v) => onChange(v),
-        options: [
-          { value: "", label: "Select\u2026" },
-          ...field.options.map((opt) => ({ value: opt.id, label: opt.name }))
-        ]
-      }
-    );
-  }
-  if (isNumericField(field)) {
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-      "input",
-      {
-        type: "number",
-        value: typeof condition.value === "number" ? condition.value : "",
-        onChange: (e) => onChange(e.target.value === "" ? null : Number(e.target.value))
-      }
-    );
-  }
-  if (field.type === "date") {
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-      "input",
-      {
-        type: "date",
-        value: typeof condition.value === "string" ? condition.value : "",
-        onChange: (e) => onChange(e.target.value)
-      }
-    );
-  }
-  if (field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime") {
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-      "input",
-      {
-        type: "datetime-local",
-        value: typeof condition.value === "string" && condition.value ? condition.value.slice(0, 16) : "",
-        onChange: (e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : "")
-      }
-    );
-  }
-  if (isSelectField(field)) {
-    return null;
-  }
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-    "input",
-    {
-      type: "text",
-      value: typeof condition.value === "string" ? condition.value : "",
-      onChange: (e) => onChange(e.target.value)
-    }
-  );
-}
-
-// src/ui/SortBar.tsx
-var import_jsx_runtime4 = __toESM(require_jsx_runtime());
-function SortBar({ doc, onChange }) {
-  const { sorts } = doc.view;
-  const update = (index, patch) => {
-    onChange(sorts.map((s, i) => i === index ? { ...s, ...patch } : s));
-  };
-  const add = () => {
-    const field = doc.fields.find((f) => !sorts.some((s) => s.fieldId === f.id)) ?? doc.fields[0];
-    if (!field) return;
-    onChange([...sorts, { fieldId: field.id, direction: "asc" }]);
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-panel", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-panel-header", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("strong", { children: "Sort" }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "tabula-btn", type: "button", onClick: add, children: "+ Sort" }),
-      sorts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "tabula-btn", type: "button", onClick: () => onChange([]), children: "Clear" })
-    ] }),
-    sorts.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-panel-empty", children: "No sorts \u2014 click + Sort or use a column menu." }),
-    sorts.map((sort, index) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-condition", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        MenuSelect,
-        {
-          value: sort.fieldId,
-          ariaLabel: "Sort field",
-          onChange: (fieldId) => update(index, { fieldId }),
-          options: doc.fields.map((f) => ({ value: f.id, label: f.name }))
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        MenuSelect,
-        {
-          value: sort.direction,
-          ariaLabel: "Sort direction",
-          onChange: (direction) => update(index, { direction: direction === "desc" ? "desc" : "asc" }),
-          options: [
-            { value: "asc", label: "A \u2192 Z" },
-            { value: "desc", label: "Z \u2192 A" }
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        "button",
-        {
-          className: "tabula-btn tabula-icon-btn",
-          type: "button",
-          onClick: () => onChange(sorts.filter((_, i) => i !== index)),
-          children: "\xD7"
-        }
-      )
-    ] }, `${sort.fieldId}-${index}`))
-  ] });
-}
-
-// src/ui/HideFieldsMenu.tsx
-var import_jsx_runtime5 = __toESM(require_jsx_runtime());
-function HideFieldsMenu({ doc, onChange }) {
-  const hidden = new Set(doc.view.hiddenFieldIds);
-  const toggle = (fieldId) => {
-    if (hidden.has(fieldId)) {
-      onChange(doc.view.hiddenFieldIds.filter((id) => id !== fieldId));
-    } else {
-      onChange([...doc.view.hiddenFieldIds, fieldId]);
-    }
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-panel", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-panel-header", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("strong", { children: "Hide fields" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-        "button",
-        {
-          className: "tabula-btn",
-          type: "button",
-          onClick: () => onChange([]),
-          disabled: hidden.size === 0,
-          children: "Show all"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "tabula-hide-list", children: doc.fields.map((f) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("label", { className: "tabula-check-label", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-        "input",
-        {
-          type: "checkbox",
-          checked: !hidden.has(f.id),
-          onChange: () => toggle(f.id)
-        }
-      ),
-      f.name,
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "tabula-muted", children: [
-        "(",
-        f.type,
-        ")"
-      ] })
-    ] }, f.id)) })
-  ] });
-}
-
-// src/ui/TableGrid.tsx
-var import_react5 = __toESM(require_react());
-
-// src/ui/CellEditor.tsx
-var import_react3 = __toESM(require_react());
-
-// src/ui/SelectEditor.tsx
-var import_react2 = __toESM(require_react());
-var import_jsx_runtime6 = __toESM(require_jsx_runtime());
-function SelectEditor({
-  field,
-  value,
-  onChange,
-  onAddOption,
-  onManageOptions
-}) {
-  const [open, setOpen] = (0, import_react2.useState)(false);
-  const [q, setQ] = (0, import_react2.useState)("");
-  const rootRef = (0, import_react2.useRef)(null);
-  const selectedIds = field.type === "singleSelect" ? typeof value === "string" ? [value] : [] : Array.isArray(value) ? value : [];
-  const filtered = (0, import_react2.useMemo)(() => {
-    const needle = q.trim().toLowerCase();
-    if (!needle) return field.options;
-    return field.options.filter((o) => o.name.toLowerCase().includes(needle));
-  }, [field.options, q]);
-  (0, import_react2.useEffect)(() => {
-    const onDoc = (e) => {
-      if (!rootRef.current?.contains(e.target)) {
-        setOpen(false);
-        setQ("");
-      }
-    };
-    activeDocument.addEventListener("mousedown", onDoc);
-    return () => activeDocument.removeEventListener("mousedown", onDoc);
-  }, []);
-  const toggle = (optionId) => {
-    if (field.type === "singleSelect") {
-      onChange(selectedIds[0] === optionId ? null : optionId);
-      setOpen(false);
-      setQ("");
-      return;
-    }
-    const next = selectedIds.includes(optionId) ? selectedIds.filter((id) => id !== optionId) : [...selectedIds, optionId];
-    onChange(next);
-  };
-  const createAndSelect = () => {
-    const name = q.trim();
-    if (!name) return;
-    const existing = field.options.find(
-      (o) => o.name.toLowerCase() === name.toLowerCase()
-    );
-    const option = existing ?? onAddOption(name);
-    if (field.type === "singleSelect") {
-      onChange(option.id);
-      setOpen(false);
-      setQ("");
-    } else {
-      const next = selectedIds.includes(option.id) ? selectedIds : [...selectedIds, option.id];
-      onChange(next);
-      setQ("");
-    }
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-select", ref: rootRef, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-      "button",
-      {
-        type: "button",
-        className: "tabula-select-trigger",
-        onClick: () => setOpen((v) => !v),
-        children: selectedIds.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "tabula-placeholder", children: "Select\u2026" }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "tabula-pills", children: selectedIds.map((id) => {
-          const opt = field.options.find((o) => o.id === id);
-          if (!opt) return null;
-          return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-            "span",
-            {
-              className: `tabula-pill tabula-color-${opt.color}`,
-              children: [
-                opt.name,
-                field.type === "multiSelect" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-                  "span",
-                  {
-                    className: "tabula-pill-x",
-                    onClick: (e) => {
-                      e.stopPropagation();
-                      toggle(id);
-                    },
-                    children: "\xD7"
-                  }
-                )
-              ]
-            },
-            id
-          );
-        }) })
-      }
-    ),
-    open && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-select-menu", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-        "input",
-        {
-          className: "tabula-select-search",
-          autoFocus: true,
-          placeholder: "Search or create\u2026",
-          value: q,
-          onChange: (e) => setQ(e.target.value),
-          onKeyDown: (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              if (filtered.length === 1) toggle(filtered[0].id);
-              else createAndSelect();
-            }
-            if (e.key === "Escape") {
-              setOpen(false);
-              setQ("");
-            }
-          }
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-select-options", children: [
-        filtered.map((opt) => {
-          const active = selectedIds.includes(opt.id);
-          return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-            "button",
-            {
-              type: "button",
-              className: `tabula-select-option ${active ? "is-active" : ""}`,
-              onClick: () => toggle(opt.id),
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
-                active && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "tabula-check", children: "\u2713" })
-              ]
-            },
-            opt.id
-          );
-        }),
-        q.trim() && !field.options.some(
-          (o) => o.name.toLowerCase() === q.trim().toLowerCase()
-        ) && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-          "button",
-          {
-            type: "button",
-            className: "tabula-select-option tabula-create-option",
-            onClick: createAndSelect,
-            children: [
-              "Create \u201C",
-              q.trim(),
-              "\u201D"
-            ]
-          }
-        )
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-        "button",
-        {
-          type: "button",
-          className: "tabula-select-manage",
-          onClick: () => {
-            setOpen(false);
-            onManageOptions();
-          },
-          children: "Manage options\u2026"
-        }
-      )
-    ] })
-  ] });
-}
-
-// src/ui/CellEditor.tsx
-var import_jsx_runtime7 = __toESM(require_jsx_runtime());
-function CellEditor(props) {
-  const { field, value, onChange } = props;
-  if (field.type === "checkbox") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("label", { className: "tabula-checkbox-cell", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      "input",
-      {
-        type: "checkbox",
-        checked: Boolean(value),
-        onChange: (e) => onChange(e.target.checked)
-      }
-    ) });
-  }
-  if (field.type === "rating") {
-    const max2 = field.max ?? 5;
-    const current = typeof value === "number" ? value : 0;
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "tabula-rating", children: Array.from({ length: max2 }, (_, i) => {
-      const n = i + 1;
-      return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-        "button",
-        {
-          type: "button",
-          className: `tabula-star ${n <= current ? "is-on" : ""}`,
-          onClick: () => onChange(current === n ? null : n),
-          "aria-label": `${n} star`,
-          children: "\u2605"
-        },
-        n
-      );
-    }) });
-  }
-  if (field.type === "singleSelect" || field.type === "multiSelect") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      SelectEditor,
-      {
-        field,
-        value,
-        onChange,
-        onAddOption: props.onAddOption,
-        onManageOptions: props.onManageOptions
-      }
-    );
-  }
-  if (field.type === "attachment") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      AttachmentCell,
-      {
-        value: Array.isArray(value) ? value : [],
-        onChange
-      }
-    );
-  }
-  if (field.type === "longText") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      LongTextCell,
-      {
-        value: typeof value === "string" ? value : "",
-        onChange
-      }
-    );
-  }
-  if (isReadOnlyField(field)) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-readonly", children: formatReadOnly(field, value) });
-  }
-  if (field.type === "number" || field.type === "currency" || field.type === "percent") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-affix-cell", children: [
-      field.type === "currency" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-affix", children: field.symbol ?? "$" }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-        "input",
-        {
-          className: "tabula-cell-input",
-          type: "number",
-          value: typeof value === "number" ? value : "",
-          onChange: (e) => onChange(e.target.value === "" ? null : Number(e.target.value)),
-          onKeyDown: navKeys
-        }
-      ),
-      field.type === "percent" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-affix", children: "%" })
-    ] });
-  }
-  if (field.type === "duration") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      "input",
-      {
-        className: "tabula-cell-input",
-        type: "text",
-        placeholder: "h:mm:ss",
-        defaultValue: formatDuration(typeof value === "number" ? value : null),
-        onBlur: (e) => onChange(parseDuration(e.target.value)),
-        onKeyDown: (e) => {
-          if (e.key === "Enter") e.target.blur();
-          navKeys(e);
-        }
-      },
-      String(value)
-    );
-  }
-  if (field.type === "date") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      "input",
-      {
-        className: "tabula-cell-input",
-        type: "date",
-        value: typeof value === "string" ? value.slice(0, 10) : "",
-        onChange: (e) => onChange(e.target.value),
-        onKeyDown: navKeys
-      }
-    );
-  }
-  if (field.type === "datetime") {
-    const local = typeof value === "string" && value ? toDatetimeLocal(value) : "";
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      "input",
-      {
-        className: "tabula-cell-input",
-        type: "datetime-local",
-        value: local,
-        onChange: (e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : ""),
-        onKeyDown: navKeys
-      }
-    );
-  }
-  if (field.type === "url" || field.type === "email") {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      LinkTextCell,
-      {
-        kind: field.type,
-        value: typeof value === "string" ? value : "",
-        onChange
-      }
-    );
-  }
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-    TextCell,
-    {
-      value: typeof value === "string" ? value : "",
-      onChange
-    }
-  );
-}
-function formatReadOnly(field, value) {
-  if (field.type === "autoNumber") {
-    return value == null ? "" : String(value);
-  }
-  if (typeof value === "string" && value) {
-    try {
-      return new Date(value).toLocaleString();
-    } catch {
-      return value;
-    }
-  }
-  return "";
-}
-function toDatetimeLocal(iso) {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-function navKeys(e) {
-  if (e.key === "Enter" && !e.target.closest("textarea")) {
-    e.target.blur();
-  }
-}
-function TextCell({
-  value,
-  onChange
-}) {
-  const [draft, setDraft] = (0, import_react3.useState)(value);
-  const focused = (0, import_react3.useRef)(false);
-  (0, import_react3.useEffect)(() => {
-    if (!focused.current) setDraft(value);
-  }, [value]);
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-    "input",
-    {
-      className: "tabula-cell-input",
-      type: "text",
-      value: draft,
-      onFocus: () => {
-        focused.current = true;
-      },
-      onBlur: () => {
-        focused.current = false;
-        onChange(draft);
-      },
-      onChange: (e) => setDraft(e.target.value),
-      onKeyDown: (e) => {
-        if (e.key === "Escape") {
-          setDraft(value);
-          e.target.blur();
-          return;
-        }
-        if (e.key === "Enter") e.target.blur();
-      }
-    }
-  );
-}
-function LongTextCell({
-  value,
-  onChange
-}) {
-  const [draft, setDraft] = (0, import_react3.useState)(value);
-  const [expanded, setExpanded] = (0, import_react3.useState)(false);
-  (0, import_react3.useEffect)(() => setDraft(value), [value]);
-  if (!expanded) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      "button",
-      {
-        type: "button",
-        className: "tabula-longtext-preview",
-        onClick: () => setExpanded(true),
-        children: value || /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-placeholder", children: "Add text\u2026" })
-      }
-    );
-  }
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-    "textarea",
-    {
-      className: "tabula-longtext",
-      autoFocus: true,
-      value: draft,
-      onChange: (e) => setDraft(e.target.value),
-      onBlur: () => {
-        onChange(draft);
-        setExpanded(false);
-      },
-      onKeyDown: (e) => {
-        if (e.key === "Escape") {
-          setDraft(value);
-          setExpanded(false);
-        }
-      }
-    }
-  );
-}
-function LinkTextCell({
-  kind,
-  value,
-  onChange
-}) {
-  const [editing, setEditing] = (0, import_react3.useState)(!value);
-  const [draft, setDraft] = (0, import_react3.useState)(value);
-  (0, import_react3.useEffect)(() => setDraft(value), [value]);
-  if (!editing && value) {
-    const href = kind === "email" ? `mailto:${value}` : value;
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-link-cell", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("a", { href, target: "_blank", rel: "noopener noreferrer", onClick: (e) => e.stopPropagation(), children: value }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", className: "tabula-btn tabula-icon-btn", onClick: () => setEditing(true), children: "\u270E" })
-    ] });
-  }
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-    "input",
-    {
-      className: "tabula-cell-input",
-      type: kind === "email" ? "email" : "url",
-      value: draft,
-      autoFocus: editing,
-      placeholder: kind === "email" ? "name@example.com" : "https://",
-      onChange: (e) => setDraft(e.target.value),
-      onBlur: () => {
-        onChange(draft);
-        setEditing(false);
-      },
-      onKeyDown: (e) => {
-        if (e.key === "Enter") e.target.blur();
-        if (e.key === "Escape") {
-          setDraft(value);
-          setEditing(false);
-        }
-      }
-    }
-  );
-}
-function AttachmentCell({
-  value,
-  onChange
-}) {
-  const [draft, setDraft] = (0, import_react3.useState)("");
-  const add = () => {
-    const path = draft.trim();
-    if (!path) return;
-    if (value.includes(path)) {
-      setDraft("");
-      return;
-    }
-    onChange([...value, path]);
-    setDraft("");
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-attachments", children: [
-    value.map((path) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "tabula-attach-chip", title: path, children: [
-      path.split("/").pop(),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-        "button",
-        {
-          type: "button",
-          className: "tabula-pill-x",
-          onClick: () => onChange(value.filter((p) => p !== path)),
-          children: "\xD7"
-        }
-      )
-    ] }, path)),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-      "input",
-      {
-        className: "tabula-cell-input tabula-attach-input",
-        placeholder: "vault/path.ext",
-        value: draft,
-        onChange: (e) => setDraft(e.target.value),
-        onKeyDown: (e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            add();
-          }
-        },
-        onBlur: add
-      }
-    )
-  ] });
-}
-
-// src/ui/FieldHeaderMenu.tsx
-var import_react4 = __toESM(require_react());
-var import_jsx_runtime8 = __toESM(require_jsx_runtime());
-function FieldHeaderMenu(props) {
-  const ref = (0, import_react4.useRef)(null);
-  const [confirmDelete, setConfirmDelete] = (0, import_react4.useState)(false);
-  (0, import_react4.useEffect)(() => {
-    const onDoc = (e) => {
-      if (!ref.current?.contains(e.target)) props.onClose();
-    };
-    activeDocument.addEventListener("mousedown", onDoc);
-    return () => activeDocument.removeEventListener("mousedown", onDoc);
-  }, [props]);
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-field-menu", ref, role: "menu", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onSortAsc, children: "Sort A \u2192 Z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onSortDesc, children: "Sort Z \u2192 A" }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onHide, children: "Hide field" }),
-    isSelectField(props.field) && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onManageOptions, children: "Manage options\u2026" }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onInsertLeft, children: "Insert left" }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: props.onInsertRight, children: "Insert right" }),
-    confirmDelete ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-        "button",
-        {
-          type: "button",
-          className: "is-danger",
-          onClick: props.onDelete,
-          children: "Confirm delete"
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: () => setConfirmDelete(false), children: "Cancel" })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-      "button",
-      {
-        type: "button",
-        className: "is-danger",
-        onClick: () => setConfirmDelete(true),
-        children: "Delete field"
-      }
-    )
-  ] });
-}
-
-// src/ui/TableGrid.tsx
-var import_jsx_runtime9 = __toESM(require_jsx_runtime());
-function TableGrid(props) {
-  const fields = visibleFields(props.doc);
-  const frozen = props.doc.view.frozenPrimary;
-  const widths = props.doc.view.columnWidths;
-  const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
-  let rowIndex = 0;
-  const body = [];
-  for (const group of props.groups) {
-    if (group.label !== "") {
-      body.push(
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("tr", { className: "tabula-group-row", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("td", { colSpan: fields.length + 2, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-group-label", children: group.label }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "tabula-muted", children: [
-            " ",
-            group.rows.length
-          ] })
-        ] }) }, `g-${group.key}`)
-      );
-    }
-    for (const row of group.rows) {
-      rowIndex += 1;
-      const index = rowIndex;
-      body.push(
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
-          "tr",
-          {
-            className: props.selectedRowId === row.id ? "is-selected" : void 0,
-            onClick: () => props.onSelectRow(row.id),
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("td", { className: "tabula-row-num sticky-col", children: index }),
-              fields.map((field, fi) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-                "td",
-                {
-                  className: fi === 0 && frozen ? "sticky-primary" : void 0,
-                  style: {
-                    width: widths[field.id] ?? 160,
-                    minWidth: widths[field.id] ?? 160
-                  },
-                  children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-                    CellEditor,
-                    {
-                      field,
-                      value: row.cells[field.id],
-                      onChange: (value) => props.onSetCell(row.id, field.id, value),
-                      onAddOption: (name) => props.onAddOption(field.id, name),
-                      onManageOptions: () => props.onManageOptions(field.id)
-                    }
-                  )
-                },
-                field.id
-              )),
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("td", { className: "tabula-row-actions", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-                "button",
-                {
-                  className: "tabula-btn tabula-icon-btn",
-                  type: "button",
-                  title: "Delete row",
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    props.onDeleteRow(row.id);
-                  },
-                  children: "\xD7"
-                }
-              ) })
-            ]
-          },
-          row.id
-        )
-      );
-    }
-  }
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-grid-wrap", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
-      "table",
-      {
-        className: `tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`,
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("tr", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("th", { className: "tabula-row-num sticky-col", children: "#" }),
-            fields.map((field, fi) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-              "th",
-              {
-                className: fi === 0 && frozen ? "sticky-primary" : void 0,
-                style: {
-                  width: widths[field.id] ?? 160,
-                  minWidth: widths[field.id] ?? 160
-                },
-                draggable: true,
-                onDragStart: (e) => {
-                  e.dataTransfer.setData("text/field-id", field.id);
-                },
-                onDragOver: (e) => e.preventDefault(),
-                onDrop: (e) => {
-                  e.preventDefault();
-                  const fromId = e.dataTransfer.getData("text/field-id");
-                  if (fromId && fromId !== field.id) {
-                    props.onReorderFields(fromId, field.id);
-                  }
-                },
-                children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-                  FieldHeader,
-                  {
-                    field,
-                    onRename: props.onRenameField,
-                    onDelete: props.onDeleteField,
-                    onManageOptions: props.onManageOptions,
-                    onSort: props.onSortField,
-                    onHide: props.onHideField,
-                    onInsert: props.onInsertField,
-                    onResize: props.onResizeColumn,
-                    width: widths[field.id] ?? 160
-                  }
-                )
-              },
-              field.id
-            )),
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("th", { className: "tabula-row-actions" })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("tbody", { children: [
-            body,
-            totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
-          ] })
-        ]
-      }
-    ),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: "+ New row" })
-  ] });
-}
-function FieldHeader({
-  field,
-  onRename,
-  onDelete,
-  onManageOptions,
-  onSort,
-  onHide,
-  onInsert,
-  onResize,
-  width
-}) {
-  const [menuOpen, setMenuOpen] = (0, import_react5.useState)(false);
-  const startX = (0, import_react5.useRef)(0);
-  const startW = (0, import_react5.useRef)(width);
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-th", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-      "input",
-      {
-        className: "tabula-th-name",
-        value: field.name,
-        onChange: (e) => onRename(field.id, e.target.value)
-      }
-    ),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-th-type", children: fieldTypeLabel(field) }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-      "button",
-      {
-        className: "tabula-btn tabula-icon-btn",
-        type: "button",
-        onClick: () => setMenuOpen((v) => !v),
-        "aria-label": "Field menu",
-        children: "\xB7\xB7\xB7"
-      }
-    ),
-    menuOpen && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-      FieldHeaderMenu,
-      {
-        field,
-        onClose: () => setMenuOpen(false),
-        onSortAsc: () => {
-          onSort(field.id, "asc");
-          setMenuOpen(false);
-        },
-        onSortDesc: () => {
-          onSort(field.id, "desc");
-          setMenuOpen(false);
-        },
-        onHide: () => {
-          onHide(field.id);
-          setMenuOpen(false);
-        },
-        onManageOptions: () => {
-          onManageOptions(field.id);
-          setMenuOpen(false);
-        },
-        onInsertLeft: () => {
-          onInsert(field.id, "left");
-          setMenuOpen(false);
-        },
-        onInsertRight: () => {
-          onInsert(field.id, "right");
-          setMenuOpen(false);
-        },
-        onDelete: () => {
-          onDelete(field.id);
-          setMenuOpen(false);
-        }
-      }
-    ),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-      "div",
-      {
-        className: "tabula-col-resize",
-        onMouseDown: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          startX.current = e.clientX;
-          startW.current = width;
-          const onMove = (ev) => {
-            const next = Math.max(80, startW.current + (ev.clientX - startX.current));
-            onResize(field.id, next);
-          };
-          const onUp = () => {
-            window.removeEventListener("mousemove", onMove);
-            window.removeEventListener("mouseup", onUp);
-          };
-          window.addEventListener("mousemove", onMove);
-          window.addEventListener("mouseup", onUp);
-        }
-      }
-    )
-  ] });
-}
-function fieldTypeLabel(field) {
-  const map = {
-    text: "text",
-    longText: "long",
-    number: "num",
-    currency: "$",
-    percent: "%",
-    duration: "dur",
-    rating: "rate",
-    checkbox: "check",
-    date: "date",
-    datetime: "time",
-    url: "url",
-    email: "mail",
-    phone: "phone",
-    singleSelect: "select",
-    multiSelect: "multi",
-    attachment: "file",
-    autoNumber: "#",
-    createdTime: "created",
-    lastModifiedTime: "modified"
-  };
-  return map[field.type] ?? field.type;
-}
-
-// src/ui/OptionManager.tsx
-var import_react6 = __toESM(require_react());
-var import_jsx_runtime10 = __toESM(require_jsx_runtime());
-function OptionManager({ field, onClose, onChange, onRemoveOption }) {
-  const [pendingDeleteId, setPendingDeleteId] = (0, import_react6.useState)(null);
-  const updateOption = (optionId, patch) => {
-    onChange({
-      ...field,
-      options: field.options.map(
-        (o) => o.id === optionId ? { ...o, ...patch } : o
-      )
-    });
-  };
-  const addOption = () => {
-    onChange({
-      ...field,
-      options: [
-        ...field.options,
-        createSelectOption(`Option ${field.options.length + 1}`)
-      ]
-    });
-  };
-  const move = (index, dir) => {
-    const next = index + dir;
-    if (next < 0 || next >= field.options.length) return;
-    const options = [...field.options];
-    const tmp = options[index];
-    options[index] = options[next];
-    options[next] = tmp;
-    onChange({ ...field, options });
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
-    "div",
-    {
-      className: "tabula-modal",
-      onClick: (e) => e.stopPropagation(),
-      role: "dialog",
-      "aria-label": "Manage options",
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-modal-header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("h3", { children: [
-            "Options \u2014 ",
-            field.name
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: "tabula-option-list", children: field.options.map((opt, index) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-option-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-            "input",
-            {
-              type: "text",
-              value: opt.name,
-              onChange: (e) => updateOption(opt.id, { name: e.target.value })
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-            "select",
-            {
-              value: opt.color,
-              onChange: (e) => updateOption(opt.id, {
-                color: e.target.value
-              }),
-              children: SELECT_COLORS.map((c) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("option", { value: c, children: c }, c))
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-            "button",
-            {
-              className: "tabula-btn tabula-icon-btn",
-              type: "button",
-              onClick: () => move(index, -1),
-              title: "Move up",
-              children: "\u2191"
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-            "button",
-            {
-              className: "tabula-btn tabula-icon-btn",
-              type: "button",
-              onClick: () => move(index, 1),
-              title: "Move down",
-              children: "\u2193"
-            }
-          ),
-          pendingDeleteId === opt.id ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_jsx_runtime10.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-              "button",
-              {
-                className: "tabula-btn tabula-icon-btn is-danger",
-                type: "button",
-                title: "Confirm delete",
-                onClick: () => {
-                  onRemoveOption(opt.id);
-                  setPendingDeleteId(null);
-                },
-                children: "\u2713"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-              "button",
-              {
-                className: "tabula-btn tabula-icon-btn",
-                type: "button",
-                title: "Cancel",
-                onClick: () => setPendingDeleteId(null),
-                children: "\u21A9"
-              }
-            )
-          ] }) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-            "button",
-            {
-              className: "tabula-btn tabula-icon-btn",
-              type: "button",
-              title: "Delete option",
-              onClick: () => setPendingDeleteId(opt.id),
-              children: "\xD7"
-            }
-          )
-        ] }, opt.id)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { className: "tabula-btn", type: "button", onClick: addOption, children: "+ Add option" })
-      ]
-    }
-  ) });
-}
-
-// src/ui/SyncMenu.tsx
-var import_react7 = __toESM(require_react());
-var import_jsx_runtime11 = __toESM(require_jsx_runtime());
-function SyncMenu({
-  linked,
-  sync,
-  busy,
-  hasToken,
-  onLink,
-  onPull,
-  onPush,
-  onUnlink
-}) {
-  const [open, setOpen] = (0, import_react7.useState)(false);
-  const ref = (0, import_react7.useRef)(null);
-  (0, import_react7.useEffect)(() => {
-    if (!open) return;
-    const onDoc = (e) => {
-      if (!ref.current?.contains(e.target)) setOpen(false);
-    };
-    activeDocument.addEventListener("mousedown", onDoc);
-    return () => activeDocument.removeEventListener("mousedown", onDoc);
-  }, [open]);
-  const label = linked ? sync?.tableName ? `Sync \xB7 ${sync.tableName}` : "Sync \xB7 Linked" : "Sync";
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-menu-select", ref, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
-      "button",
-      {
-        type: "button",
-        className: `tabula-btn ${linked ? "is-active" : ""} ${busy ? "is-busy" : ""}`,
-        "aria-expanded": open,
-        disabled: busy,
-        onClick: () => setOpen((v) => !v),
-        title: hasToken ? linked ? "Airtable sync actions" : "Link this table to Airtable" : "Set an Airtable token in plugin settings first",
-        children: [
-          busy ? "Syncing\u2026" : label,
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "tabula-menu-chevron", children: "\u25BE" })
-        ]
-      }
-    ),
-    open && /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-menu-popover align-right", role: "menu", children: [
-      !hasToken && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-menu-hint", children: "Add a personal access token in Settings \u2192 Airtable Tabula." }),
-      hasToken && !linked && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-        "button",
-        {
-          type: "button",
-          className: "tabula-menu-option",
-          onClick: () => {
-            setOpen(false);
-            onLink();
-          },
-          children: "Link Airtable table\u2026"
-        }
-      ),
-      hasToken && linked && /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_jsx_runtime11.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-          "button",
-          {
-            type: "button",
-            className: "tabula-menu-option",
-            onClick: () => {
-              setOpen(false);
-              onPull();
-            },
-            children: "Pull from Airtable"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-          "button",
-          {
-            type: "button",
-            className: "tabula-menu-option",
-            onClick: () => {
-              setOpen(false);
-              onPush();
-            },
-            children: "Push to Airtable"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-          "button",
-          {
-            type: "button",
-            className: "tabula-menu-option",
-            onClick: () => {
-              setOpen(false);
-              onLink();
-            },
-            children: "Change link\u2026"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-          "button",
-          {
-            type: "button",
-            className: "tabula-menu-option is-danger",
-            onClick: () => {
-              setOpen(false);
-              onUnlink();
-            },
-            children: "Unlink"
-          }
-        ),
-        (sync?.lastPulledAt || sync?.lastPushedAt) && /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-menu-hint", children: [
-          sync.lastPulledAt && /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { children: [
-            "Pulled ",
-            new Date(sync.lastPulledAt).toLocaleString()
-          ] }),
-          sync.lastPushedAt && /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { children: [
-            "Pushed ",
-            new Date(sync.lastPushedAt).toLocaleString()
-          ] })
-        ] })
-      ] })
-    ] })
-  ] });
-}
-
-// src/ui/LinkSyncModal.tsx
-var import_react8 = __toESM(require_react());
-var import_jsx_runtime12 = __toESM(require_jsx_runtime());
-function LinkSyncModal({ token, doc, onClose, onLinked }) {
-  const [bases, setBases] = (0, import_react8.useState)([]);
-  const [tables, setTables] = (0, import_react8.useState)([]);
-  const [baseId, setBaseId] = (0, import_react8.useState)(doc.sync?.baseId ?? "");
-  const [tableId, setTableId] = (0, import_react8.useState)(doc.sync?.tableId ?? "");
-  const [replaceSchema, setReplaceSchema] = (0, import_react8.useState)(!doc.fields.length || doc.rows.length === 0);
-  const [loading, setLoading] = (0, import_react8.useState)(true);
-  const [loadingTables, setLoadingTables] = (0, import_react8.useState)(false);
-  const [error2, setError] = (0, import_react8.useState)(null);
-  const [busy, setBusy] = (0, import_react8.useState)(false);
-  (0, import_react8.useEffect)(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const client = new AirtableClient(token);
-        const list = await client.listBases();
-        if (!cancelled) {
-          setBases(list);
-          setLoading(false);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Failed to list bases");
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [token]);
-  (0, import_react8.useEffect)(() => {
-    if (!baseId) {
-      setTables([]);
-      return;
-    }
-    let cancelled = false;
-    setLoadingTables(true);
-    setError(null);
-    void (async () => {
-      try {
-        const client = new AirtableClient(token);
-        const list = await client.getTables(baseId);
-        if (!cancelled) {
-          setTables(list);
-          setLoadingTables(false);
-          if (!list.some((t) => t.id === tableId)) setTableId("");
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Failed to list tables");
-          setLoadingTables(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [baseId, token]);
-  const link = async () => {
-    const base = bases.find((b) => b.id === baseId);
-    const table = tables.find((t) => t.id === tableId);
-    if (!base || !table) {
-      setError("Pick a base and table");
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const { doc: next } = createLinkConfig(
-        base.id,
-        base.name,
-        table,
-        doc,
-        replaceSchema
-      );
-      onLinked(next);
-      onClose();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to link");
-    } finally {
-      setBusy(false);
-    }
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
-    "div",
-    {
-      className: "tabula-modal",
-      onClick: (e) => e.stopPropagation(),
-      role: "dialog",
-      "aria-label": "Link Airtable table",
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-modal-header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("h3", { children: "Link Airtable table" }),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
-        ] }),
-        loading && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("p", { className: "tabula-muted", children: "Loading bases\u2026" }),
-        error2 && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("p", { className: "tabula-query-error", children: error2 }),
-        !loading && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-sync-form", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("label", { className: "tabula-sync-field", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { children: "Base" }),
-            /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
-              "select",
-              {
-                value: baseId,
-                onChange: (e) => setBaseId(e.target.value),
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("option", { value: "", children: "Select base\u2026" }),
-                  bases.map((b) => /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("option", { value: b.id, children: b.name }, b.id))
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("label", { className: "tabula-sync-field", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { children: "Table" }),
-            /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
-              "select",
-              {
-                value: tableId,
-                onChange: (e) => setTableId(e.target.value),
-                disabled: !baseId || loadingTables,
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("option", { value: "", children: loadingTables ? "Loading\u2026" : "Select table\u2026" }),
-                  tables.map((t) => /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("option", { value: t.id, children: t.name }, t.id))
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("label", { className: "tabula-check-label", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-              "input",
-              {
-                type: "checkbox",
-                checked: replaceSchema,
-                onChange: (e) => setReplaceSchema(e.target.checked)
-              }
-            ),
-            "Replace local columns with Airtable schema (clears rows)"
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("p", { className: "tabula-muted", children: "Fields are matched by name. Pull after linking to import records." }),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "tabula-panel-header", children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-            "button",
-            {
-              className: "tabula-btn tabula-btn-primary",
-              type: "button",
-              disabled: !baseId || !tableId || busy,
-              onClick: () => void link(),
-              children: busy ? "Linking\u2026" : "Link table"
-            }
-          ) })
-        ] })
-      ]
-    }
-  ) });
-}
-
-// src/ui/TableApp.tsx
-var import_jsx_runtime13 = __toESM(require_jsx_runtime());
-function TableApp({ doc, onChange, airtableToken = "" }) {
-  const [showFilters, setShowFilters] = (0, import_react9.useState)(
-    doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
-  );
-  const [showSorts, setShowSorts] = (0, import_react9.useState)(doc.view.sorts.length > 0);
-  const [showHide, setShowHide] = (0, import_react9.useState)(false);
-  const [optionFieldId, setOptionFieldId] = (0, import_react9.useState)(null);
-  const [queryError, setQueryError] = (0, import_react9.useState)();
-  const [selectedRowId, setSelectedRowId] = (0, import_react9.useState)(null);
-  const [showLinkModal, setShowLinkModal] = (0, import_react9.useState)(false);
-  const [syncBusy, setSyncBusy] = (0, import_react9.useState)(false);
-  const groups = (0, import_react9.useMemo)(() => getGroupedRows(doc), [doc]);
-  const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
-  const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
-  const hasToken = Boolean(airtableToken.trim());
-  const updateDoc = (next) => onChange(next);
-  const patchView = (patch) => updateDoc({ ...doc, view: { ...doc.view, ...patch } });
-  const setSearch = (search) => patchView({ search });
-  const setQuery = (query) => {
-    const parsed = parseQueryString(query, doc.fields);
-    if (!parsed.ok) {
-      setQueryError(parsed.error);
-      patchView({ query });
-      return;
-    }
-    setQueryError(void 0);
-    patchView({ query: parsed.query, filters: parsed.group });
-  };
-  const setFilters = (filters) => {
-    setQueryError(void 0);
-    patchView({ filters, query: filtersToQueryString(filters, doc.fields) });
-  };
-  const addRow = () => {
-    const { row, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
-    updateDoc({
-      ...doc,
-      rows: [...doc.rows, row],
-      autoNumberNext: nextAuto
-    });
-  };
-  const deleteRow = (rowId) => {
-    const recordMap = { ...doc.sync?.recordMap ?? {} };
-    delete recordMap[rowId];
-    updateDoc({
-      ...doc,
-      rows: doc.rows.filter((r) => r.id !== rowId),
-      sync: doc.sync ? { ...doc.sync, recordMap } : doc.sync
-    });
-    if (selectedRowId === rowId) setSelectedRowId(null);
-  };
-  const addField = (type, atIndex) => {
-    const field = createField(type);
-    const fields = [...doc.fields];
-    if (atIndex == null) fields.push(field);
-    else fields.splice(atIndex, 0, field);
-    let autoNumberNext = doc.autoNumberNext ?? 1;
-    const rows = doc.rows.map((row) => {
-      let cell = emptyCellValue(type);
-      if (type === "autoNumber") {
-        cell = autoNumberNext;
-        autoNumberNext += 1;
-      } else if (type === "createdTime" || type === "lastModifiedTime") {
-        cell = (/* @__PURE__ */ new Date()).toISOString();
-      }
-      return { ...row, cells: { ...row.cells, [field.id]: cell } };
-    });
-    updateDoc({ ...doc, fields, rows, autoNumberNext });
-  };
-  const deleteField = (fieldId) => {
-    const fieldMap = { ...doc.sync?.fieldMap ?? {} };
-    delete fieldMap[fieldId];
-    updateDoc({
-      ...doc,
-      fields: doc.fields.filter((f) => f.id !== fieldId),
-      rows: doc.rows.map((row) => {
-        const cells = { ...row.cells };
-        delete cells[fieldId];
-        return { ...row, cells };
-      }),
-      view: {
-        ...doc.view,
-        filters: {
-          ...doc.view.filters,
-          conditions: doc.view.filters.conditions.filter((c) => c.fieldId !== fieldId)
-        },
-        sorts: doc.view.sorts.filter((s) => s.fieldId !== fieldId),
-        hiddenFieldIds: doc.view.hiddenFieldIds.filter((id) => id !== fieldId),
-        groupBy: doc.view.groupBy.fieldId === fieldId ? { fieldId: null } : doc.view.groupBy,
-        columnWidths: Object.fromEntries(
-          Object.entries(doc.view.columnWidths).filter(([id]) => id !== fieldId)
-        )
-      },
-      sync: doc.sync ? { ...doc.sync, fieldMap } : doc.sync
-    });
-  };
-  const renameField = (fieldId, name) => {
-    updateDoc({
-      ...doc,
-      fields: doc.fields.map((f) => f.id === fieldId ? { ...f, name } : f)
-    });
-  };
-  const setCell = (rowId, fieldId, value) => {
-    updateDoc({
-      ...doc,
-      rows: doc.rows.map((row) => {
-        if (row.id !== rowId) return row;
-        const next = {
-          ...row,
-          cells: { ...row.cells, [fieldId]: value }
-        };
-        return touchLastModified(next, doc.fields);
-      })
-    });
-  };
-  const updateField = (field) => {
-    updateDoc({
-      ...doc,
-      fields: doc.fields.map((f) => f.id === field.id ? field : f)
-    });
-  };
-  const addOption = (fieldId, name) => {
-    const option = createSelectOption(name);
-    updateDoc({
-      ...doc,
-      fields: doc.fields.map((f) => {
-        if (f.id !== fieldId || f.type !== "singleSelect" && f.type !== "multiSelect") {
-          return f;
-        }
-        return { ...f, options: [...f.options, option] };
-      })
-    });
-    return option;
-  };
-  const removeOption = (fieldId, optionId) => {
-    updateDoc(removeOptionFromDocument(doc, fieldId, optionId));
-  };
-  const setSorts = (sorts) => patchView({ sorts });
-  const sortField = (fieldId, direction) => {
-    const rest = doc.view.sorts.filter((s) => s.fieldId !== fieldId);
-    patchView({ sorts: [{ fieldId, direction }, ...rest] });
-    setShowSorts(true);
-  };
-  const hideField = (fieldId) => {
-    if (!doc.view.hiddenFieldIds.includes(fieldId)) {
-      patchView({ hiddenFieldIds: [...doc.view.hiddenFieldIds, fieldId] });
-    }
-  };
-  const insertField = (fieldId, side) => {
-    const idx = doc.fields.findIndex((f) => f.id === fieldId);
-    if (idx < 0) return;
-    addField("text", side === "left" ? idx : idx + 1);
-  };
-  const reorderFields = (fromId, toId) => {
-    const from = doc.fields.findIndex((f) => f.id === fromId);
-    const to = doc.fields.findIndex((f) => f.id === toId);
-    if (from < 0 || to < 0 || from === to) return;
-    const fields = [...doc.fields];
-    const [moved] = fields.splice(from, 1);
-    fields.splice(to, 0, moved);
-    updateDoc({ ...doc, fields });
-  };
-  const resizeColumn = (fieldId, width) => {
-    patchView({
-      columnWidths: { ...doc.view.columnWidths, [fieldId]: width }
-    });
-  };
-  const runPull = async () => {
-    if (!hasToken || !doc.sync) return;
-    setSyncBusy(true);
-    try {
-      const client = new AirtableClient(airtableToken.trim());
-      const next = await pullFromAirtable(client, doc);
-      updateDoc(next);
-      new import_obsidian2.Notice(`Pulled ${next.rows.length} rows from Airtable`);
-    } catch (e) {
-      console.error(e);
-      new import_obsidian2.Notice(e instanceof Error ? e.message : "Pull failed");
-    } finally {
-      setSyncBusy(false);
-    }
-  };
-  const runPush = async () => {
-    if (!hasToken || !doc.sync) return;
-    setSyncBusy(true);
-    try {
-      const client = new AirtableClient(airtableToken.trim());
-      const next = await pushToAirtable(client, doc);
-      updateDoc(next);
-      new import_obsidian2.Notice(`Pushed ${doc.rows.length} rows to Airtable`);
-    } catch (e) {
-      console.error(e);
-      new import_obsidian2.Notice(e instanceof Error ? e.message : "Push failed");
-    } finally {
-      setSyncBusy(false);
-    }
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: `tabula-root height-${doc.view.rowHeight}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      Toolbar,
-      {
-        doc,
-        rowCount: visibleCount,
-        showFilters,
-        showSorts,
-        showHide,
-        syncControl: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-          SyncMenu,
-          {
-            linked: Boolean(doc.sync),
-            sync: doc.sync,
-            busy: syncBusy,
-            hasToken,
-            onLink: () => setShowLinkModal(true),
-            onPull: () => void runPull(),
-            onPush: () => void runPush(),
-            onUnlink: () => updateDoc({ ...doc, sync: null })
-          }
-        ),
-        onRename: (name) => updateDoc({ ...doc, name }),
-        onSearch: setSearch,
-        onToggleFilters: () => setShowFilters((v) => !v),
-        onToggleSorts: () => setShowSorts((v) => !v),
-        onToggleHide: () => setShowHide((v) => !v),
-        onAddRow: addRow,
-        onAddField: (type) => addField(type),
-        onGroupBy: (fieldId) => patchView({ groupBy: { fieldId } }),
-        onRowHeight: (rowHeight) => patchView({ rowHeight }),
-        onToggleFrozen: () => patchView({ frozenPrimary: !doc.view.frozenPrimary })
-      }
-    ),
-    showFilters && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      FilterBar,
-      {
-        doc,
-        queryError,
-        onQueryChange: setQuery,
-        onFiltersChange: setFilters
-      }
-    ),
-    showSorts && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(SortBar, { doc, onChange: setSorts }),
-    showHide && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      HideFieldsMenu,
-      {
-        doc,
-        onChange: (hiddenFieldIds) => patchView({ hiddenFieldIds })
-      }
-    ),
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      TableGrid,
-      {
-        doc,
-        groups,
-        selectedRowId,
-        onSelectRow: setSelectedRowId,
-        onSetCell: setCell,
-        onDeleteRow: deleteRow,
-        onRenameField: renameField,
-        onDeleteField: deleteField,
-        onManageOptions: setOptionFieldId,
-        onAddOption: addOption,
-        onSortField: sortField,
-        onHideField: hideField,
-        onInsertField: insertField,
-        onReorderFields: reorderFields,
-        onResizeColumn: resizeColumn,
-        onAddRow: addRow
-      }
-    ),
-    optionField && (optionField.type === "singleSelect" || optionField.type === "multiSelect") && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      OptionManager,
-      {
-        field: optionField,
-        onClose: () => setOptionFieldId(null),
-        onChange: updateField,
-        onRemoveOption: (optionId) => removeOption(optionField.id, optionId)
-      }
-    ),
-    showLinkModal && hasToken && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-      LinkSyncModal,
-      {
-        token: airtableToken.trim(),
-        doc,
-        onClose: () => setShowLinkModal(false),
-        onLinked: (next) => {
-          updateDoc(next);
-          new import_obsidian2.Notice(
-            `Linked to ${next.sync?.baseName ?? "base"} / ${next.sync?.tableName ?? "table"}`
-          );
-        }
-      }
-    )
-  ] });
-}
-
-// src/ui/mount.tsx
-function mountTableApp(container, props) {
-  const root = (0, import_client.createRoot)(container);
-  root.render((0, import_react10.createElement)(TableApp, props));
-  return root;
-}
-function updateTableApp(root, props) {
-  root.render((0, import_react10.createElement)(TableApp, props));
-}
-
-// src/views/TableView.ts
-var VIEW_TYPE_TABULA = "airtable-tabula-view";
-var TABULA_EXTENSION = "tabula";
-var TableView = class extends import_obsidian3.TextFileView {
-  constructor(leaf, plugin) {
-    super(leaf);
-    this.reactRoot = null;
-    this.doc = null;
-    this.mountEl = null;
-    this.saveTimer = null;
-    this.applyingExternal = false;
-    this.plugin = plugin;
-  }
-  getViewType() {
-    return VIEW_TYPE_TABULA;
-  }
-  getDisplayText() {
-    return this.doc?.name ?? this.file?.basename ?? "Table";
-  }
-  getViewData() {
-    if (!this.doc) return this.data ?? "";
-    return serializeTableDocument(this.doc);
-  }
-  setViewData(data, clear) {
-    this.data = data;
-    try {
-      this.doc = parseTableDocument(data);
-    } catch (e) {
-      console.error("Failed to parse .tabula file", e);
-      this.doc = parseTableDocument("");
-    }
-    if (clear) {
-      this.remount();
-    } else {
-      this.render();
-    }
-  }
-  clear() {
-    this.doc = null;
-    this.data = "";
-    this.unmount();
-  }
-  async onOpen() {
-    this.contentEl.empty();
-    this.contentEl.addClass("tabula-view");
-    this.mountEl = this.contentEl.createDiv({ cls: "tabula-mount" });
-    this.remount();
-  }
-  async onClose() {
-    if (this.saveTimer != null) {
-      window.clearTimeout(this.saveTimer);
-      this.saveTimer = null;
-      this.requestSave();
-    }
-    this.unmount();
-  }
-  appProps() {
-    return {
-      doc: this.doc,
-      onChange: (doc) => this.handleChange(doc),
-      airtableToken: this.plugin.settings.airtableToken
-    };
-  }
-  remount() {
-    this.unmount();
-    if (!this.mountEl || !this.doc) return;
-    this.reactRoot = mountTableApp(this.mountEl, this.appProps());
-  }
-  render() {
-    if (!this.reactRoot || !this.doc) {
-      this.remount();
-      return;
-    }
-    updateTableApp(this.reactRoot, this.appProps());
-  }
-  handleChange(doc) {
-    if (this.applyingExternal) return;
-    this.doc = doc;
-    this.data = serializeTableDocument(doc);
-    this.app.workspace.requestSaveLayout();
-    this.debounceSave();
-    this.render();
-  }
-  debounceSave() {
-    if (this.saveTimer != null) {
-      window.clearTimeout(this.saveTimer);
-    }
-    this.saveTimer = window.setTimeout(() => {
-      this.saveTimer = null;
-      this.requestSave();
-    }, 300);
-  }
-  unmount() {
-    if (this.reactRoot) {
-      this.reactRoot.unmount();
-      this.reactRoot = null;
-    }
-    if (this.mountEl) {
-      this.mountEl.empty();
-    }
-  }
-};
-
-// src/settings.ts
-var DEFAULT_SETTINGS = {
-  airtableToken: ""
-};
-
-// src/ui/SettingsTab.ts
-var import_obsidian4 = require("obsidian");
-var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
-  constructor(app, plugin) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-  display() {
-    const { containerEl } = this;
-    containerEl.empty();
-    new import_obsidian4.Setting(containerEl).setName("Airtable sync").setHeading();
-    new import_obsidian4.Setting(containerEl).setDesc(
-      "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
-    );
-    new import_obsidian4.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
-      text.inputEl.type = "password";
-      text.inputEl.autocomplete = "off";
-      text.setPlaceholder("pat\u2026");
-      text.setValue(this.plugin.settings.airtableToken);
-      text.onChange(async (value) => {
-        this.plugin.settings.airtableToken = value.trim();
-        await this.plugin.saveSettings();
-      });
-    });
-  }
-};
 
 // node_modules/saxen/dist/index.js
 var fromCharCode = String.fromCharCode;
@@ -31979,35 +28863,42 @@ function readSheet(input, sheet, options) {
 }
 
 // src/import/spreadsheet.ts
-async function spreadsheetToTable(file) {
-  const matrix = await fileToMatrix(file);
-  return matrixToTable(matrix, file.name);
+var CSV_MIME = "text/csv";
+var TSV_MIME = "text/tab-separated-values";
+var XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+async function spreadsheetToTable(file, firstRowIsHeader = true) {
+  const matrix = await spreadsheetToMatrix(file);
+  return matrixToTable(matrix, file.name, firstRowIsHeader);
 }
-async function fileToMatrix(file) {
+async function spreadsheetToMatrix(file) {
   const name = file.name.toLowerCase();
-  if (name.endsWith(".csv")) {
+  if (name.endsWith(".csv") || file.type === CSV_MIME) {
     return parseCsv(await file.text());
   }
-  if (name.endsWith(".xlsx")) {
+  if (name.endsWith(".xlsx") || file.type === XLSX_MIME) {
     return await readSheet(file);
   }
   throw new Error("Unsupported file type. Use .csv or .xlsx");
 }
-function matrixToTable(matrix, fileName) {
+function matrixToTable(matrix, fileName, firstRowIsHeader = true) {
   if (!matrix.length) {
     throw new Error("Spreadsheet is empty");
   }
-  const headerRow = matrix[0].map((cell, i) => {
+  const maxColumns = matrix.reduce((max2, row) => Math.max(max2, row.length), 0);
+  if (maxColumns === 0) {
+    throw new Error("Spreadsheet has no columns");
+  }
+  const headerRow = firstRowIsHeader ? matrix[0].map((cell, i) => {
     const label = String(cell ?? "").trim();
     return label || `Column ${i + 1}`;
-  });
+  }) : Array.from({ length: maxColumns }, (_, i) => `Column ${i + 1}`);
   const seen = /* @__PURE__ */ new Map();
   const headers = headerRow.map((name) => {
     const count = seen.get(name) ?? 0;
     seen.set(name, count + 1);
     return count === 0 ? name : `${name} ${count + 1}`;
   });
-  const dataRows = matrix.slice(1).filter(
+  const dataRows = (firstRowIsHeader ? matrix.slice(1) : matrix).filter(
     (row) => row.some((cell) => String(cell ?? "").trim() !== "")
   );
   const columns = headers.map((name, colIndex) => {
@@ -32054,7 +28945,252 @@ function matrixToTable(matrix, fileName) {
     sync: null
   };
 }
+function clipboardTextToMatrix(text, types = []) {
+  if (!text.trim()) return null;
+  const normalizedTypes = types.map((type) => type.toLowerCase());
+  const isCsv = normalizedTypes.includes(CSV_MIME);
+  const isTsv = normalizedTypes.includes(TSV_MIME);
+  if (text.includes("	") || isTsv) {
+    const matrix = parseDelimited(text, "	");
+    return matrix.some((row) => row.length > 1) || matrix.length > 1 ? matrix : null;
+  }
+  if (isCsv || text.includes("\n") || text.includes("\r")) {
+    const matrix = parseCsv(text);
+    return matrix.some((row) => row.length > 1) || matrix.length > 1 ? matrix : null;
+  }
+  if (isCsv) return parseCsv(text);
+  return null;
+}
+function clipboardHtmlToMatrix(html) {
+  if (!/<table[\s>]/i.test(html) || typeof DOMParser === "undefined") return null;
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const table = parsed.querySelector("table");
+  if (!table) return null;
+  const rows = Array.from(table.rows).map(
+    (row) => Array.from(row.cells).map((cell) => cell.textContent ?? "")
+  );
+  return rows.length ? rows : null;
+}
+function singleLineCsvToMatrix(text) {
+  if (/[\r\n\t]/.test(text)) return null;
+  const matrix = parseCsv(text);
+  return matrix[0]?.length > 1 ? matrix : null;
+}
+async function readSpreadsheetClipboard() {
+  if (typeof navigator === "undefined" || !navigator.clipboard) return null;
+  const clipboard = navigator.clipboard;
+  let readError;
+  if (clipboard.read) {
+    try {
+      const items = await clipboard.read();
+      for (const item of items) {
+        const fileType = item.types.find((type) => type === CSV_MIME || type === XLSX_MIME);
+        if (fileType) {
+          const blob = await item.getType(fileType);
+          const fileName = fileType === XLSX_MIME ? "Clipboard.xlsx" : "Clipboard.csv";
+          const file = new File([blob], fileName, { type: fileType });
+          return { matrix: await spreadsheetToMatrix(file), sourceName: fileName };
+        }
+        if (item.types.includes("text/html")) {
+          const html = await (await item.getType("text/html")).text();
+          const matrix = clipboardHtmlToMatrix(html);
+          if (matrix) return { matrix, sourceName: "Clipboard Data" };
+        }
+        if (item.types.includes("text/plain")) {
+          const text = await (await item.getType("text/plain")).text();
+          const matrix = clipboardTextToMatrix(text, item.types) ?? singleLineCsvToMatrix(text);
+          if (matrix) return { matrix, sourceName: "Clipboard Data" };
+        }
+      }
+    } catch (error2) {
+      readError = error2;
+    }
+  }
+  if (clipboard.readText) {
+    try {
+      const text = await clipboard.readText();
+      const matrix = clipboardTextToMatrix(text) ?? singleLineCsvToMatrix(text);
+      if (matrix) return { matrix, sourceName: "Clipboard Data" };
+    } catch (error2) {
+      readError ?? (readError = error2);
+    }
+  }
+  if (readError) throw readError;
+  return null;
+}
+function appendSpreadsheetToTable(current, incoming) {
+  const fields = [...current.fields];
+  const fieldByName = /* @__PURE__ */ new Map();
+  fields.forEach((field, index) => {
+    const key = normalizeHeader(field.name);
+    if (!fieldByName.has(key)) fieldByName.set(key, index);
+  });
+  const sourceToTarget = /* @__PURE__ */ new Map();
+  let addedFields = 0;
+  for (const sourceField of incoming.fields) {
+    const key = normalizeHeader(sourceField.name);
+    let targetIndex = fieldByName.get(key);
+    if (targetIndex == null) {
+      const added = cloneFieldWithNewIds(sourceField);
+      targetIndex = fields.length;
+      fields.push(added);
+      fieldByName.set(key, targetIndex);
+      addedFields += 1;
+    }
+    sourceToTarget.set(sourceField.id, targetIndex);
+  }
+  const existingRows = current.rows.map((row) => {
+    const cells = { ...row.cells };
+    for (const field of fields.slice(current.fields.length)) {
+      cells[field.id] = emptyCellValue(field.type);
+    }
+    return { ...row, cells };
+  });
+  let nextAuto = Math.max(current.autoNumberNext ?? 1, nextAutoNumber(fields, current.rows));
+  const appendedRows = [];
+  for (const sourceRow of incoming.rows) {
+    const generated = createRow(fields, nextAuto);
+    nextAuto = generated.nextAuto;
+    const cells = { ...generated.row.cells };
+    for (const sourceField of incoming.fields) {
+      const targetIndex = sourceToTarget.get(sourceField.id);
+      if (targetIndex == null) continue;
+      const targetField = fields[targetIndex];
+      if (isReadOnlyField(targetField)) continue;
+      const raw = sourceCellAsRaw(sourceField, sourceRow.cells[sourceField.id]);
+      cells[targetField.id] = coerceForTargetField(
+        fields,
+        targetIndex,
+        raw
+      );
+    }
+    appendedRows.push({ ...generated.row, cells });
+  }
+  return {
+    doc: {
+      ...current,
+      fields,
+      rows: [...existingRows, ...appendedRows],
+      autoNumberNext: nextAuto
+    },
+    addedFields,
+    addedRows: appendedRows.length
+  };
+}
+function cloneFieldWithNewIds(field) {
+  const id = createId("f");
+  if (field.type === "singleSelect" || field.type === "multiSelect") {
+    return {
+      ...field,
+      id,
+      options: field.options.map((option) => ({
+        ...option,
+        id: createId("o")
+      }))
+    };
+  }
+  return { ...field, id };
+}
+function nextAutoNumber(fields, rows) {
+  let next = 1;
+  for (const field of fields) {
+    if (field.type !== "autoNumber") continue;
+    for (const row of rows) {
+      const value = row.cells[field.id];
+      if (typeof value === "number") next = Math.max(next, value + 1);
+    }
+  }
+  return next;
+}
+function normalizeHeader(name) {
+  return name.trim().toLocaleLowerCase();
+}
+function sourceCellAsRaw(field, value) {
+  if (field.type === "singleSelect") {
+    return field.options.find((option) => option.id === value)?.name ?? "";
+  }
+  if (field.type === "multiSelect" && Array.isArray(value)) {
+    return value.map(
+      (id) => field.options.find((option) => option.id === id)?.name ?? ""
+    );
+  }
+  return value;
+}
+function coerceForTargetField(fields, fieldIndex, raw) {
+  let field = fields[fieldIndex];
+  if (raw == null || typeof raw === "string" && raw.trim() === "") {
+    return emptyCellValue(field.type);
+  }
+  switch (field.type) {
+    case "checkbox": {
+      if (typeof raw === "boolean") return raw;
+      const text = String(raw).trim().toLowerCase();
+      return ["true", "yes", "y", "1", "checked"].includes(text);
+    }
+    case "number":
+    case "currency":
+    case "percent":
+    case "duration":
+    case "rating": {
+      if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+      const text = String(raw).trim().replace(/,/g, "").replace(/%$/, "");
+      const number = Number(text);
+      return Number.isFinite(number) ? number : null;
+    }
+    case "date": {
+      if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+        return raw.toISOString().slice(0, 10);
+      }
+      const text = String(raw).trim();
+      const date = new Date(text);
+      return Number.isNaN(date.getTime()) ? text.slice(0, 10) : date.toISOString().slice(0, 10);
+    }
+    case "datetime": {
+      if (raw instanceof Date && !Number.isNaN(raw.getTime())) return raw.toISOString();
+      const text = String(raw).trim();
+      const date = new Date(text);
+      return Number.isNaN(date.getTime()) ? text : date.toISOString();
+    }
+    case "singleSelect": {
+      const name = String(raw).trim();
+      let option = field.options.find(
+        (candidate) => candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+      );
+      if (!option) {
+        option = createSelectOption(name);
+        field = { ...field, options: [...field.options, option] };
+        fields[fieldIndex] = field;
+      }
+      return option.id;
+    }
+    case "multiSelect": {
+      const values = Array.isArray(raw) ? raw : [raw];
+      const ids = [];
+      for (const value of values) {
+        const name = String(value).trim();
+        if (!name) continue;
+        let option = field.options.find(
+          (candidate) => candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+        );
+        if (!option) {
+          option = createSelectOption(name);
+          field = { ...field, options: [...field.options, option] };
+          fields[fieldIndex] = field;
+        }
+        ids.push(option.id);
+      }
+      return ids;
+    }
+    case "attachment":
+      return Array.isArray(raw) ? raw.map(String) : [String(raw)];
+    default:
+      return String(raw);
+  }
+}
 function parseCsv(text) {
+  return parseDelimited(text, ",");
+}
+function parseDelimited(text, delimiter) {
   const rows = [];
   let row = [];
   let cell = "";
@@ -32083,7 +29219,7 @@ function parseCsv(text) {
       i += 1;
       continue;
     }
-    if (c === ",") {
+    if (c === delimiter) {
       row.push(cell);
       cell = "";
       i += 1;
@@ -32210,6 +29346,3521 @@ function pickSpreadsheetFile() {
   });
 }
 
+// src/ui/PasteSpreadsheetModal.tsx
+var import_react = __toESM(require_react());
+var import_jsx_runtime = __toESM(require_jsx_runtime());
+function PasteSpreadsheetModal({
+  matrix,
+  sourceName,
+  currentDoc,
+  onClose,
+  onReplace,
+  onAppend,
+  onCreateNew
+}) {
+  const [firstRowIsHeader, setFirstRowIsHeader] = (0, import_react.useState)(true);
+  const [busy, setBusy] = (0, import_react.useState)(false);
+  const [confirmReplace, setConfirmReplace] = (0, import_react.useState)(false);
+  const [replaceCandidate, setReplaceCandidate] = (0, import_react.useState)(null);
+  const [error2, setError] = (0, import_react.useState)("");
+  const columnCount = (0, import_react.useMemo)(
+    () => matrix.reduce((max2, row) => Math.max(max2, row.length), 0),
+    [matrix]
+  );
+  const rowCount = (0, import_react.useMemo)(
+    () => matrix.filter((row) => row.some((cell) => String(cell ?? "").trim() !== "")).length - (firstRowIsHeader ? 1 : 0),
+    [matrix, firstRowIsHeader]
+  );
+  const preview = matrix.slice(0, 6).map(
+    (row) => Array.from({ length: Math.min(columnCount, 6) }, (_, index) => String(row[index] ?? ""))
+  );
+  const buildIncoming = () => matrixToTable(matrix, sourceName, firstRowIsHeader);
+  const handleReplace = () => {
+    setError("");
+    try {
+      const incoming = buildIncoming();
+      if (currentDoc.sync) {
+        setReplaceCandidate(incoming);
+        setConfirmReplace(true);
+        return;
+      }
+      onReplace(incoming);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not read spreadsheet data");
+    }
+  };
+  const confirmReplacement = () => {
+    if (!replaceCandidate) return;
+    onReplace(replaceCandidate);
+    setReplaceCandidate(null);
+    setConfirmReplace(false);
+  };
+  const handleAppend = () => {
+    setError("");
+    try {
+      onAppend(buildIncoming());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not read spreadsheet data");
+    }
+  };
+  const handleCreate = async () => {
+    setError("");
+    setBusy(true);
+    try {
+      await onCreateNew(buildIncoming());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not create a new table");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+    "div",
+    {
+      className: "tabula-modal tabula-paste-modal",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-labelledby": "tabula-paste-title",
+      onClick: (event) => event.stopPropagation(),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-modal-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { id: "tabula-paste-title", children: "Paste spreadsheet data" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-muted tabula-paste-source", children: [
+              sourceName,
+              " \xB7 ",
+              Math.max(0, rowCount),
+              " rows \xB7 ",
+              columnCount,
+              " columns"
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-icon-btn",
+              type: "button",
+              "aria-label": "Close paste preview",
+              onClick: onClose,
+              children: "\xD7"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "tabula-paste-header-toggle", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "input",
+            {
+              type: "checkbox",
+              checked: firstRowIsHeader,
+              disabled: confirmReplace,
+              onChange: (event) => setFirstRowIsHeader(event.target.checked)
+            }
+          ),
+          "First row contains column names"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-preview-wrap", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", { className: "tabula-paste-preview", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: preview.map((row, rowIndex) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          "tr",
+          {
+            className: firstRowIsHeader && rowIndex === 0 ? "is-header" : void 0,
+            children: row.map(
+              (cell, cellIndex) => firstRowIsHeader && rowIndex === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { children: cell || `Column ${cellIndex + 1}` }, cellIndex) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { children: cell }, cellIndex)
+            )
+          },
+          rowIndex
+        )) }) }) }),
+        currentDoc.sync && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-warning", children: "This table is linked to Airtable. Replacing it will unlink the table. Appended rows will be new local records; new columns will not be included in sync." }),
+        confirmReplace ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-paste-confirm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Replace this table and unlink Airtable?" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "The imported columns and rows will replace the current data. This cannot be undone from this dialog." }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-paste-actions", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "tabula-btn", type: "button", onClick: () => setConfirmReplace(false), children: "Cancel" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+              "button",
+              {
+                className: "tabula-btn tabula-btn-primary",
+                type: "button",
+                onClick: confirmReplacement,
+                children: "Confirm replace"
+              }
+            )
+          ] })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-paste-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "tabula-btn", type: "button", disabled: busy, onClick: handleReplace, children: "Replace current table" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "tabula-btn", type: "button", disabled: busy, onClick: handleAppend, children: "Append to current table" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-btn-primary",
+              type: "button",
+              disabled: busy,
+              onClick: () => void handleCreate(),
+              children: busy ? "Creating\u2026" : "Create new table"
+            }
+          )
+        ] }),
+        error2 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-error", children: error2 })
+      ]
+    }
+  ) });
+}
+
+// src/data/query.ts
+var TEXT_OPS = ["contains", "equals", "isEmpty", "isNotEmpty"];
+var NUMBER_OPS = ["equals", "gt", "lt", "isEmpty"];
+var CHECKBOX_OPS = ["isTrue", "isFalse"];
+var DATE_OPS = ["equals", "before", "after", "isEmpty"];
+var SINGLE_OPS = ["is", "isNot", "isAnyOf", "isEmpty"];
+var MULTI_OPS = [
+  "contains",
+  "containsAll",
+  "containsAny",
+  "isEmpty"
+];
+var ATTACH_OPS = ["isEmpty", "isNotEmpty", "contains"];
+function operatorsForField(field) {
+  switch (field.type) {
+    case "text":
+    case "longText":
+    case "url":
+    case "email":
+    case "phone":
+      return TEXT_OPS;
+    case "number":
+    case "currency":
+    case "percent":
+    case "duration":
+    case "rating":
+    case "autoNumber":
+      return NUMBER_OPS;
+    case "checkbox":
+      return CHECKBOX_OPS;
+    case "date":
+    case "datetime":
+    case "createdTime":
+    case "lastModifiedTime":
+      return DATE_OPS;
+    case "singleSelect":
+      return SINGLE_OPS;
+    case "multiSelect":
+      return MULTI_OPS;
+    case "attachment":
+      return ATTACH_OPS;
+  }
+}
+function operatorLabel(op) {
+  const labels = {
+    contains: "contains",
+    equals: "equals",
+    isEmpty: "is empty",
+    isNotEmpty: "is not empty",
+    gt: ">",
+    lt: "<",
+    isTrue: "is checked",
+    isFalse: "is unchecked",
+    before: "is before",
+    after: "is after",
+    is: "is",
+    isNot: "is not",
+    isAnyOf: "is any of",
+    containsAll: "contains all of",
+    containsAny: "contains any of"
+  };
+  return labels[op];
+}
+function getVisibleRows(doc) {
+  const { search, filters, sorts } = doc.view;
+  let rows = doc.rows.filter((row) => matchesSearch(doc, row, search));
+  rows = rows.filter((row) => matchesFilterGroup(doc, row, filters));
+  if (sorts.length > 0) {
+    rows = [...rows].sort((a, b) => compareRows(doc, a, b, sorts));
+  }
+  return rows;
+}
+function getGroupedRows(doc) {
+  const rows = getVisibleRows(doc);
+  const fieldId = doc.view.groupBy.fieldId;
+  if (!fieldId) {
+    return [{ key: "all", label: "", rows }];
+  }
+  const field = doc.fields.find((f) => f.id === fieldId);
+  if (!field) {
+    return [{ key: "all", label: "", rows }];
+  }
+  const map = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const { key, label } = groupKeyForCell(field, row.cells[field.id]);
+    const existing = map.get(key);
+    if (existing) existing.rows.push(row);
+    else map.set(key, { key, label, rows: [row] });
+  }
+  return Array.from(map.values());
+}
+function groupKeyForCell(field, value) {
+  if (value == null || value === "" || Array.isArray(value) && value.length === 0) {
+    return { key: "__empty__", label: "(Empty)" };
+  }
+  if (isSelectField(field)) {
+    if (field.type === "singleSelect") {
+      const opt = field.options.find((o) => o.id === value);
+      return { key: String(value), label: opt?.name ?? String(value) };
+    }
+    const ids = Array.isArray(value) ? value : [];
+    const labels = ids.map(
+      (id) => field.options.find((o) => o.id === id)?.name ?? id
+    );
+    return { key: ids.slice().sort().join(","), label: labels.join(", ") || "(Empty)" };
+  }
+  if (field.type === "checkbox") {
+    return {
+      key: value ? "true" : "false",
+      label: value ? "Checked" : "Unchecked"
+    };
+  }
+  if (field.type === "rating") {
+    return { key: String(value), label: `${value} \u2605` };
+  }
+  return { key: String(value), label: String(value) };
+}
+function matchesSearch(doc, row, search) {
+  const q = search.trim().toLowerCase();
+  if (!q) return true;
+  for (const field of doc.fields) {
+    const value = row.cells[field.id];
+    if (isTextLikeField(field)) {
+      if (String(value ?? "").toLowerCase().includes(q)) return true;
+    } else if (isNumericField(field)) {
+      if (value != null && String(value).toLowerCase().includes(q)) return true;
+    } else if (field.type === "attachment") {
+      const paths = Array.isArray(value) ? value : [];
+      if (paths.some((p) => p.toLowerCase().includes(q))) return true;
+    } else if (isSelectField(field)) {
+      const ids = field.type === "singleSelect" ? typeof value === "string" ? [value] : [] : Array.isArray(value) ? value : [];
+      for (const id of ids) {
+        const opt = field.options.find((o) => o.id === id);
+        if (opt && opt.name.toLowerCase().includes(q)) return true;
+      }
+    }
+  }
+  return false;
+}
+function matchesFilterGroup(doc, row, group) {
+  const active = group.conditions.filter((c) => c.fieldId);
+  if (active.length === 0) return true;
+  if (group.logic === "and") {
+    return active.every((c) => matchesCondition(doc, row, c));
+  }
+  return active.some((c) => matchesCondition(doc, row, c));
+}
+function matchesCondition(doc, row, condition) {
+  const field = doc.fields.find((f) => f.id === condition.fieldId);
+  if (!field) return true;
+  const value = row.cells[field.id];
+  const op = condition.operator;
+  const target = condition.value;
+  if (isTextLikeField(field)) {
+    const text = String(value ?? "");
+    if (op === "isEmpty") return text.trim() === "";
+    if (op === "isNotEmpty") return text.trim() !== "";
+    if (op === "equals") return text.toLowerCase() === String(target ?? "").toLowerCase();
+    if (op === "contains") {
+      return text.toLowerCase().includes(String(target ?? "").toLowerCase());
+    }
+    if (op === "before") return text !== "" && text < String(target ?? "");
+    if (op === "after") return text !== "" && text > String(target ?? "");
+    return true;
+  }
+  if (isNumericField(field)) {
+    const num = typeof value === "number" ? value : null;
+    if (op === "isEmpty") return num == null;
+    if (num == null) return false;
+    const t = typeof target === "number" ? target : Number(target);
+    if (Number.isNaN(t)) return false;
+    if (op === "equals") return num === t;
+    if (op === "gt") return num > t;
+    if (op === "lt") return num < t;
+    return true;
+  }
+  if (field.type === "checkbox") {
+    const checked = Boolean(value);
+    if (op === "isTrue") return checked;
+    if (op === "isFalse") return !checked;
+    return true;
+  }
+  if (field.type === "singleSelect") {
+    const id = typeof value === "string" ? value : null;
+    if (op === "isEmpty") return id == null;
+    if (op === "is") return id === target;
+    if (op === "isNot") return id !== target;
+    if (op === "isAnyOf") {
+      const list = Array.isArray(target) ? target : [];
+      return id != null && list.includes(id);
+    }
+    return true;
+  }
+  if (field.type === "multiSelect" || field.type === "attachment") {
+    const ids = Array.isArray(value) ? value : [];
+    if (op === "isEmpty") return ids.length === 0;
+    if (op === "isNotEmpty") return ids.length > 0;
+    if (op === "contains") {
+      return typeof target === "string" && ids.some((x) => x.includes(String(target)));
+    }
+    const list = Array.isArray(target) ? target : typeof target === "string" ? target.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    if (op === "containsAny") return list.some((id) => ids.includes(id));
+    if (op === "containsAll") return list.every((id) => ids.includes(id));
+    return true;
+  }
+  return true;
+}
+function compareRows(doc, a, b, sorts) {
+  for (const sort of sorts) {
+    const field = doc.fields.find((f) => f.id === sort.fieldId);
+    if (!field) continue;
+    const av = a.cells[field.id];
+    const bv = b.cells[field.id];
+    const cmp = compareValues(field, av, bv);
+    if (cmp !== 0) return sort.direction === "asc" ? cmp : -cmp;
+  }
+  return 0;
+}
+function compareValues(field, a, b) {
+  if (isNumericField(field)) {
+    const an = typeof a === "number" ? a : Number.NEGATIVE_INFINITY;
+    const bn = typeof b === "number" ? b : Number.NEGATIVE_INFINITY;
+    return an - bn;
+  }
+  if (field.type === "checkbox") {
+    return Number(Boolean(a)) - Number(Boolean(b));
+  }
+  if (isSelectField(field)) {
+    const nameOf = (v) => {
+      if (field.type === "singleSelect") {
+        const opt = field.options.find((o) => o.id === v);
+        return opt?.name ?? "";
+      }
+      const ids = Array.isArray(v) ? v : [];
+      return ids.map((id) => field.options.find((o) => o.id === id)?.name ?? "").join(", ");
+    };
+    return nameOf(a).localeCompare(nameOf(b));
+  }
+  if (field.type === "attachment") {
+    const as = Array.isArray(a) ? a.join(", ") : "";
+    const bs = Array.isArray(b) ? b.join(", ") : "";
+    return as.localeCompare(bs);
+  }
+  return String(a ?? "").localeCompare(String(b ?? ""));
+}
+function parseQueryString(query, fields) {
+  const trimmed = query.trim();
+  if (!trimmed) {
+    return {
+      ok: true,
+      query: "",
+      group: { logic: "and", conditions: [] }
+    };
+  }
+  const tokens = tokenizeQuery(trimmed);
+  const conditions = [];
+  for (const token of tokens) {
+    const match = token.match(/^([^:]+):(.*)$/);
+    if (!match) {
+      return {
+        ok: false,
+        query,
+        group: { logic: "and", conditions: [] },
+        error: `Invalid token "${token}". Use field:value`
+      };
+    }
+    const fieldName = match[1].trim();
+    let rawValue = match[2];
+    const field = fields.find(
+      (f) => f.name.toLowerCase() === fieldName.toLowerCase()
+    );
+    if (!field) {
+      return {
+        ok: false,
+        query,
+        group: { logic: "and", conditions: [] },
+        error: `Unknown field "${fieldName}"`
+      };
+    }
+    let operator = "equals";
+    if (rawValue.startsWith("~")) {
+      operator = "contains";
+      rawValue = rawValue.slice(1);
+    } else if (rawValue.startsWith(">")) {
+      operator = "gt";
+      rawValue = rawValue.slice(1);
+    } else if (rawValue.startsWith("<")) {
+      operator = "lt";
+      rawValue = rawValue.slice(1);
+    } else if (rawValue.startsWith("!")) {
+      operator = "isNot";
+      rawValue = rawValue.slice(1);
+    }
+    if (rawValue === "" || rawValue.toLowerCase() === "empty") {
+      conditions.push({
+        id: createId("c"),
+        fieldId: field.id,
+        operator: "isEmpty"
+      });
+      continue;
+    }
+    const condition = buildConditionFromQuery(field, operator, rawValue);
+    if (!condition) {
+      return {
+        ok: false,
+        query,
+        group: { logic: "and", conditions: [] },
+        error: `Unsupported query for field "${field.name}"`
+      };
+    }
+    conditions.push(condition);
+  }
+  return {
+    ok: true,
+    query,
+    group: { logic: "and", conditions }
+  };
+}
+function tokenizeQuery(input) {
+  const tokens = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < input.length; i++) {
+    const ch3 = input[i];
+    if (ch3 === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (ch3 === " " && !inQuotes) {
+      if (current) tokens.push(current);
+      current = "";
+      continue;
+    }
+    current += ch3;
+  }
+  if (current) tokens.push(current);
+  return tokens;
+}
+function buildConditionFromQuery(field, requestedOp, rawValue) {
+  const id = createId("c");
+  const parts = rawValue.split(",").map((s) => s.trim()).filter(Boolean);
+  if (isTextLikeField(field)) {
+    let finalOp = "equals";
+    if (requestedOp === "contains") finalOp = "contains";
+    else if (requestedOp === "gt" && (field.type === "date" || field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime")) {
+      finalOp = "after";
+    } else if (requestedOp === "lt" && (field.type === "date" || field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime")) {
+      finalOp = "before";
+    }
+    return { id, fieldId: field.id, operator: finalOp, value: rawValue };
+  }
+  if (isNumericField(field)) {
+    const num = Number(rawValue);
+    if (Number.isNaN(num)) return null;
+    const op = requestedOp === "gt" || requestedOp === "lt" ? requestedOp : "equals";
+    return { id, fieldId: field.id, operator: op, value: num };
+  }
+  if (field.type === "checkbox") {
+    const truthy = ["true", "1", "yes", "checked"].includes(rawValue.toLowerCase());
+    return {
+      id,
+      fieldId: field.id,
+      operator: truthy ? "isTrue" : "isFalse"
+    };
+  }
+  if (field.type === "singleSelect") {
+    if (parts.length > 1 || requestedOp === "isAnyOf") {
+      const ids = resolveOptionIds(field.options, parts);
+      return { id, fieldId: field.id, operator: "isAnyOf", value: ids };
+    }
+    const optId = resolveOptionId(field.options, rawValue);
+    if (!optId) return null;
+    return {
+      id,
+      fieldId: field.id,
+      operator: requestedOp === "isNot" ? "isNot" : "is",
+      value: optId
+    };
+  }
+  if (field.type === "multiSelect") {
+    const ids = resolveOptionIds(field.options, parts.length ? parts : [rawValue]);
+    if (ids.length === 0) return null;
+    if (ids.length === 1 && requestedOp !== "containsAny" && requestedOp !== "containsAll") {
+      return { id, fieldId: field.id, operator: "contains", value: ids[0] };
+    }
+    return {
+      id,
+      fieldId: field.id,
+      operator: requestedOp === "containsAll" ? "containsAll" : "containsAny",
+      value: ids
+    };
+  }
+  if (field.type === "attachment") {
+    return { id, fieldId: field.id, operator: "contains", value: rawValue };
+  }
+  return null;
+}
+function resolveOptionId(options, name) {
+  const found = options.find(
+    (o) => o.name.toLowerCase() === name.toLowerCase() || o.id === name
+  );
+  return found?.id ?? null;
+}
+function resolveOptionIds(options, names) {
+  return names.map((n) => resolveOptionId(options, n)).filter((id) => id != null);
+}
+function filtersToQueryString(group, fields) {
+  const parts = [];
+  for (const condition of group.conditions) {
+    const field = fields.find((f) => f.id === condition.fieldId);
+    if (!field) continue;
+    const name = field.name.includes(" ") ? `"${field.name}"` : field.name;
+    if (condition.operator === "isEmpty") {
+      parts.push(`${name}:empty`);
+      continue;
+    }
+    if (condition.operator === "isNotEmpty") continue;
+    if (condition.operator === "contains" && (field.type === "text" || field.type === "longText" || field.type === "url" || field.type === "email" || field.type === "phone")) {
+      parts.push(`${name}:~${String(condition.value ?? "")}`);
+      continue;
+    }
+    if (condition.operator === "gt") {
+      parts.push(`${name}:>${String(condition.value ?? "")}`);
+      continue;
+    }
+    if (condition.operator === "lt") {
+      parts.push(`${name}:<${String(condition.value ?? "")}`);
+      continue;
+    }
+    if (condition.operator === "isNot") {
+      const label = optionLabel(field, condition.value ?? null);
+      parts.push(`${name}:!${label}`);
+      continue;
+    }
+    if (condition.operator === "isAnyOf" || condition.operator === "containsAny" || condition.operator === "containsAll") {
+      const ids = Array.isArray(condition.value) ? condition.value : [];
+      const labels = ids.map((id) => optionLabel(field, id));
+      parts.push(`${name}:${labels.join(",")}`);
+      continue;
+    }
+    if (field.type === "checkbox") {
+      parts.push(
+        `${name}:${condition.operator === "isTrue" ? "true" : "false"}`
+      );
+      continue;
+    }
+    if (isSelectField(field)) {
+      parts.push(`${name}:${optionLabel(field, condition.value ?? null)}`);
+      continue;
+    }
+    parts.push(`${name}:${String(condition.value ?? "")}`);
+  }
+  return parts.join(" ");
+}
+function optionLabel(field, value) {
+  if (!isSelectField(field)) return String(value ?? "");
+  if (typeof value === "string") {
+    return field.options.find((o) => o.id === value)?.name ?? value;
+  }
+  return String(value ?? "");
+}
+
+// src/sync/airtableClient.ts
+var import_obsidian = require("obsidian");
+var AirtableApiError = class extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+    this.name = "AirtableApiError";
+  }
+};
+var AirtableClient = class {
+  constructor(token) {
+    this.token = token;
+  }
+  async request(path, init = {}) {
+    const res = await (0, import_obsidian.requestUrl)({
+      url: `https://api.airtable.com/v0${path}`,
+      method: init.method ?? "GET",
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        "Content-Type": "application/json"
+      },
+      body: init.body,
+      throw: false
+    });
+    let body = null;
+    try {
+      body = res.text ? JSON.parse(res.text) : null;
+    } catch {
+      body = res.text;
+    }
+    if (res.status >= 400) {
+      const msg = typeof body === "object" && body && "error" in body && typeof body.error?.message === "string" ? body.error.message : `Airtable error ${res.status}`;
+      throw new AirtableApiError(res.status, msg);
+    }
+    return body;
+  }
+  async listBases() {
+    const bases = [];
+    let offset;
+    do {
+      const q = offset ? `?offset=${encodeURIComponent(offset)}` : "";
+      const page = await this.request(
+        `/meta/bases${q}`
+      );
+      bases.push(...page.bases);
+      offset = page.offset;
+    } while (offset);
+    return bases;
+  }
+  async getTables(baseId) {
+    const data = await this.request(
+      `/meta/bases/${baseId}/tables`
+    );
+    return data.tables;
+  }
+  async listRecords(baseId, tableId) {
+    const records = [];
+    let offset;
+    do {
+      const params = new URLSearchParams({ pageSize: "100" });
+      if (offset) params.set("offset", offset);
+      const page = await this.request(
+        `/${baseId}/${tableId}?${params.toString()}`
+      );
+      records.push(...page.records);
+      offset = page.offset;
+    } while (offset);
+    return records;
+  }
+  async createRecords(baseId, tableId, records) {
+    const created = [];
+    for (let i = 0; i < records.length; i += 10) {
+      const chunk = records.slice(i, i + 10);
+      const page = await this.request(
+        `/${baseId}/${tableId}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ records: chunk, typecast: true })
+        }
+      );
+      created.push(...page.records);
+    }
+    return created;
+  }
+  async updateRecords(baseId, tableId, records) {
+    const updated = [];
+    for (let i = 0; i < records.length; i += 10) {
+      const chunk = records.slice(i, i + 10);
+      const page = await this.request(
+        `/${baseId}/${tableId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ records: chunk, typecast: true })
+        }
+      );
+      updated.push(...page.records);
+    }
+    return updated;
+  }
+};
+
+// src/sync/syncEngine.ts
+var AIRTABLE_TO_LOCAL = {
+  singleLineText: "text",
+  multilineText: "longText",
+  richText: "longText",
+  number: "number",
+  currency: "currency",
+  percent: "percent",
+  duration: "duration",
+  rating: "rating",
+  checkbox: "checkbox",
+  date: "date",
+  dateTime: "datetime",
+  url: "url",
+  email: "email",
+  phoneNumber: "phone",
+  singleSelect: "singleSelect",
+  multipleSelects: "multiSelect",
+  multipleAttachments: "attachment",
+  autoNumber: "autoNumber",
+  createdTime: "createdTime",
+  lastModifiedTime: "lastModifiedTime"
+};
+var LOCAL_WRITABLE = [
+  "text",
+  "longText",
+  "number",
+  "currency",
+  "percent",
+  "duration",
+  "rating",
+  "checkbox",
+  "date",
+  "datetime",
+  "url",
+  "email",
+  "phone",
+  "singleSelect",
+  "multiSelect",
+  "attachment"
+];
+function mapAirtableType(type) {
+  return AIRTABLE_TO_LOCAL[type] ?? "text";
+}
+function buildFieldMap(localFields, remoteFields) {
+  const map = {};
+  const used = /* @__PURE__ */ new Set();
+  for (const local of localFields) {
+    const match = remoteFields.find(
+      (r) => !used.has(r.id) && r.name.toLowerCase() === local.name.toLowerCase()
+    );
+    if (match) {
+      map[local.id] = match.id;
+      used.add(match.id);
+    }
+  }
+  return map;
+}
+function fieldsFromAirtableTable(table) {
+  return table.fields.map((rf) => airtableFieldToLocal(rf));
+}
+function airtableFieldToLocal(rf) {
+  const type = mapAirtableType(rf.type);
+  const id = createId("f");
+  const name = rf.name;
+  if (type === "singleSelect" || type === "multiSelect") {
+    const choices = rf.options?.choices ?? [];
+    return {
+      id,
+      name,
+      type,
+      options: choices.map((c, i) => ({
+        id: createId("o"),
+        name: c.name,
+        color: SELECT_COLORS[i % SELECT_COLORS.length] ?? "gray"
+      }))
+    };
+  }
+  if (type === "currency") {
+    return { id, name, type, symbol: rf.options?.symbol ?? "$" };
+  }
+  if (type === "rating") {
+    return { id, name, type, max: rf.options?.max ?? 5 };
+  }
+  switch (type) {
+    case "text":
+      return { id, name, type };
+    case "longText":
+      return { id, name, type };
+    case "number":
+      return { id, name, type };
+    case "percent":
+      return { id, name, type };
+    case "duration":
+      return { id, name, type };
+    case "checkbox":
+      return { id, name, type };
+    case "date":
+      return { id, name, type };
+    case "datetime":
+      return { id, name, type };
+    case "url":
+      return { id, name, type };
+    case "email":
+      return { id, name, type };
+    case "phone":
+      return { id, name, type };
+    case "attachment":
+      return { id, name, type };
+    case "autoNumber":
+      return { id, name, type };
+    case "createdTime":
+      return { id, name, type };
+    case "lastModifiedTime":
+      return { id, name, type };
+  }
+}
+function createLinkConfig(baseId, baseName, table, doc, replaceSchema) {
+  let fields = doc.fields;
+  let rows = doc.rows;
+  if (replaceSchema) {
+    fields = fieldsFromAirtableTable(table);
+    rows = [];
+  }
+  const fieldMap = buildFieldMap(fields, table.fields);
+  if (replaceSchema) {
+    fields.forEach((f, i) => {
+      const rf = table.fields[i];
+      if (rf) fieldMap[f.id] = rf.id;
+    });
+  }
+  const sync = {
+    baseId,
+    baseName,
+    tableId: table.id,
+    tableName: table.name,
+    fieldMap,
+    recordMap: {}
+  };
+  return {
+    doc: {
+      ...doc,
+      name: replaceSchema ? table.name : doc.name,
+      fields,
+      rows,
+      sync
+    },
+    sync
+  };
+}
+async function pullFromAirtable(client, doc) {
+  const sync = doc.sync;
+  if (!sync) throw new Error("Table is not linked to Airtable");
+  const tables = await client.getTables(sync.baseId);
+  const table = tables.find((t) => t.id === sync.tableId);
+  if (!table) throw new Error("Linked Airtable table not found");
+  const records = await client.listRecords(sync.baseId, sync.tableId);
+  let fields = doc.fields.map((f) => ensureSelectOptionsFromRemote(f, table, sync));
+  const reverseRecord = new Map(
+    Object.entries(sync.recordMap).map(([localId, remoteId]) => [remoteId, localId])
+  );
+  const nextRecordMap = { ...sync.recordMap };
+  const rowsById = new Map(doc.rows.map((r) => [r.id, r]));
+  const nextRows = [];
+  const seenLocal = /* @__PURE__ */ new Set();
+  for (const record of records) {
+    const existingLocalId = reverseRecord.get(record.id);
+    const localId = existingLocalId ?? createId("r");
+    seenLocal.add(localId);
+    nextRecordMap[localId] = record.id;
+    const prev = rowsById.get(localId);
+    const cells = {};
+    for (const field of fields) {
+      const airFieldId = sync.fieldMap[field.id];
+      if (!airFieldId) {
+        cells[field.id] = prev?.cells[field.id] ?? emptyCellValue(field.type);
+        continue;
+      }
+      const airField = table.fields.find((f) => f.id === airFieldId);
+      const raw = record.fields[airField?.name ?? ""];
+      cells[field.id] = fromAirtableValue(field, raw);
+    }
+    nextRows.push({ id: localId, cells });
+  }
+  for (const row of doc.rows) {
+    if (!seenLocal.has(row.id) && !sync.recordMap[row.id]) {
+      nextRows.push(row);
+    }
+  }
+  return {
+    ...doc,
+    fields,
+    rows: nextRows,
+    sync: {
+      ...sync,
+      recordMap: nextRecordMap,
+      lastPulledAt: nowIso()
+    }
+  };
+}
+function ensureSelectOptionsFromRemote(field, table, sync) {
+  if (!isSelectField(field)) return field;
+  const airFieldId = sync.fieldMap[field.id];
+  if (!airFieldId) return field;
+  const airField = table.fields.find((f) => f.id === airFieldId);
+  const choices = airField?.options?.choices ?? [];
+  if (choices.length === 0) return field;
+  const options = [...field.options];
+  for (const choice of choices) {
+    if (!options.some((o) => o.name.toLowerCase() === choice.name.toLowerCase())) {
+      options.push(createSelectOption(choice.name));
+    }
+  }
+  return { ...field, options };
+}
+async function pushToAirtable(client, doc) {
+  const sync = doc.sync;
+  if (!sync) throw new Error("Table is not linked to Airtable");
+  const tables = await client.getTables(sync.baseId);
+  const table = tables.find((t) => t.id === sync.tableId);
+  if (!table) throw new Error("Linked Airtable table not found");
+  const toCreate = [];
+  const toUpdate = [];
+  for (const row of doc.rows) {
+    const fields = rowToAirtableFields(row, doc.fields, sync, table);
+    const remoteId = sync.recordMap[row.id];
+    if (remoteId) toUpdate.push({ id: remoteId, fields });
+    else toCreate.push({ localId: row.id, fields });
+  }
+  const nextRecordMap = { ...sync.recordMap };
+  if (toUpdate.length) {
+    await client.updateRecords(sync.baseId, sync.tableId, toUpdate);
+  }
+  if (toCreate.length) {
+    const created = await client.createRecords(
+      sync.baseId,
+      sync.tableId,
+      toCreate.map((c) => ({ fields: c.fields }))
+    );
+    created.forEach((rec, i) => {
+      nextRecordMap[toCreate[i].localId] = rec.id;
+    });
+  }
+  return {
+    ...doc,
+    sync: {
+      ...sync,
+      recordMap: nextRecordMap,
+      lastPushedAt: nowIso()
+    }
+  };
+}
+function rowToAirtableFields(row, fields, sync, table) {
+  const out = {};
+  for (const field of fields) {
+    if (isReadOnlyField(field)) continue;
+    if (!LOCAL_WRITABLE.includes(field.type)) continue;
+    const airFieldId = sync.fieldMap[field.id];
+    if (!airFieldId) continue;
+    const airField = table.fields.find((f) => f.id === airFieldId);
+    if (!airField) continue;
+    if (["formula", "rollup", "lookup", "count", "autoNumber", "createdTime", "lastModifiedTime", "button"].includes(
+      airField.type
+    )) {
+      continue;
+    }
+    const value = toAirtableValue(field, row.cells[field.id]);
+    if (value !== void 0) {
+      out[airField.name] = value;
+    }
+  }
+  return out;
+}
+function fromAirtableValue(field, raw) {
+  if (raw == null) return emptyCellValue(field.type);
+  switch (field.type) {
+    case "text":
+    case "longText":
+    case "url":
+    case "email":
+    case "phone":
+    case "date":
+      return String(raw);
+    case "datetime":
+    case "createdTime":
+    case "lastModifiedTime":
+      return String(raw);
+    case "number":
+    case "currency":
+    case "percent":
+    case "duration":
+    case "rating":
+    case "autoNumber":
+      return typeof raw === "number" ? raw : Number(raw);
+    case "checkbox":
+      return Boolean(raw);
+    case "singleSelect": {
+      if (!isSelectField(field)) return null;
+      const name = String(raw);
+      const opt = field.options.find(
+        (o) => o.name.toLowerCase() === name.toLowerCase()
+      );
+      return opt?.id ?? null;
+    }
+    case "multiSelect": {
+      if (!isSelectField(field)) return [];
+      const names = Array.isArray(raw) ? raw.map(String) : [];
+      return names.map(
+        (n) => field.options.find((o) => o.name.toLowerCase() === n.toLowerCase())?.id
+      ).filter((id) => Boolean(id));
+    }
+    case "attachment": {
+      if (!Array.isArray(raw)) return [];
+      return raw.map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object" && "url" in item) {
+          return String(item.url);
+        }
+        return null;
+      }).filter((u) => Boolean(u));
+    }
+  }
+}
+function toAirtableValue(field, value) {
+  switch (field.type) {
+    case "text":
+    case "longText":
+    case "url":
+    case "email":
+    case "phone":
+    case "date":
+      return value == null || value === "" ? null : String(value);
+    case "datetime":
+      return value == null || value === "" ? null : String(value);
+    case "number":
+    case "currency":
+    case "percent":
+    case "duration":
+    case "rating":
+      return typeof value === "number" ? value : null;
+    case "checkbox":
+      return Boolean(value);
+    case "singleSelect": {
+      if (!isSelectField(field) || typeof value !== "string") return null;
+      return field.options.find((o) => o.id === value)?.name ?? null;
+    }
+    case "multiSelect": {
+      if (!isSelectField(field) || !Array.isArray(value)) return [];
+      return value.map((id) => field.options.find((o) => o.id === id)?.name).filter((n) => Boolean(n));
+    }
+    case "attachment": {
+      if (!Array.isArray(value) || value.length === 0) return [];
+      return value.map((url) => ({ url }));
+    }
+    default:
+      return void 0;
+  }
+}
+
+// src/ui/MenuSelect.tsx
+var import_react2 = __toESM(require_react());
+var import_jsx_runtime2 = __toESM(require_jsx_runtime());
+function MenuSelect({
+  label,
+  value,
+  options,
+  onChange,
+  title,
+  ariaLabel,
+  className = "",
+  variant = "control",
+  triggerLabel,
+  align = "left"
+}) {
+  const [open, setOpen] = (0, import_react2.useState)(false);
+  const rootRef = (0, import_react2.useRef)(null);
+  const selected = options.find((o) => o.value === value);
+  const display = triggerLabel ?? (variant === "control" ? selected?.label ?? "\u2026" : triggerLabel ?? selected?.label ?? "\u2026");
+  (0, import_react2.useEffect)(() => {
+    if (!open) return;
+    const onDoc = (e) => {
+      if (!rootRef.current?.contains(e.target)) setOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    activeDocument.addEventListener("mousedown", onDoc);
+    activeDocument.addEventListener("keydown", onKey);
+    return () => {
+      activeDocument.removeEventListener("mousedown", onDoc);
+      activeDocument.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+  const triggerClass = variant === "control" ? "tabula-menu-trigger" : variant === "button-primary" ? "tabula-btn tabula-btn-primary tabula-menu-btn" : "tabula-btn tabula-menu-btn";
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    "div",
+    {
+      className: `tabula-menu-select ${className}`,
+      ref: rootRef,
+      title,
+      children: [
+        variant === "control" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+          "button",
+          {
+            type: "button",
+            className: `tabula-inline-control ${triggerClass}`,
+            "aria-label": ariaLabel ?? label,
+            "aria-expanded": open,
+            "aria-haspopup": "listbox",
+            onClick: () => setOpen((v) => !v),
+            children: [
+              label && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-label", children: label }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-value", children: display }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
+            ]
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+          "button",
+          {
+            type: "button",
+            className: triggerClass,
+            "aria-label": ariaLabel ?? triggerLabel,
+            "aria-expanded": open,
+            "aria-haspopup": "listbox",
+            onClick: () => setOpen((v) => !v),
+            children: [
+              display,
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
+            ]
+          }
+        ),
+        open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          "div",
+          {
+            className: `tabula-menu-popover align-${align}`,
+            role: "listbox",
+            "aria-label": ariaLabel ?? label,
+            children: options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+              "button",
+              {
+                type: "button",
+                role: "option",
+                "aria-selected": opt.value === value,
+                disabled: opt.disabled,
+                className: `tabula-menu-option ${opt.value === value ? "is-selected" : ""}`,
+                onClick: () => {
+                  if (opt.disabled) return;
+                  onChange(opt.value);
+                  setOpen(false);
+                },
+                children: [
+                  opt.label,
+                  opt.value === value && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-check", "aria-hidden": "true", children: "\u2713" })
+                ]
+              },
+              opt.value || "__empty"
+            ))
+          }
+        )
+      ]
+    }
+  );
+}
+
+// src/ui/Toolbar.tsx
+var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+function Toolbar(props) {
+  const { doc } = props;
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      "input",
+      {
+        className: "tabula-title",
+        value: doc.name,
+        onChange: (e) => props.onRename(e.target.value),
+        "aria-label": "Table name"
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar-actions", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        "input",
+        {
+          className: "tabula-search",
+          type: "search",
+          placeholder: "Search\u2026",
+          value: doc.view.search,
+          onChange: (e) => props.onSearch(e.target.value),
+          "aria-label": "Search rows"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        "button",
+        {
+          className: `tabula-btn ${props.showFilters ? "is-active" : ""}`,
+          onClick: props.onToggleFilters,
+          type: "button",
+          "aria-pressed": props.showFilters,
+          title: "Show filter and query panel",
+          children: [
+            "Filter",
+            doc.view.filters.conditions.length > 0 ? ` (${doc.view.filters.conditions.length})` : ""
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        "button",
+        {
+          className: `tabula-btn ${props.showSorts || doc.view.sorts.length > 0 ? "is-active" : ""}`,
+          onClick: props.onToggleSorts,
+          type: "button",
+          "aria-pressed": props.showSorts,
+          title: "Show sort panel",
+          children: [
+            "Sort",
+            doc.view.sorts.length ? ` (${doc.view.sorts.length})` : ""
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        MenuSelect,
+        {
+          label: "Group",
+          title: "Group rows by field",
+          ariaLabel: "Group by field",
+          value: doc.view.groupBy.fieldId ?? "",
+          onChange: (v) => props.onGroupBy(v || null),
+          options: [
+            { value: "", label: "None" },
+            ...doc.fields.map((f) => ({ value: f.id, label: f.name }))
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        "button",
+        {
+          className: `tabula-btn ${props.showHide ? "is-active" : ""}`,
+          onClick: props.onToggleHide,
+          type: "button",
+          "aria-pressed": props.showHide,
+          title: "Show or hide columns",
+          children: [
+            "Hide",
+            doc.view.hiddenFieldIds.length ? ` (${doc.view.hiddenFieldIds.length})` : ""
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        MenuSelect,
+        {
+          label: "Height",
+          title: "Row height",
+          ariaLabel: "Row height",
+          value: doc.view.rowHeight,
+          onChange: (v) => props.onRowHeight(v),
+          options: [
+            { value: "short", label: "Short" },
+            { value: "medium", label: "Medium" },
+            { value: "tall", label: "Tall" }
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        MenuSelect,
+        {
+          label: "Freeze",
+          title: "Keep the first column fixed while scrolling",
+          ariaLabel: "Freeze primary column",
+          value: doc.view.frozenPrimary ? "on" : "off",
+          onChange: (v) => {
+            const next = v === "on";
+            if (next !== doc.view.frozenPrimary) props.onToggleFrozen();
+          },
+          options: [
+            { value: "on", label: "On" },
+            { value: "off", label: "Off" }
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
+      props.syncControl,
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        "button",
+        {
+          className: "tabula-btn tabula-btn-primary",
+          onClick: props.onAddRow,
+          type: "button",
+          title: "Add a new row",
+          children: "+ Row"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        MenuSelect,
+        {
+          variant: "button",
+          triggerLabel: "+ Field",
+          title: "Add a column",
+          ariaLabel: "Add field type",
+          value: "",
+          align: "right",
+          onChange: (type) => {
+            if (type) props.onAddField(type);
+          },
+          options: ALL_FIELD_TYPES.map((ft) => ({
+            value: ft.type,
+            label: ft.label
+          }))
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "tabula-count", children: [
+        props.rowCount,
+        props.rowCount !== doc.rows.length ? ` / ${doc.rows.length}` : "",
+        " rows"
+      ] })
+    ] })
+  ] });
+}
+
+// src/ui/FilterBar.tsx
+var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+function FilterBar({
+  doc,
+  queryError,
+  onQueryChange,
+  onFiltersChange
+}) {
+  const { filters, query } = doc.view;
+  const updateCondition = (id, patch) => {
+    onFiltersChange({
+      ...filters,
+      conditions: filters.conditions.map(
+        (c) => c.id === id ? { ...c, ...patch } : c
+      )
+    });
+  };
+  const addCondition = () => {
+    const field = doc.fields[0];
+    if (!field) return;
+    const ops = operatorsForField(field);
+    onFiltersChange({
+      ...filters,
+      conditions: [
+        ...filters.conditions,
+        {
+          id: createId("c"),
+          fieldId: field.id,
+          operator: ops[0],
+          value: ""
+        }
+      ]
+    });
+  };
+  const removeCondition = (id) => {
+    onFiltersChange({
+      ...filters,
+      conditions: filters.conditions.filter((c) => c.id !== id)
+    });
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-filter-bar", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-query-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("label", { className: "tabula-query-label", children: "Query" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        "input",
+        {
+          className: `tabula-query-input ${queryError ? "has-error" : ""}`,
+          value: query,
+          placeholder: "status:Done tags:urgent,design name:~ship",
+          onChange: (e) => onQueryChange(e.target.value),
+          spellCheck: false
+        }
+      ),
+      queryError && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-query-error", children: queryError })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-filter-controls", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        MenuSelect,
+        {
+          value: filters.logic,
+          ariaLabel: "Filter logic",
+          onChange: (logic) => onFiltersChange({
+            ...filters,
+            logic: logic === "or" ? "or" : "and"
+          }),
+          options: [
+            { value: "and", label: "Match all (AND)" },
+            { value: "or", label: "Match any (OR)" }
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "tabula-btn", type: "button", onClick: addCondition, children: "+ Condition" }),
+      filters.conditions.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        "button",
+        {
+          className: "tabula-btn",
+          type: "button",
+          onClick: () => onFiltersChange({ logic: filters.logic, conditions: [] }),
+          children: "Clear"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-conditions", children: filters.conditions.map((condition) => {
+      const field = doc.fields.find((f) => f.id === condition.fieldId);
+      const ops = field ? operatorsForField(field) : [];
+      const needsValue = !["isEmpty", "isNotEmpty", "isTrue", "isFalse"].includes(
+        condition.operator
+      );
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-condition", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          MenuSelect,
+          {
+            value: condition.fieldId,
+            ariaLabel: "Filter field",
+            onChange: (fieldId) => {
+              const nextField = doc.fields.find((f) => f.id === fieldId);
+              const nextOps = nextField ? operatorsForField(nextField) : [];
+              updateCondition(condition.id, {
+                fieldId,
+                operator: nextOps[0],
+                value: ""
+              });
+            },
+            options: doc.fields.map((f) => ({ value: f.id, label: f.name }))
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          MenuSelect,
+          {
+            value: condition.operator,
+            ariaLabel: "Filter operator",
+            onChange: (operator) => updateCondition(condition.id, {
+              operator
+            }),
+            options: ops.map((op) => ({
+              value: op,
+              label: operatorLabel(op)
+            }))
+          }
+        ),
+        needsValue && field && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          ConditionValueInput,
+          {
+            field,
+            condition,
+            onChange: (value) => updateCondition(condition.id, { value })
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          "button",
+          {
+            className: "tabula-btn tabula-icon-btn",
+            type: "button",
+            onClick: () => removeCondition(condition.id),
+            "aria-label": "Remove condition",
+            children: "\xD7"
+          }
+        )
+      ] }, condition.id);
+    }) })
+  ] });
+}
+function ConditionValueInput({
+  field,
+  condition,
+  onChange
+}) {
+  if (field.type === "singleSelect" || field.type === "multiSelect") {
+    if (condition.operator === "isAnyOf" || condition.operator === "containsAny" || condition.operator === "containsAll") {
+      const selected = Array.isArray(condition.value) ? condition.value : [];
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-multi-filter", children: field.options.map((opt) => {
+        const checked = selected.includes(opt.id);
+        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("label", { className: "tabula-check-label", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            "input",
+            {
+              type: "checkbox",
+              checked,
+              onChange: () => {
+                onChange(
+                  checked ? selected.filter((id) => id !== opt.id) : [...selected, opt.id]
+                );
+              }
+            }
+          ),
+          opt.name
+        ] }, opt.id);
+      }) });
+    }
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      MenuSelect,
+      {
+        value: typeof condition.value === "string" ? condition.value : "",
+        ariaLabel: "Filter value",
+        onChange: (v) => onChange(v),
+        options: [
+          { value: "", label: "Select\u2026" },
+          ...field.options.map((opt) => ({ value: opt.id, label: opt.name }))
+        ]
+      }
+    );
+  }
+  if (isNumericField(field)) {
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      "input",
+      {
+        type: "number",
+        value: typeof condition.value === "number" ? condition.value : "",
+        onChange: (e) => onChange(e.target.value === "" ? null : Number(e.target.value))
+      }
+    );
+  }
+  if (field.type === "date") {
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      "input",
+      {
+        type: "date",
+        value: typeof condition.value === "string" ? condition.value : "",
+        onChange: (e) => onChange(e.target.value)
+      }
+    );
+  }
+  if (field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime") {
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      "input",
+      {
+        type: "datetime-local",
+        value: typeof condition.value === "string" && condition.value ? condition.value.slice(0, 16) : "",
+        onChange: (e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : "")
+      }
+    );
+  }
+  if (isSelectField(field)) {
+    return null;
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    "input",
+    {
+      type: "text",
+      value: typeof condition.value === "string" ? condition.value : "",
+      onChange: (e) => onChange(e.target.value)
+    }
+  );
+}
+
+// src/ui/SortBar.tsx
+var import_jsx_runtime5 = __toESM(require_jsx_runtime());
+function SortBar({ doc, onChange }) {
+  const { sorts } = doc.view;
+  const update = (index, patch) => {
+    onChange(sorts.map((s, i) => i === index ? { ...s, ...patch } : s));
+  };
+  const add = () => {
+    const field = doc.fields.find((f) => !sorts.some((s) => s.fieldId === f.id)) ?? doc.fields[0];
+    if (!field) return;
+    onChange([...sorts, { fieldId: field.id, direction: "asc" }]);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-panel", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-panel-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("strong", { children: "Sort" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "tabula-btn", type: "button", onClick: add, children: "+ Sort" }),
+      sorts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "tabula-btn", type: "button", onClick: () => onChange([]), children: "Clear" })
+    ] }),
+    sorts.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "tabula-panel-empty", children: "No sorts \u2014 click + Sort or use a column menu." }),
+    sorts.map((sort, index) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-condition", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        MenuSelect,
+        {
+          value: sort.fieldId,
+          ariaLabel: "Sort field",
+          onChange: (fieldId) => update(index, { fieldId }),
+          options: doc.fields.map((f) => ({ value: f.id, label: f.name }))
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        MenuSelect,
+        {
+          value: sort.direction,
+          ariaLabel: "Sort direction",
+          onChange: (direction) => update(index, { direction: direction === "desc" ? "desc" : "asc" }),
+          options: [
+            { value: "asc", label: "A \u2192 Z" },
+            { value: "desc", label: "Z \u2192 A" }
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        "button",
+        {
+          className: "tabula-btn tabula-icon-btn",
+          type: "button",
+          onClick: () => onChange(sorts.filter((_, i) => i !== index)),
+          children: "\xD7"
+        }
+      )
+    ] }, `${sort.fieldId}-${index}`))
+  ] });
+}
+
+// src/ui/HideFieldsMenu.tsx
+var import_jsx_runtime6 = __toESM(require_jsx_runtime());
+function HideFieldsMenu({ doc, onChange }) {
+  const hidden = new Set(doc.view.hiddenFieldIds);
+  const toggle = (fieldId) => {
+    if (hidden.has(fieldId)) {
+      onChange(doc.view.hiddenFieldIds.filter((id) => id !== fieldId));
+    } else {
+      onChange([...doc.view.hiddenFieldIds, fieldId]);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-panel", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-panel-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("strong", { children: "Hide fields" }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+        "button",
+        {
+          className: "tabula-btn",
+          type: "button",
+          onClick: () => onChange([]),
+          disabled: hidden.size === 0,
+          children: "Show all"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "tabula-hide-list", children: doc.fields.map((f) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "tabula-check-label", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+        "input",
+        {
+          type: "checkbox",
+          checked: !hidden.has(f.id),
+          onChange: () => toggle(f.id)
+        }
+      ),
+      f.name,
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "tabula-muted", children: [
+        "(",
+        f.type,
+        ")"
+      ] })
+    ] }, f.id)) })
+  ] });
+}
+
+// src/ui/TableGrid.tsx
+var import_react6 = __toESM(require_react());
+
+// src/ui/CellEditor.tsx
+var import_react4 = __toESM(require_react());
+
+// src/ui/SelectEditor.tsx
+var import_react3 = __toESM(require_react());
+var import_jsx_runtime7 = __toESM(require_jsx_runtime());
+function SelectEditor({
+  field,
+  value,
+  onChange,
+  onAddOption,
+  onManageOptions
+}) {
+  const [open, setOpen] = (0, import_react3.useState)(false);
+  const [q, setQ] = (0, import_react3.useState)("");
+  const rootRef = (0, import_react3.useRef)(null);
+  const selectedIds = field.type === "singleSelect" ? typeof value === "string" ? [value] : [] : Array.isArray(value) ? value : [];
+  const filtered = (0, import_react3.useMemo)(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return field.options;
+    return field.options.filter((o) => o.name.toLowerCase().includes(needle));
+  }, [field.options, q]);
+  (0, import_react3.useEffect)(() => {
+    const onDoc = (e) => {
+      if (!rootRef.current?.contains(e.target)) {
+        setOpen(false);
+        setQ("");
+      }
+    };
+    activeDocument.addEventListener("mousedown", onDoc);
+    return () => activeDocument.removeEventListener("mousedown", onDoc);
+  }, []);
+  const toggle = (optionId) => {
+    if (field.type === "singleSelect") {
+      onChange(selectedIds[0] === optionId ? null : optionId);
+      setOpen(false);
+      setQ("");
+      return;
+    }
+    const next = selectedIds.includes(optionId) ? selectedIds.filter((id) => id !== optionId) : [...selectedIds, optionId];
+    onChange(next);
+  };
+  const createAndSelect = () => {
+    const name = q.trim();
+    if (!name) return;
+    const existing = field.options.find(
+      (o) => o.name.toLowerCase() === name.toLowerCase()
+    );
+    const option = existing ?? onAddOption(name);
+    if (field.type === "singleSelect") {
+      onChange(option.id);
+      setOpen(false);
+      setQ("");
+    } else {
+      const next = selectedIds.includes(option.id) ? selectedIds : [...selectedIds, option.id];
+      onChange(next);
+      setQ("");
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-select", ref: rootRef, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      "button",
+      {
+        type: "button",
+        className: "tabula-select-trigger",
+        onClick: () => setOpen((v) => !v),
+        children: selectedIds.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-placeholder", children: "Select\u2026" }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-pills", children: selectedIds.map((id) => {
+          const opt = field.options.find((o) => o.id === id);
+          if (!opt) return null;
+          return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+            "span",
+            {
+              className: `tabula-pill tabula-color-${opt.color}`,
+              children: [
+                opt.name,
+                field.type === "multiSelect" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+                  "span",
+                  {
+                    className: "tabula-pill-x",
+                    onClick: (e) => {
+                      e.stopPropagation();
+                      toggle(id);
+                    },
+                    children: "\xD7"
+                  }
+                )
+              ]
+            },
+            id
+          );
+        }) })
+      }
+    ),
+    open && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-select-menu", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+        "input",
+        {
+          className: "tabula-select-search",
+          autoFocus: true,
+          placeholder: "Search or create\u2026",
+          value: q,
+          onChange: (e) => setQ(e.target.value),
+          onKeyDown: (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (filtered.length === 1) toggle(filtered[0].id);
+              else createAndSelect();
+            }
+            if (e.key === "Escape") {
+              setOpen(false);
+              setQ("");
+            }
+          }
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-select-options", children: [
+        filtered.map((opt) => {
+          const active = selectedIds.includes(opt.id);
+          return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+            "button",
+            {
+              type: "button",
+              className: `tabula-select-option ${active ? "is-active" : ""}`,
+              onClick: () => toggle(opt.id),
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
+                active && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-check", children: "\u2713" })
+              ]
+            },
+            opt.id
+          );
+        }),
+        q.trim() && !field.options.some(
+          (o) => o.name.toLowerCase() === q.trim().toLowerCase()
+        ) && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+          "button",
+          {
+            type: "button",
+            className: "tabula-select-option tabula-create-option",
+            onClick: createAndSelect,
+            children: [
+              "Create \u201C",
+              q.trim(),
+              "\u201D"
+            ]
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+        "button",
+        {
+          type: "button",
+          className: "tabula-select-manage",
+          onClick: () => {
+            setOpen(false);
+            onManageOptions();
+          },
+          children: "Manage options\u2026"
+        }
+      )
+    ] })
+  ] });
+}
+
+// src/ui/CellEditor.tsx
+var import_jsx_runtime8 = __toESM(require_jsx_runtime());
+function CellEditor(props) {
+  const { field, value, onChange } = props;
+  if (field.type === "checkbox") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("label", { className: "tabula-checkbox-cell", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "input",
+      {
+        type: "checkbox",
+        checked: Boolean(value),
+        onChange: (e) => onChange(e.target.checked)
+      }
+    ) });
+  }
+  if (field.type === "rating") {
+    const max2 = field.max ?? 5;
+    const current = typeof value === "number" ? value : 0;
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "tabula-rating", children: Array.from({ length: max2 }, (_, i) => {
+      const n = i + 1;
+      return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        "button",
+        {
+          type: "button",
+          className: `tabula-star ${n <= current ? "is-on" : ""}`,
+          onClick: () => onChange(current === n ? null : n),
+          "aria-label": `${n} star`,
+          children: "\u2605"
+        },
+        n
+      );
+    }) });
+  }
+  if (field.type === "singleSelect" || field.type === "multiSelect") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      SelectEditor,
+      {
+        field,
+        value,
+        onChange,
+        onAddOption: props.onAddOption,
+        onManageOptions: props.onManageOptions
+      }
+    );
+  }
+  if (field.type === "attachment") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      AttachmentCell,
+      {
+        value: Array.isArray(value) ? value : [],
+        onChange
+      }
+    );
+  }
+  if (field.type === "longText") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      LongTextCell,
+      {
+        value: typeof value === "string" ? value : "",
+        onChange
+      }
+    );
+  }
+  if (isReadOnlyField(field)) {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-readonly", children: formatReadOnly(field, value) });
+  }
+  if (field.type === "number" || field.type === "currency" || field.type === "percent") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-affix-cell", children: [
+      field.type === "currency" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-affix", children: field.symbol ?? "$" }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        "input",
+        {
+          className: "tabula-cell-input",
+          type: "number",
+          value: typeof value === "number" ? value : "",
+          onChange: (e) => onChange(e.target.value === "" ? null : Number(e.target.value)),
+          onKeyDown: navKeys
+        }
+      ),
+      field.type === "percent" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-affix", children: "%" })
+    ] });
+  }
+  if (field.type === "duration") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "input",
+      {
+        className: "tabula-cell-input",
+        type: "text",
+        placeholder: "h:mm:ss",
+        defaultValue: formatDuration(typeof value === "number" ? value : null),
+        onBlur: (e) => onChange(parseDuration(e.target.value)),
+        onKeyDown: (e) => {
+          if (e.key === "Enter") e.target.blur();
+          navKeys(e);
+        }
+      },
+      String(value)
+    );
+  }
+  if (field.type === "date") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "input",
+      {
+        className: "tabula-cell-input",
+        type: "date",
+        value: typeof value === "string" ? value.slice(0, 10) : "",
+        onChange: (e) => onChange(e.target.value),
+        onKeyDown: navKeys
+      }
+    );
+  }
+  if (field.type === "datetime") {
+    const local = typeof value === "string" && value ? toDatetimeLocal(value) : "";
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "input",
+      {
+        className: "tabula-cell-input",
+        type: "datetime-local",
+        value: local,
+        onChange: (e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : ""),
+        onKeyDown: navKeys
+      }
+    );
+  }
+  if (field.type === "url" || field.type === "email") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      LinkTextCell,
+      {
+        kind: field.type,
+        value: typeof value === "string" ? value : "",
+        onChange
+      }
+    );
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    TextCell,
+    {
+      value: typeof value === "string" ? value : "",
+      onChange
+    }
+  );
+}
+function formatReadOnly(field, value) {
+  if (field.type === "autoNumber") {
+    return value == null ? "" : String(value);
+  }
+  if (typeof value === "string" && value) {
+    try {
+      return new Date(value).toLocaleString();
+    } catch {
+      return value;
+    }
+  }
+  return "";
+}
+function toDatetimeLocal(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function navKeys(e) {
+  if (e.key === "Enter" && !e.target.closest("textarea")) {
+    e.target.blur();
+  }
+}
+function TextCell({
+  value,
+  onChange
+}) {
+  const [draft, setDraft] = (0, import_react4.useState)(value);
+  const focused = (0, import_react4.useRef)(false);
+  (0, import_react4.useEffect)(() => {
+    if (!focused.current) setDraft(value);
+  }, [value]);
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    "input",
+    {
+      className: "tabula-cell-input",
+      type: "text",
+      value: draft,
+      onFocus: () => {
+        focused.current = true;
+      },
+      onBlur: () => {
+        focused.current = false;
+        onChange(draft);
+      },
+      onChange: (e) => setDraft(e.target.value),
+      onKeyDown: (e) => {
+        if (e.key === "Escape") {
+          setDraft(value);
+          e.target.blur();
+          return;
+        }
+        if (e.key === "Enter") e.target.blur();
+      }
+    }
+  );
+}
+function LongTextCell({
+  value,
+  onChange
+}) {
+  const [draft, setDraft] = (0, import_react4.useState)(value);
+  const [expanded, setExpanded] = (0, import_react4.useState)(false);
+  (0, import_react4.useEffect)(() => setDraft(value), [value]);
+  if (!expanded) {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "button",
+      {
+        type: "button",
+        className: "tabula-longtext-preview",
+        onClick: () => setExpanded(true),
+        children: value || /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-placeholder", children: "Add text\u2026" })
+      }
+    );
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    "textarea",
+    {
+      className: "tabula-longtext",
+      autoFocus: true,
+      value: draft,
+      onChange: (e) => setDraft(e.target.value),
+      onBlur: () => {
+        onChange(draft);
+        setExpanded(false);
+      },
+      onKeyDown: (e) => {
+        if (e.key === "Escape") {
+          setDraft(value);
+          setExpanded(false);
+        }
+      }
+    }
+  );
+}
+function LinkTextCell({
+  kind,
+  value,
+  onChange
+}) {
+  const [editing, setEditing] = (0, import_react4.useState)(!value);
+  const [draft, setDraft] = (0, import_react4.useState)(value);
+  (0, import_react4.useEffect)(() => setDraft(value), [value]);
+  if (!editing && value) {
+    const href = kind === "email" ? `mailto:${value}` : value;
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-link-cell", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("a", { href, target: "_blank", rel: "noopener noreferrer", onClick: (e) => e.stopPropagation(), children: value }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", className: "tabula-btn tabula-icon-btn", onClick: () => setEditing(true), children: "\u270E" })
+    ] });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    "input",
+    {
+      className: "tabula-cell-input",
+      type: kind === "email" ? "email" : "url",
+      value: draft,
+      autoFocus: editing,
+      placeholder: kind === "email" ? "name@example.com" : "https://",
+      onChange: (e) => setDraft(e.target.value),
+      onBlur: () => {
+        onChange(draft);
+        setEditing(false);
+      },
+      onKeyDown: (e) => {
+        if (e.key === "Enter") e.target.blur();
+        if (e.key === "Escape") {
+          setDraft(value);
+          setEditing(false);
+        }
+      }
+    }
+  );
+}
+function AttachmentCell({
+  value,
+  onChange
+}) {
+  const [draft, setDraft] = (0, import_react4.useState)("");
+  const add = () => {
+    const path = draft.trim();
+    if (!path) return;
+    if (value.includes(path)) {
+      setDraft("");
+      return;
+    }
+    onChange([...value, path]);
+    setDraft("");
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-attachments", children: [
+    value.map((path) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "tabula-attach-chip", title: path, children: [
+      path.split("/").pop(),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        "button",
+        {
+          type: "button",
+          className: "tabula-pill-x",
+          onClick: () => onChange(value.filter((p) => p !== path)),
+          children: "\xD7"
+        }
+      )
+    ] }, path)),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      "input",
+      {
+        className: "tabula-cell-input tabula-attach-input",
+        placeholder: "vault/path.ext",
+        value: draft,
+        onChange: (e) => setDraft(e.target.value),
+        onKeyDown: (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            add();
+          }
+        },
+        onBlur: add
+      }
+    )
+  ] });
+}
+
+// src/ui/FieldHeaderMenu.tsx
+var import_react5 = __toESM(require_react());
+var import_jsx_runtime9 = __toESM(require_jsx_runtime());
+function FieldHeaderMenu(props) {
+  const ref = (0, import_react5.useRef)(null);
+  const [confirmDelete, setConfirmDelete] = (0, import_react5.useState)(false);
+  (0, import_react5.useEffect)(() => {
+    const onDoc = (e) => {
+      if (!ref.current?.contains(e.target)) props.onClose();
+    };
+    activeDocument.addEventListener("mousedown", onDoc);
+    return () => activeDocument.removeEventListener("mousedown", onDoc);
+  }, [props]);
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-field-menu", ref, role: "menu", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onSortAsc, children: "Sort A \u2192 Z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onSortDesc, children: "Sort Z \u2192 A" }),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onHide, children: "Hide field" }),
+    isSelectField(props.field) && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onManageOptions, children: "Manage options\u2026" }),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onInsertLeft, children: "Insert left" }),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onInsertRight, children: "Insert right" }),
+    confirmDelete ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+        "button",
+        {
+          type: "button",
+          className: "is-danger",
+          onClick: props.onDelete,
+          children: "Confirm delete"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: () => setConfirmDelete(false), children: "Cancel" })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      "button",
+      {
+        type: "button",
+        className: "is-danger",
+        onClick: () => setConfirmDelete(true),
+        children: "Delete field"
+      }
+    )
+  ] });
+}
+
+// src/ui/TableGrid.tsx
+var import_jsx_runtime10 = __toESM(require_jsx_runtime());
+function TableGrid(props) {
+  const fields = visibleFields(props.doc);
+  const frozen = props.doc.view.frozenPrimary;
+  const widths = props.doc.view.columnWidths;
+  const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
+  const [dragState, setDragState] = (0, import_react6.useState)(null);
+  const dragCleanup = (0, import_react6.useRef)(null);
+  const startReorder = (kind, sourceId, event) => {
+    if (event.pointerType === "mouse" && event.button !== 0 || kind === "row" && !props.canReorderRows) return;
+    event.preventDefault();
+    event.stopPropagation();
+    dragCleanup.current?.();
+    setDragState({ kind, sourceId, targetId: null, side: null });
+    const pointerId = event.pointerId;
+    const scrollContainer = event.currentTarget.closest(".tabula-grid-wrap");
+    const findDropTarget = (pointerEvent) => {
+      const element = document.elementFromPoint(pointerEvent.clientX, pointerEvent.clientY);
+      const target = element?.closest("[data-reorder-kind]");
+      if (!target || target.dataset.reorderKind !== kind) return null;
+      const targetId = target.dataset.reorderId;
+      if (!targetId) return null;
+      const rect = target.getBoundingClientRect();
+      const coordinate = kind === "row" ? pointerEvent.clientY : pointerEvent.clientX;
+      const midpoint = kind === "row" ? rect.top + rect.height / 2 : rect.left + rect.width / 2;
+      return { targetId, side: coordinate < midpoint ? "before" : "after" };
+    };
+    const cleanup = () => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointercancel", onCancel);
+      window.removeEventListener("blur", onCancel);
+      if (dragCleanup.current === cleanup) dragCleanup.current = null;
+    };
+    const onMove = (pointerEvent) => {
+      if (pointerEvent.pointerId !== pointerId) return;
+      pointerEvent.preventDefault();
+      if (scrollContainer) {
+        const bounds = scrollContainer.getBoundingClientRect();
+        const edge = 36;
+        if (kind === "row") {
+          if (pointerEvent.clientY < bounds.top + edge) scrollContainer.scrollTop -= 14;
+          else if (pointerEvent.clientY > bounds.bottom - edge) scrollContainer.scrollTop += 14;
+        } else {
+          if (pointerEvent.clientX < bounds.left + edge) scrollContainer.scrollLeft -= 14;
+          else if (pointerEvent.clientX > bounds.right - edge) scrollContainer.scrollLeft += 14;
+        }
+      }
+      const target = findDropTarget(pointerEvent);
+      setDragState((current) => {
+        if (!current || current.sourceId !== sourceId || current.kind !== kind) return current;
+        if (current.targetId === (target?.targetId ?? null) && current.side === (target?.side ?? null)) {
+          return current;
+        }
+        return {
+          ...current,
+          targetId: target?.targetId ?? null,
+          side: target?.side ?? null
+        };
+      });
+    };
+    const onUp = (pointerEvent) => {
+      if (pointerEvent.pointerId !== pointerId) return;
+      pointerEvent.preventDefault();
+      const target = findDropTarget(pointerEvent);
+      cleanup();
+      setDragState(null);
+      if (!target || target.targetId === sourceId) return;
+      if (kind === "row") props.onReorderRows(sourceId, target.targetId, target.side);
+      else props.onReorderFields(sourceId, target.targetId, target.side);
+    };
+    const onCancel = () => {
+      cleanup();
+      setDragState(null);
+    };
+    dragCleanup.current = cleanup;
+    document.addEventListener("pointermove", onMove, { passive: false });
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onCancel);
+    window.addEventListener("blur", onCancel);
+  };
+  (0, import_react6.useEffect)(
+    () => () => {
+      dragCleanup.current?.();
+    },
+    []
+  );
+  let rowIndex = 0;
+  const body = [];
+  for (const group of props.groups) {
+    if (group.label !== "") {
+      body.push(
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { className: "tabula-group-row", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("td", { colSpan: fields.length + 2, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-group-label", children: group.label }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { className: "tabula-muted", children: [
+            " ",
+            group.rows.length
+          ] })
+        ] }) }, `g-${group.key}`)
+      );
+    }
+    for (const row of group.rows) {
+      rowIndex += 1;
+      const index = rowIndex;
+      const isDragSource = dragState?.kind === "row" && dragState.sourceId === row.id;
+      const dropClass = dragState?.kind === "row" && dragState.targetId === row.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
+      body.push(
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+          "tr",
+          {
+            "data-reorder-kind": props.canReorderRows ? "row" : void 0,
+            "data-reorder-id": props.canReorderRows ? row.id : void 0,
+            className: [
+              props.selectedRowId === row.id ? "is-selected" : "",
+              isDragSource ? "is-dragging" : "",
+              dropClass
+            ].filter(Boolean).join(" ") || void 0,
+            onClick: () => props.onSelectRow(row.id),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { className: "tabula-row-num sticky-col", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-row-num-content", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { children: index }),
+                /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                  "button",
+                  {
+                    className: "tabula-row-drag-handle",
+                    type: "button",
+                    "aria-label": `Drag row ${index} to reorder`,
+                    title: props.canReorderRows ? "Drag to reorder row" : "Clear sorting to manually reorder rows",
+                    disabled: !props.canReorderRows,
+                    onPointerDown: (event) => startReorder("row", row.id, event),
+                    onClick: (event) => event.stopPropagation(),
+                    children: "\u283F"
+                  }
+                )
+              ] }) }),
+              fields.map((field, fi) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                "td",
+                {
+                  className: fi === 0 && frozen ? "sticky-primary" : void 0,
+                  style: {
+                    width: widths[field.id] ?? 160,
+                    minWidth: widths[field.id] ?? 160
+                  },
+                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                    CellEditor,
+                    {
+                      field,
+                      value: row.cells[field.id],
+                      onChange: (value) => props.onSetCell(row.id, field.id, value),
+                      onAddOption: (name) => props.onAddOption(field.id, name),
+                      onManageOptions: () => props.onManageOptions(field.id)
+                    }
+                  )
+                },
+                field.id
+              )),
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { className: "tabula-row-actions", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                "button",
+                {
+                  className: "tabula-btn tabula-icon-btn",
+                  type: "button",
+                  title: "Delete row",
+                  onClick: (e) => {
+                    e.stopPropagation();
+                    props.onDeleteRow(row.id);
+                  },
+                  children: "\xD7"
+                }
+              ) })
+            ]
+          },
+          row.id
+        )
+      );
+    }
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-grid-wrap", tabIndex: 0, "aria-label": "Table data grid", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+      "table",
+      {
+        className: `tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`,
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tr", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-num sticky-col", children: "#" }),
+            fields.map((field, fi) => {
+              const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
+              const dropClass = dragState?.kind === "field" && dragState.targetId === field.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
+              return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                "th",
+                {
+                  "data-reorder-kind": "field",
+                  "data-reorder-id": field.id,
+                  className: [
+                    fi === 0 && frozen ? "sticky-primary" : "",
+                    isDragSource ? "is-dragging" : "",
+                    dropClass
+                  ].filter(Boolean).join(" ") || void 0,
+                  style: {
+                    width: widths[field.id] ?? 160,
+                    minWidth: widths[field.id] ?? 160
+                  },
+                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                    FieldHeader,
+                    {
+                      field,
+                      onRename: props.onRenameField,
+                      onDelete: props.onDeleteField,
+                      onManageOptions: props.onManageOptions,
+                      onSort: props.onSortField,
+                      onHide: props.onHideField,
+                      onInsert: props.onInsertField,
+                      onResize: props.onResizeColumn,
+                      onBeginReorder: (event) => startReorder("field", field.id, event),
+                      width: widths[field.id] ?? 160
+                    }
+                  )
+                },
+                field.id
+              );
+            }),
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-actions" })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tbody", { children: [
+            body,
+            totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
+          ] })
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: "+ New row" })
+  ] });
+}
+function FieldHeader({
+  field,
+  onRename,
+  onDelete,
+  onManageOptions,
+  onSort,
+  onHide,
+  onInsert,
+  onResize,
+  onBeginReorder,
+  width
+}) {
+  const [menuOpen, setMenuOpen] = (0, import_react6.useState)(false);
+  const startX = (0, import_react6.useRef)(0);
+  const startW = (0, import_react6.useRef)(width);
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-th", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      "button",
+      {
+        className: "tabula-col-drag-handle",
+        type: "button",
+        "aria-label": `Drag ${field.name} column to reorder`,
+        title: "Drag to move column left or right",
+        onPointerDown: onBeginReorder,
+        onClick: (event) => event.stopPropagation(),
+        children: "\u283F"
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      "input",
+      {
+        className: "tabula-th-name",
+        value: field.name,
+        onChange: (e) => onRename(field.id, e.target.value)
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-th-type", children: fieldTypeLabel(field) }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      "button",
+      {
+        className: "tabula-btn tabula-icon-btn",
+        type: "button",
+        onClick: () => setMenuOpen((v) => !v),
+        "aria-label": "Field menu",
+        children: "\xB7\xB7\xB7"
+      }
+    ),
+    menuOpen && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      FieldHeaderMenu,
+      {
+        field,
+        onClose: () => setMenuOpen(false),
+        onSortAsc: () => {
+          onSort(field.id, "asc");
+          setMenuOpen(false);
+        },
+        onSortDesc: () => {
+          onSort(field.id, "desc");
+          setMenuOpen(false);
+        },
+        onHide: () => {
+          onHide(field.id);
+          setMenuOpen(false);
+        },
+        onManageOptions: () => {
+          onManageOptions(field.id);
+          setMenuOpen(false);
+        },
+        onInsertLeft: () => {
+          onInsert(field.id, "left");
+          setMenuOpen(false);
+        },
+        onInsertRight: () => {
+          onInsert(field.id, "right");
+          setMenuOpen(false);
+        },
+        onDelete: () => {
+          onDelete(field.id);
+          setMenuOpen(false);
+        }
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      "div",
+      {
+        className: "tabula-col-resize",
+        onMouseDown: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          startX.current = e.clientX;
+          startW.current = width;
+          const onMove = (ev) => {
+            const next = Math.max(80, startW.current + (ev.clientX - startX.current));
+            onResize(field.id, next);
+          };
+          const onUp = () => {
+            window.removeEventListener("mousemove", onMove);
+            window.removeEventListener("mouseup", onUp);
+          };
+          window.addEventListener("mousemove", onMove);
+          window.addEventListener("mouseup", onUp);
+        }
+      }
+    )
+  ] });
+}
+function fieldTypeLabel(field) {
+  const map = {
+    text: "text",
+    longText: "long",
+    number: "num",
+    currency: "$",
+    percent: "%",
+    duration: "dur",
+    rating: "rate",
+    checkbox: "check",
+    date: "date",
+    datetime: "time",
+    url: "url",
+    email: "mail",
+    phone: "phone",
+    singleSelect: "select",
+    multiSelect: "multi",
+    attachment: "file",
+    autoNumber: "#",
+    createdTime: "created",
+    lastModifiedTime: "modified"
+  };
+  return map[field.type] ?? field.type;
+}
+
+// src/ui/OptionManager.tsx
+var import_react7 = __toESM(require_react());
+var import_jsx_runtime11 = __toESM(require_jsx_runtime());
+function OptionManager({ field, onClose, onChange, onRemoveOption }) {
+  const [pendingDeleteId, setPendingDeleteId] = (0, import_react7.useState)(null);
+  const updateOption = (optionId, patch) => {
+    onChange({
+      ...field,
+      options: field.options.map(
+        (o) => o.id === optionId ? { ...o, ...patch } : o
+      )
+    });
+  };
+  const addOption = () => {
+    onChange({
+      ...field,
+      options: [
+        ...field.options,
+        createSelectOption(`Option ${field.options.length + 1}`)
+      ]
+    });
+  };
+  const move = (index, dir) => {
+    const next = index + dir;
+    if (next < 0 || next >= field.options.length) return;
+    const options = [...field.options];
+    const tmp = options[index];
+    options[index] = options[next];
+    options[next] = tmp;
+    onChange({ ...field, options });
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
+    "div",
+    {
+      className: "tabula-modal",
+      onClick: (e) => e.stopPropagation(),
+      role: "dialog",
+      "aria-label": "Manage options",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-modal-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("h3", { children: [
+            "Options \u2014 ",
+            field.name
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-option-list", children: field.options.map((opt, index) => /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-option-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            "input",
+            {
+              type: "text",
+              value: opt.name,
+              onChange: (e) => updateOption(opt.id, { name: e.target.value })
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            "select",
+            {
+              value: opt.color,
+              onChange: (e) => updateOption(opt.id, {
+                color: e.target.value
+              }),
+              children: SELECT_COLORS.map((c) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("option", { value: c, children: c }, c))
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-icon-btn",
+              type: "button",
+              onClick: () => move(index, -1),
+              title: "Move up",
+              children: "\u2191"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-icon-btn",
+              type: "button",
+              onClick: () => move(index, 1),
+              title: "Move down",
+              children: "\u2193"
+            }
+          ),
+          pendingDeleteId === opt.id ? /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_jsx_runtime11.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+              "button",
+              {
+                className: "tabula-btn tabula-icon-btn is-danger",
+                type: "button",
+                title: "Confirm delete",
+                onClick: () => {
+                  onRemoveOption(opt.id);
+                  setPendingDeleteId(null);
+                },
+                children: "\u2713"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+              "button",
+              {
+                className: "tabula-btn tabula-icon-btn",
+                type: "button",
+                title: "Cancel",
+                onClick: () => setPendingDeleteId(null),
+                children: "\u21A9"
+              }
+            )
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-icon-btn",
+              type: "button",
+              title: "Delete option",
+              onClick: () => setPendingDeleteId(opt.id),
+              children: "\xD7"
+            }
+          )
+        ] }, opt.id)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("button", { className: "tabula-btn", type: "button", onClick: addOption, children: "+ Add option" })
+      ]
+    }
+  ) });
+}
+
+// src/ui/SyncMenu.tsx
+var import_react8 = __toESM(require_react());
+var import_jsx_runtime12 = __toESM(require_jsx_runtime());
+function SyncMenu({
+  linked,
+  sync,
+  busy,
+  hasToken,
+  onLink,
+  onPull,
+  onPush,
+  onUnlink
+}) {
+  const [open, setOpen] = (0, import_react8.useState)(false);
+  const ref = (0, import_react8.useRef)(null);
+  (0, import_react8.useEffect)(() => {
+    if (!open) return;
+    const onDoc = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
+    };
+    activeDocument.addEventListener("mousedown", onDoc);
+    return () => activeDocument.removeEventListener("mousedown", onDoc);
+  }, [open]);
+  const label = linked ? sync?.tableName ? `Sync \xB7 ${sync.tableName}` : "Sync \xB7 Linked" : "Sync";
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-menu-select", ref, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
+      "button",
+      {
+        type: "button",
+        className: `tabula-btn ${linked ? "is-active" : ""} ${busy ? "is-busy" : ""}`,
+        "aria-expanded": open,
+        disabled: busy,
+        onClick: () => setOpen((v) => !v),
+        title: hasToken ? linked ? "Airtable sync actions" : "Link this table to Airtable" : "Set an Airtable token in plugin settings first",
+        children: [
+          busy ? "Syncing\u2026" : label,
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { className: "tabula-menu-chevron", children: "\u25BE" })
+        ]
+      }
+    ),
+    open && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-menu-popover align-right", role: "menu", children: [
+      !hasToken && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "tabula-menu-hint", children: "Add a personal access token in Settings \u2192 Airtable Tabula." }),
+      hasToken && !linked && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        "button",
+        {
+          type: "button",
+          className: "tabula-menu-option",
+          onClick: () => {
+            setOpen(false);
+            onLink();
+          },
+          children: "Link Airtable table\u2026"
+        }
+      ),
+      hasToken && linked && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "tabula-menu-option",
+            onClick: () => {
+              setOpen(false);
+              onPull();
+            },
+            children: "Pull from Airtable"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "tabula-menu-option",
+            onClick: () => {
+              setOpen(false);
+              onPush();
+            },
+            children: "Push to Airtable"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "tabula-menu-option",
+            onClick: () => {
+              setOpen(false);
+              onLink();
+            },
+            children: "Change link\u2026"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          "button",
+          {
+            type: "button",
+            className: "tabula-menu-option is-danger",
+            onClick: () => {
+              setOpen(false);
+              onUnlink();
+            },
+            children: "Unlink"
+          }
+        ),
+        (sync?.lastPulledAt || sync?.lastPushedAt) && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-menu-hint", children: [
+          sync.lastPulledAt && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { children: [
+            "Pulled ",
+            new Date(sync.lastPulledAt).toLocaleString()
+          ] }),
+          sync.lastPushedAt && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { children: [
+            "Pushed ",
+            new Date(sync.lastPushedAt).toLocaleString()
+          ] })
+        ] })
+      ] })
+    ] })
+  ] });
+}
+
+// src/ui/LinkSyncModal.tsx
+var import_react9 = __toESM(require_react());
+var import_jsx_runtime13 = __toESM(require_jsx_runtime());
+function LinkSyncModal({ token, doc, onClose, onLinked }) {
+  const [bases, setBases] = (0, import_react9.useState)([]);
+  const [tables, setTables] = (0, import_react9.useState)([]);
+  const [baseId, setBaseId] = (0, import_react9.useState)(doc.sync?.baseId ?? "");
+  const [tableId, setTableId] = (0, import_react9.useState)(doc.sync?.tableId ?? "");
+  const [replaceSchema, setReplaceSchema] = (0, import_react9.useState)(!doc.fields.length || doc.rows.length === 0);
+  const [loading, setLoading] = (0, import_react9.useState)(true);
+  const [loadingTables, setLoadingTables] = (0, import_react9.useState)(false);
+  const [error2, setError] = (0, import_react9.useState)(null);
+  const [busy, setBusy] = (0, import_react9.useState)(false);
+  (0, import_react9.useEffect)(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const client = new AirtableClient(token);
+        const list = await client.listBases();
+        if (!cancelled) {
+          setBases(list);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to list bases");
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+  (0, import_react9.useEffect)(() => {
+    if (!baseId) {
+      setTables([]);
+      return;
+    }
+    let cancelled = false;
+    setLoadingTables(true);
+    setError(null);
+    void (async () => {
+      try {
+        const client = new AirtableClient(token);
+        const list = await client.getTables(baseId);
+        if (!cancelled) {
+          setTables(list);
+          setLoadingTables(false);
+          if (!list.some((t) => t.id === tableId)) setTableId("");
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to list tables");
+          setLoadingTables(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [baseId, token]);
+  const link = async () => {
+    const base = bases.find((b) => b.id === baseId);
+    const table = tables.find((t) => t.id === tableId);
+    if (!base || !table) {
+      setError("Pick a base and table");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const { doc: next } = createLinkConfig(
+        base.id,
+        base.name,
+        table,
+        doc,
+        replaceSchema
+      );
+      onLinked(next);
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to link");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+    "div",
+    {
+      className: "tabula-modal",
+      onClick: (e) => e.stopPropagation(),
+      role: "dialog",
+      "aria-label": "Link Airtable table",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-modal-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("h3", { children: "Link Airtable table" }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
+        ] }),
+        loading && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "tabula-muted", children: "Loading bases\u2026" }),
+        error2 && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "tabula-query-error", children: error2 }),
+        !loading && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-sync-form", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "tabula-sync-field", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { children: "Base" }),
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+              "select",
+              {
+                value: baseId,
+                onChange: (e) => setBaseId(e.target.value),
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: "", children: "Select base\u2026" }),
+                  bases.map((b) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: b.id, children: b.name }, b.id))
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "tabula-sync-field", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { children: "Table" }),
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+              "select",
+              {
+                value: tableId,
+                onChange: (e) => setTableId(e.target.value),
+                disabled: !baseId || loadingTables,
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: "", children: loadingTables ? "Loading\u2026" : "Select table\u2026" }),
+                  tables.map((t) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: t.id, children: t.name }, t.id))
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "tabula-check-label", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+              "input",
+              {
+                type: "checkbox",
+                checked: replaceSchema,
+                onChange: (e) => setReplaceSchema(e.target.checked)
+              }
+            ),
+            "Replace local columns with Airtable schema (clears rows)"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "tabula-muted", children: "Fields are matched by name. Pull after linking to import records." }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "tabula-panel-header", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-btn-primary",
+              type: "button",
+              disabled: !baseId || !tableId || busy,
+              onClick: () => void link(),
+              children: busy ? "Linking\u2026" : "Link table"
+            }
+          ) })
+        ] })
+      ]
+    }
+  ) });
+}
+
+// src/ui/TableApp.tsx
+var import_jsx_runtime14 = __toESM(require_jsx_runtime());
+function TableApp({
+  doc,
+  onChange,
+  onCreateTableFromPaste,
+  onRegisterClipboardPaste,
+  airtableToken = ""
+}) {
+  const [showFilters, setShowFilters] = (0, import_react10.useState)(
+    doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
+  );
+  const [showSorts, setShowSorts] = (0, import_react10.useState)(doc.view.sorts.length > 0);
+  const [showHide, setShowHide] = (0, import_react10.useState)(false);
+  const [optionFieldId, setOptionFieldId] = (0, import_react10.useState)(null);
+  const [queryError, setQueryError] = (0, import_react10.useState)();
+  const [selectedRowId, setSelectedRowId] = (0, import_react10.useState)(null);
+  const [showLinkModal, setShowLinkModal] = (0, import_react10.useState)(false);
+  const [syncBusy, setSyncBusy] = (0, import_react10.useState)(false);
+  const [pasteCandidate, setPasteCandidate] = (0, import_react10.useState)(null);
+  const groups = (0, import_react10.useMemo)(() => getGroupedRows(doc), [doc]);
+  const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
+  const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
+  const hasToken = Boolean(airtableToken.trim());
+  const requestClipboardPaste = (0, import_react10.useCallback)(() => {
+    void readSpreadsheetClipboard().then((payload) => {
+      if (!payload) {
+        new import_obsidian2.Notice("Clipboard has no CSV, XLSX, or spreadsheet cell data");
+        return;
+      }
+      setPasteCandidate(payload);
+    }).catch((error2) => {
+      console.error(error2);
+      new import_obsidian2.Notice("Clipboard access was unavailable. Focus the table and press Ctrl/Cmd+V instead.");
+    });
+  }, []);
+  (0, import_react10.useEffect)(() => {
+    onRegisterClipboardPaste(requestClipboardPaste);
+    return () => onRegisterClipboardPaste(null);
+  }, [onRegisterClipboardPaste, requestClipboardPaste]);
+  const updateDoc = (next) => onChange(next);
+  const patchView = (patch) => updateDoc({ ...doc, view: { ...doc.view, ...patch } });
+  const setSearch = (search) => patchView({ search });
+  const setQuery = (query) => {
+    const parsed = parseQueryString(query, doc.fields);
+    if (!parsed.ok) {
+      setQueryError(parsed.error);
+      patchView({ query });
+      return;
+    }
+    setQueryError(void 0);
+    patchView({ query: parsed.query, filters: parsed.group });
+  };
+  const setFilters = (filters) => {
+    setQueryError(void 0);
+    patchView({ filters, query: filtersToQueryString(filters, doc.fields) });
+  };
+  const handlePaste = (event) => {
+    if (!(event.target instanceof HTMLElement) || !event.target.closest(".tabula-grid-wrap")) return;
+    const transfer = event.clipboardData;
+    const files = [
+      ...Array.from(transfer.files),
+      ...Array.from(transfer.items).filter((item) => item.kind === "file").map((item) => item.getAsFile()).filter((file2) => file2 != null)
+    ];
+    const file = files.find(isSpreadsheetFile);
+    if (file) {
+      event.preventDefault();
+      event.stopPropagation();
+      void spreadsheetToMatrix(file).then((matrix2) => setPasteCandidate({ matrix: matrix2, sourceName: file.name })).catch((error2) => {
+        console.error(error2);
+        new import_obsidian2.Notice(error2 instanceof Error ? error2.message : "Could not read pasted spreadsheet");
+      });
+      return;
+    }
+    const types = Array.from(transfer.types);
+    const htmlMatrix = clipboardHtmlToMatrix(transfer.getData("text/html"));
+    const text = transfer.getData("text/plain");
+    const structuredClipboard = text.includes("	") || types.includes("text/csv") || types.includes("text/tab-separated-values");
+    if (event.target instanceof HTMLElement && event.target.tagName === "TEXTAREA" && !htmlMatrix && !structuredClipboard) {
+      return;
+    }
+    const matrix = htmlMatrix ?? clipboardTextToMatrix(text, types);
+    if (!matrix) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setPasteCandidate({ matrix, sourceName: "Clipboard Data" });
+  };
+  const addRow = () => {
+    const { row, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
+    updateDoc({
+      ...doc,
+      rows: [...doc.rows, row],
+      autoNumberNext: nextAuto
+    });
+  };
+  const deleteRow = (rowId) => {
+    const recordMap = { ...doc.sync?.recordMap ?? {} };
+    delete recordMap[rowId];
+    updateDoc({
+      ...doc,
+      rows: doc.rows.filter((r) => r.id !== rowId),
+      sync: doc.sync ? { ...doc.sync, recordMap } : doc.sync
+    });
+    if (selectedRowId === rowId) setSelectedRowId(null);
+  };
+  const addField = (type, atIndex) => {
+    const field = createField(type);
+    const fields = [...doc.fields];
+    if (atIndex == null) fields.push(field);
+    else fields.splice(atIndex, 0, field);
+    let autoNumberNext = doc.autoNumberNext ?? 1;
+    const rows = doc.rows.map((row) => {
+      let cell = emptyCellValue(type);
+      if (type === "autoNumber") {
+        cell = autoNumberNext;
+        autoNumberNext += 1;
+      } else if (type === "createdTime" || type === "lastModifiedTime") {
+        cell = (/* @__PURE__ */ new Date()).toISOString();
+      }
+      return { ...row, cells: { ...row.cells, [field.id]: cell } };
+    });
+    updateDoc({ ...doc, fields, rows, autoNumberNext });
+  };
+  const deleteField = (fieldId) => {
+    const fieldMap = { ...doc.sync?.fieldMap ?? {} };
+    delete fieldMap[fieldId];
+    updateDoc({
+      ...doc,
+      fields: doc.fields.filter((f) => f.id !== fieldId),
+      rows: doc.rows.map((row) => {
+        const cells = { ...row.cells };
+        delete cells[fieldId];
+        return { ...row, cells };
+      }),
+      view: {
+        ...doc.view,
+        filters: {
+          ...doc.view.filters,
+          conditions: doc.view.filters.conditions.filter((c) => c.fieldId !== fieldId)
+        },
+        sorts: doc.view.sorts.filter((s) => s.fieldId !== fieldId),
+        hiddenFieldIds: doc.view.hiddenFieldIds.filter((id) => id !== fieldId),
+        groupBy: doc.view.groupBy.fieldId === fieldId ? { fieldId: null } : doc.view.groupBy,
+        columnWidths: Object.fromEntries(
+          Object.entries(doc.view.columnWidths).filter(([id]) => id !== fieldId)
+        )
+      },
+      sync: doc.sync ? { ...doc.sync, fieldMap } : doc.sync
+    });
+  };
+  const renameField = (fieldId, name) => {
+    updateDoc({
+      ...doc,
+      fields: doc.fields.map((f) => f.id === fieldId ? { ...f, name } : f)
+    });
+  };
+  const setCell = (rowId, fieldId, value) => {
+    updateDoc({
+      ...doc,
+      rows: doc.rows.map((row) => {
+        if (row.id !== rowId) return row;
+        const next = {
+          ...row,
+          cells: { ...row.cells, [fieldId]: value }
+        };
+        return touchLastModified(next, doc.fields);
+      })
+    });
+  };
+  const updateField = (field) => {
+    updateDoc({
+      ...doc,
+      fields: doc.fields.map((f) => f.id === field.id ? field : f)
+    });
+  };
+  const addOption = (fieldId, name) => {
+    const option = createSelectOption(name);
+    updateDoc({
+      ...doc,
+      fields: doc.fields.map((f) => {
+        if (f.id !== fieldId || f.type !== "singleSelect" && f.type !== "multiSelect") {
+          return f;
+        }
+        return { ...f, options: [...f.options, option] };
+      })
+    });
+    return option;
+  };
+  const removeOption = (fieldId, optionId) => {
+    updateDoc(removeOptionFromDocument(doc, fieldId, optionId));
+  };
+  const setSorts = (sorts) => patchView({ sorts });
+  const sortField = (fieldId, direction) => {
+    const rest = doc.view.sorts.filter((s) => s.fieldId !== fieldId);
+    patchView({ sorts: [{ fieldId, direction }, ...rest] });
+    setShowSorts(true);
+  };
+  const hideField = (fieldId) => {
+    if (!doc.view.hiddenFieldIds.includes(fieldId)) {
+      patchView({ hiddenFieldIds: [...doc.view.hiddenFieldIds, fieldId] });
+    }
+  };
+  const insertField = (fieldId, side) => {
+    const idx = doc.fields.findIndex((f) => f.id === fieldId);
+    if (idx < 0) return;
+    addField("text", side === "left" ? idx : idx + 1);
+  };
+  const reorderFields = (fromId, toId, side) => {
+    const fields = reorderById(doc.fields, fromId, toId, side);
+    if (fields !== doc.fields) updateDoc({ ...doc, fields });
+  };
+  const reorderRows = (fromId, toId, side) => {
+    if (doc.view.sorts.length > 0) return;
+    const rows = reorderById(doc.rows, fromId, toId, side);
+    if (rows !== doc.rows) updateDoc({ ...doc, rows });
+  };
+  const resizeColumn = (fieldId, width) => {
+    patchView({
+      columnWidths: { ...doc.view.columnWidths, [fieldId]: width }
+    });
+  };
+  const replaceFromPaste = (incoming) => {
+    updateDoc({
+      ...incoming,
+      name: doc.name,
+      view: createEmptyView(),
+      sync: null
+    });
+    setSelectedRowId(null);
+    setShowFilters(false);
+    setShowSorts(false);
+    setShowHide(false);
+    setQueryError(void 0);
+    setPasteCandidate(null);
+    new import_obsidian2.Notice(`Replaced table with ${incoming.rows.length} rows`);
+  };
+  const appendFromPaste = (incoming) => {
+    const result = appendSpreadsheetToTable(doc, incoming);
+    updateDoc(result.doc);
+    setPasteCandidate(null);
+    new import_obsidian2.Notice(
+      `Appended ${result.addedRows} rows${result.addedFields ? ` and added ${result.addedFields} fields` : ""}`
+    );
+    if (doc.sync && result.addedFields > 0) {
+      new import_obsidian2.Notice("New fields are local only until they are mapped to Airtable");
+    }
+  };
+  const createFromPaste = async (incoming) => {
+    await onCreateTableFromPaste(incoming);
+    setPasteCandidate(null);
+  };
+  const runPull = async () => {
+    if (!hasToken || !doc.sync) return;
+    setSyncBusy(true);
+    try {
+      const client = new AirtableClient(airtableToken.trim());
+      const next = await pullFromAirtable(client, doc);
+      updateDoc(next);
+      new import_obsidian2.Notice(`Pulled ${next.rows.length} rows from Airtable`);
+    } catch (e) {
+      console.error(e);
+      new import_obsidian2.Notice(e instanceof Error ? e.message : "Pull failed");
+    } finally {
+      setSyncBusy(false);
+    }
+  };
+  const runPush = async () => {
+    if (!hasToken || !doc.sync) return;
+    setSyncBusy(true);
+    try {
+      const client = new AirtableClient(airtableToken.trim());
+      const next = await pushToAirtable(client, doc);
+      updateDoc(next);
+      new import_obsidian2.Notice(`Pushed ${doc.rows.length} rows to Airtable`);
+    } catch (e) {
+      console.error(e);
+      new import_obsidian2.Notice(e instanceof Error ? e.message : "Push failed");
+    } finally {
+      setSyncBusy(false);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: `tabula-root height-${doc.view.rowHeight}`, onPaste: handlePaste, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      Toolbar,
+      {
+        doc,
+        rowCount: visibleCount,
+        showFilters,
+        showSorts,
+        showHide,
+        syncControl: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+          SyncMenu,
+          {
+            linked: Boolean(doc.sync),
+            sync: doc.sync,
+            busy: syncBusy,
+            hasToken,
+            onLink: () => setShowLinkModal(true),
+            onPull: () => void runPull(),
+            onPush: () => void runPush(),
+            onUnlink: () => updateDoc({ ...doc, sync: null })
+          }
+        ),
+        onRename: (name) => updateDoc({ ...doc, name }),
+        onSearch: setSearch,
+        onToggleFilters: () => setShowFilters((v) => !v),
+        onToggleSorts: () => setShowSorts((v) => !v),
+        onToggleHide: () => setShowHide((v) => !v),
+        onAddRow: addRow,
+        onAddField: (type) => addField(type),
+        onGroupBy: (fieldId) => patchView({ groupBy: { fieldId } }),
+        onRowHeight: (rowHeight) => patchView({ rowHeight }),
+        onToggleFrozen: () => patchView({ frozenPrimary: !doc.view.frozenPrimary })
+      }
+    ),
+    showFilters && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      FilterBar,
+      {
+        doc,
+        queryError,
+        onQueryChange: setQuery,
+        onFiltersChange: setFilters
+      }
+    ),
+    showSorts && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(SortBar, { doc, onChange: setSorts }),
+    showHide && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      HideFieldsMenu,
+      {
+        doc,
+        onChange: (hiddenFieldIds) => patchView({ hiddenFieldIds })
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      TableGrid,
+      {
+        doc,
+        groups,
+        selectedRowId,
+        canReorderRows: doc.view.sorts.length === 0,
+        onSelectRow: setSelectedRowId,
+        onSetCell: setCell,
+        onDeleteRow: deleteRow,
+        onRenameField: renameField,
+        onDeleteField: deleteField,
+        onManageOptions: setOptionFieldId,
+        onAddOption: addOption,
+        onSortField: sortField,
+        onHideField: hideField,
+        onInsertField: insertField,
+        onReorderRows: reorderRows,
+        onReorderFields: reorderFields,
+        onResizeColumn: resizeColumn,
+        onAddRow: addRow
+      }
+    ),
+    pasteCandidate && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      PasteSpreadsheetModal,
+      {
+        matrix: pasteCandidate.matrix,
+        sourceName: pasteCandidate.sourceName,
+        currentDoc: doc,
+        onClose: () => setPasteCandidate(null),
+        onReplace: replaceFromPaste,
+        onAppend: appendFromPaste,
+        onCreateNew: createFromPaste
+      }
+    ),
+    optionField && (optionField.type === "singleSelect" || optionField.type === "multiSelect") && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      OptionManager,
+      {
+        field: optionField,
+        onClose: () => setOptionFieldId(null),
+        onChange: updateField,
+        onRemoveOption: (optionId) => removeOption(optionField.id, optionId)
+      }
+    ),
+    showLinkModal && hasToken && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      LinkSyncModal,
+      {
+        token: airtableToken.trim(),
+        doc,
+        onClose: () => setShowLinkModal(false),
+        onLinked: (next) => {
+          updateDoc(next);
+          new import_obsidian2.Notice(
+            `Linked to ${next.sync?.baseName ?? "base"} / ${next.sync?.tableName ?? "table"}`
+          );
+        }
+      }
+    )
+  ] });
+}
+function isSpreadsheetFile(file) {
+  const name = file.name.toLowerCase();
+  return name.endsWith(".csv") || name.endsWith(".xlsx") || file.type === "text/csv" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+}
+
+// src/ui/mount.tsx
+function mountTableApp(container, props) {
+  const root = (0, import_client.createRoot)(container);
+  root.render((0, import_react11.createElement)(TableApp, props));
+  return root;
+}
+function updateTableApp(root, props) {
+  root.render((0, import_react11.createElement)(TableApp, props));
+}
+
+// src/views/TableView.ts
+var VIEW_TYPE_TABULA = "airtable-tabula-view";
+var TABULA_EXTENSION = "tabula";
+var TableView = class extends import_obsidian3.TextFileView {
+  constructor(leaf, plugin) {
+    super(leaf);
+    this.reactRoot = null;
+    this.doc = null;
+    this.mountEl = null;
+    this.saveTimer = null;
+    this.applyingExternal = false;
+    this.clipboardPasteHandler = null;
+    this.registerClipboardPaste = (handler) => {
+      this.clipboardPasteHandler = handler;
+    };
+    this.plugin = plugin;
+  }
+  requestClipboardPaste() {
+    if (!this.clipboardPasteHandler) return false;
+    this.clipboardPasteHandler();
+    return true;
+  }
+  getViewType() {
+    return VIEW_TYPE_TABULA;
+  }
+  getDisplayText() {
+    return this.doc?.name ?? this.file?.basename ?? "Table";
+  }
+  getViewData() {
+    if (!this.doc) return this.data ?? "";
+    return serializeTableDocument(this.doc);
+  }
+  setViewData(data, clear) {
+    this.data = data;
+    try {
+      this.doc = parseTableDocument(data);
+    } catch (e) {
+      console.error("Failed to parse .tabula file", e);
+      this.doc = parseTableDocument("");
+    }
+    if (clear) {
+      this.remount();
+    } else {
+      this.render();
+    }
+  }
+  clear() {
+    this.doc = null;
+    this.data = "";
+    this.unmount();
+  }
+  async onOpen() {
+    this.contentEl.empty();
+    this.contentEl.addClass("tabula-view");
+    this.mountEl = this.contentEl.createDiv({ cls: "tabula-mount" });
+    this.remount();
+  }
+  async onClose() {
+    if (this.saveTimer != null) {
+      window.clearTimeout(this.saveTimer);
+      this.saveTimer = null;
+      this.requestSave();
+    }
+    this.unmount();
+  }
+  appProps() {
+    return {
+      doc: this.doc,
+      onChange: (doc) => this.handleChange(doc),
+      onCreateTableFromPaste: (doc) => this.plugin.createTableFromPaste(doc),
+      onRegisterClipboardPaste: this.registerClipboardPaste,
+      airtableToken: this.plugin.settings.airtableToken
+    };
+  }
+  remount() {
+    this.unmount();
+    if (!this.mountEl || !this.doc) return;
+    this.reactRoot = mountTableApp(this.mountEl, this.appProps());
+  }
+  render() {
+    if (!this.reactRoot || !this.doc) {
+      this.remount();
+      return;
+    }
+    updateTableApp(this.reactRoot, this.appProps());
+  }
+  handleChange(doc) {
+    if (this.applyingExternal) return;
+    this.doc = doc;
+    this.data = serializeTableDocument(doc);
+    this.app.workspace.requestSaveLayout();
+    this.debounceSave();
+    this.render();
+  }
+  debounceSave() {
+    if (this.saveTimer != null) {
+      window.clearTimeout(this.saveTimer);
+    }
+    this.saveTimer = window.setTimeout(() => {
+      this.saveTimer = null;
+      this.requestSave();
+    }, 300);
+  }
+  unmount() {
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
+    if (this.mountEl) {
+      this.mountEl.empty();
+    }
+  }
+};
+
+// src/settings.ts
+var DEFAULT_SETTINGS = {
+  airtableToken: ""
+};
+
+// src/ui/SettingsTab.ts
+var import_obsidian4 = require("obsidian");
+var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+  display() {
+    const { containerEl } = this;
+    containerEl.empty();
+    new import_obsidian4.Setting(containerEl).setName("Airtable sync").setHeading();
+    new import_obsidian4.Setting(containerEl).setDesc(
+      "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
+    );
+    new import_obsidian4.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
+      text.inputEl.type = "password";
+      text.inputEl.autocomplete = "off";
+      text.setPlaceholder("pat\u2026");
+      text.setValue(this.plugin.settings.airtableToken);
+      text.onChange(async (value) => {
+        this.plugin.settings.airtableToken = value.trim();
+        await this.plugin.saveSettings();
+      });
+    });
+  }
+};
+
 // src/main.ts
 var TabulaPlugin = class extends import_obsidian5.Plugin {
   constructor() {
@@ -32234,9 +32885,27 @@ var TabulaPlugin = class extends import_obsidian5.Plugin {
       name: "Import CSV / Excel as table",
       callback: () => void this.importSpreadsheet()
     });
-    this.addRibbonIcon("table", "Create Airtable Tabula table", () => {
-      void this.createNewTable();
+    this.addCommand({
+      id: "paste-spreadsheet",
+      name: "Paste spreadsheet from clipboard",
+      callback: () => this.requestClipboardPaste()
     });
+    const ribbonIcon = this.addRibbonIcon("table", "Airtable Tabula actions", (event) => {
+      const menu = new import_obsidian5.Menu();
+      menu.addItem(
+        (item) => item.setTitle("Create new table").onClick(() => void this.createNewTable())
+      );
+      menu.addItem(
+        (item) => item.setTitle("Paste spreadsheet from clipboard").onClick(() => this.requestClipboardPaste())
+      );
+      menu.addItem(
+        (item) => item.setTitle("Import CSV / Excel file").onClick(() => void this.importSpreadsheet())
+      );
+      menu.showAtMouseEvent(event);
+    });
+    ribbonIcon.addClass("tabula-ribbon-action");
+    ribbonIcon.style.color = "var(--interactive-accent)";
+    ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
   }
   async loadSettings() {
     const data = await this.loadData();
@@ -32262,6 +32931,17 @@ var TabulaPlugin = class extends import_obsidian5.Plugin {
       console.error(e);
       new import_obsidian5.Notice(e instanceof Error ? e.message : "Import failed");
     }
+  }
+  requestClipboardPaste() {
+    const tableView = this.app.workspace.getActiveViewOfType(TableView);
+    if (!tableView?.requestClipboardPaste()) {
+      new import_obsidian5.Notice("Open a Tabula table before pasting spreadsheet data from the ribbon");
+    }
+  }
+  async createTableFromPaste(doc) {
+    const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
+    await this.app.workspace.getLeaf(true).openFile(file);
+    new import_obsidian5.Notice(`Created ${file.basename} from pasted data`);
   }
   async createNewTable() {
     const doc = createDefaultTable("Untitled Table");

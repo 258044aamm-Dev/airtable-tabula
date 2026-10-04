@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ClipboardEvent as ReactClipboardEvent } from "react";
 import { Notice } from "obsidian";
 import {
 	TableDocument,
@@ -9,12 +9,23 @@ import {
 	emptyCellValue,
 } from "../data/types";
 import {
+	createEmptyView,
 	createField,
 	createRow,
 	createSelectOption,
+	reorderById,
 	removeOptionFromDocument,
 	touchLastModified,
 } from "../data/store";
+import {
+	appendSpreadsheetToTable,
+	clipboardHtmlToMatrix,
+	clipboardTextToMatrix,
+	readSpreadsheetClipboard,
+	spreadsheetToMatrix,
+} from "../import/spreadsheet";
+import { PasteSpreadsheetModal } from "./PasteSpreadsheetModal";
+import type { DropSide } from "./TableGrid";
 import {
 	filtersToQueryString,
 	getGroupedRows,
@@ -34,10 +45,18 @@ import { LinkSyncModal } from "./LinkSyncModal";
 interface Props {
 	doc: TableDocument;
 	onChange: (doc: TableDocument) => void;
+	onCreateTableFromPaste: (doc: TableDocument) => Promise<void>;
+	onRegisterClipboardPaste: (handler: (() => void) | null) => void;
 	airtableToken?: string;
 }
 
-export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
+export function TableApp({
+	doc,
+	onChange,
+	onCreateTableFromPaste,
+	onRegisterClipboardPaste,
+	airtableToken = "",
+}: Props) {
 	const [showFilters, setShowFilters] = useState(
 		doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
 	);
@@ -48,11 +67,35 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 	const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 	const [showLinkModal, setShowLinkModal] = useState(false);
 	const [syncBusy, setSyncBusy] = useState(false);
+	const [pasteCandidate, setPasteCandidate] = useState<{
+		matrix: unknown[][];
+		sourceName: string;
+	} | null>(null);
 
 	const groups = useMemo(() => getGroupedRows(doc), [doc]);
 	const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
 	const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
 	const hasToken = Boolean(airtableToken.trim());
+
+	const requestClipboardPaste = useCallback(() => {
+		void readSpreadsheetClipboard()
+			.then((payload) => {
+				if (!payload) {
+					new Notice("Clipboard has no CSV, XLSX, or spreadsheet cell data");
+					return;
+				}
+				setPasteCandidate(payload);
+			})
+			.catch((error: unknown) => {
+				console.error(error);
+				new Notice("Clipboard access was unavailable. Focus the table and press Ctrl/Cmd+V instead.");
+			});
+	}, []);
+
+	useEffect(() => {
+		onRegisterClipboardPaste(requestClipboardPaste);
+		return () => onRegisterClipboardPaste(null);
+	}, [onRegisterClipboardPaste, requestClipboardPaste]);
 
 	const updateDoc = (next: TableDocument) => onChange(next);
 	const patchView = (patch: Partial<TableDocument["view"]>) =>
@@ -74,6 +117,46 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 	const setFilters = (filters: TableDocument["view"]["filters"]) => {
 		setQueryError(undefined);
 		patchView({ filters, query: filtersToQueryString(filters, doc.fields) });
+	};
+
+	const handlePaste = (event: ReactClipboardEvent<HTMLDivElement>) => {
+		if (!(event.target instanceof HTMLElement) || !event.target.closest(".tabula-grid-wrap")) return;
+		const transfer = event.clipboardData;
+		const files = [
+			...Array.from(transfer.files),
+			...Array.from(transfer.items)
+				.filter((item) => item.kind === "file")
+				.map((item) => item.getAsFile())
+				.filter((file): file is File => file != null),
+		];
+		const file = files.find(isSpreadsheetFile);
+		if (file) {
+			event.preventDefault();
+			event.stopPropagation();
+			void spreadsheetToMatrix(file)
+				.then((matrix) => setPasteCandidate({ matrix, sourceName: file.name }))
+				.catch((error: unknown) => {
+					console.error(error);
+					new Notice(error instanceof Error ? error.message : "Could not read pasted spreadsheet");
+				});
+			return;
+		}
+
+		const types = Array.from(transfer.types);
+		const htmlMatrix = clipboardHtmlToMatrix(transfer.getData("text/html"));
+		const text = transfer.getData("text/plain");
+		const structuredClipboard =
+			text.includes("\t") || types.includes("text/csv") || types.includes("text/tab-separated-values");
+		// Keep ordinary multiline text editing in long-text cells intact. A copied
+		// spreadsheet range will normally carry tabs or an HTML table payload.
+		if (event.target instanceof HTMLElement && event.target.tagName === "TEXTAREA" && !htmlMatrix && !structuredClipboard) {
+			return;
+		}
+		const matrix = htmlMatrix ?? clipboardTextToMatrix(text, types);
+		if (!matrix) return;
+		event.preventDefault();
+		event.stopPropagation();
+		setPasteCandidate({ matrix, sourceName: "Clipboard Data" });
 	};
 
 	const addRow = () => {
@@ -217,20 +300,54 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 		addField("text", side === "left" ? idx : idx + 1);
 	};
 
-	const reorderFields = (fromId: string, toId: string) => {
-		const from = doc.fields.findIndex((f) => f.id === fromId);
-		const to = doc.fields.findIndex((f) => f.id === toId);
-		if (from < 0 || to < 0 || from === to) return;
-		const fields = [...doc.fields];
-		const [moved] = fields.splice(from, 1);
-		fields.splice(to, 0, moved);
-		updateDoc({ ...doc, fields });
+	const reorderFields = (fromId: string, toId: string, side: DropSide) => {
+		const fields = reorderById(doc.fields, fromId, toId, side);
+		if (fields !== doc.fields) updateDoc({ ...doc, fields });
+	};
+
+	const reorderRows = (fromId: string, toId: string, side: DropSide) => {
+		if (doc.view.sorts.length > 0) return;
+		const rows = reorderById(doc.rows, fromId, toId, side);
+		if (rows !== doc.rows) updateDoc({ ...doc, rows });
 	};
 
 	const resizeColumn = (fieldId: string, width: number) => {
 		patchView({
 			columnWidths: { ...doc.view.columnWidths, [fieldId]: width },
 		});
+	};
+
+	const replaceFromPaste = (incoming: TableDocument) => {
+		updateDoc({
+			...incoming,
+			name: doc.name,
+			view: createEmptyView(),
+			sync: null,
+		});
+		setSelectedRowId(null);
+		setShowFilters(false);
+		setShowSorts(false);
+		setShowHide(false);
+		setQueryError(undefined);
+		setPasteCandidate(null);
+		new Notice(`Replaced table with ${incoming.rows.length} rows`);
+	};
+
+	const appendFromPaste = (incoming: TableDocument) => {
+		const result = appendSpreadsheetToTable(doc, incoming);
+		updateDoc(result.doc);
+		setPasteCandidate(null);
+		new Notice(
+			`Appended ${result.addedRows} rows${result.addedFields ? ` and added ${result.addedFields} fields` : ""}`
+		);
+		if (doc.sync && result.addedFields > 0) {
+			new Notice("New fields are local only until they are mapped to Airtable");
+		}
+	};
+
+	const createFromPaste = async (incoming: TableDocument) => {
+		await onCreateTableFromPaste(incoming);
+		setPasteCandidate(null);
 	};
 
 	const runPull = async () => {
@@ -266,7 +383,7 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 	};
 
 	return (
-		<div className={`tabula-root height-${doc.view.rowHeight}`}>
+		<div className={`tabula-root height-${doc.view.rowHeight}`} onPaste={handlePaste}>
 			<Toolbar
 				doc={doc}
 				rowCount={visibleCount}
@@ -317,6 +434,7 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 				doc={doc}
 				groups={groups}
 				selectedRowId={selectedRowId}
+				canReorderRows={doc.view.sorts.length === 0}
 				onSelectRow={setSelectedRowId}
 				onSetCell={setCell}
 				onDeleteRow={deleteRow}
@@ -327,10 +445,22 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 				onSortField={sortField}
 				onHideField={hideField}
 				onInsertField={insertField}
+				onReorderRows={reorderRows}
 				onReorderFields={reorderFields}
 				onResizeColumn={resizeColumn}
 				onAddRow={addRow}
 			/>
+			{pasteCandidate && (
+				<PasteSpreadsheetModal
+					matrix={pasteCandidate.matrix}
+					sourceName={pasteCandidate.sourceName}
+					currentDoc={doc}
+					onClose={() => setPasteCandidate(null)}
+					onReplace={replaceFromPaste}
+					onAppend={appendFromPaste}
+					onCreateNew={createFromPaste}
+				/>
+			)}
 			{optionField &&
 				(optionField.type === "singleSelect" ||
 					optionField.type === "multiSelect") && (
@@ -357,5 +487,15 @@ export function TableApp({ doc, onChange, airtableToken = "" }: Props) {
 				/>
 			)}
 		</div>
+	);
+}
+
+function isSpreadsheetFile(file: File): boolean {
+	const name = file.name.toLowerCase();
+	return (
+		name.endsWith(".csv") ||
+		name.endsWith(".xlsx") ||
+		file.type === "text/csv" ||
+		file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 	);
 }

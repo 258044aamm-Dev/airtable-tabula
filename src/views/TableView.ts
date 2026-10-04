@@ -18,6 +18,17 @@ export class TableView extends TextFileView {
 	private mountEl: HTMLElement | null = null;
 	private saveTimer: number | null = null;
 	private applyingExternal = false;
+	private clipboardPasteHandler: (() => void) | null = null;
+
+	private registerClipboardPaste = (handler: (() => void) | null): void => {
+		this.clipboardPasteHandler = handler;
+	};
+
+	requestClipboardPaste(): boolean {
+		if (!this.clipboardPasteHandler) return false;
+		this.clipboardPasteHandler();
+		return true;
+	}
 
 	constructor(leaf: WorkspaceLeaf, plugin: TabulaPlugin) {
 		super(leaf);
@@ -78,6 +89,8 @@ export class TableView extends TextFileView {
 		return {
 			doc: this.doc!,
 			onChange: (doc: TableDocument) => this.handleChange(doc),
+			onCreateTableFromPaste: (doc: TableDocument) => this.plugin.createTableFromPaste(doc),
+			onRegisterClipboardPaste: this.registerClipboardPaste,
 			airtableToken: this.plugin.settings.airtableToken,
 		};
 	}

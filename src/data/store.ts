@@ -23,6 +23,25 @@ export function createId(prefix: string): string {
 	return `${prefix}_${Date.now().toString(36)}_${counter.toString(36)}`;
 }
 
+export function reorderById<T extends { id: string }>(
+	items: T[],
+	fromId: string,
+	toId: string,
+	side: "before" | "after"
+): T[] {
+	if (fromId === toId) return items;
+	const fromIndex = items.findIndex((item) => item.id === fromId);
+	if (fromIndex < 0 || !items.some((item) => item.id === toId)) return items;
+	const next = [...items];
+	const [moved] = next.splice(fromIndex, 1);
+	const targetIndex = next.findIndex((item) => item.id === toId);
+	if (targetIndex < 0) return items;
+	const insertIndex = targetIndex + (side === "after" ? 1 : 0);
+	if (insertIndex === fromIndex) return items;
+	next.splice(insertIndex, 0, moved);
+	return next;
+}
+
 export function nowIso(): string {
 	return new Date().toISOString();
 }

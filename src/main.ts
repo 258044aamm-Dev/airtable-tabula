@@ -1,4 +1,4 @@
-import { Notice, Plugin, TFile } from "obsidian";
+import { Menu, Notice, Plugin, TFile } from "obsidian";
 import {
 	TABULA_EXTENSION,
 	TableView,
@@ -9,6 +9,7 @@ import {
 	serializeTableDocument,
 } from "./data/store";
 import { DEFAULT_SETTINGS, PluginSettings } from "./settings";
+import type { TableDocument } from "./data/types";
 import { TabulaSettingTab } from "./ui/SettingsTab";
 import {
 	pickSpreadsheetFile,
@@ -41,9 +42,34 @@ export default class TabulaPlugin extends Plugin {
 			callback: () => void this.importSpreadsheet(),
 		});
 
-		this.addRibbonIcon("table", "Create Airtable Tabula table", () => {
-			void this.createNewTable();
+		this.addCommand({
+			id: "paste-spreadsheet",
+			name: "Paste spreadsheet from clipboard",
+			callback: () => this.requestClipboardPaste(),
 		});
+
+		const ribbonIcon = this.addRibbonIcon("table", "Airtable Tabula actions", (event) => {
+			const menu = new Menu();
+			menu.addItem((item) =>
+				item
+					.setTitle("Create new table")
+					.onClick(() => void this.createNewTable())
+			);
+			menu.addItem((item) =>
+				item
+					.setTitle("Paste spreadsheet from clipboard")
+					.onClick(() => this.requestClipboardPaste())
+			);
+			menu.addItem((item) =>
+				item
+					.setTitle("Import CSV / Excel file")
+					.onClick(() => void this.importSpreadsheet())
+			);
+			menu.showAtMouseEvent(event);
+		});
+		ribbonIcon.addClass("tabula-ribbon-action");
+		ribbonIcon.style.color = "var(--interactive-accent)";
+		ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
 	}
 
 	async loadSettings(): Promise<void> {
@@ -73,6 +99,19 @@ export default class TabulaPlugin extends Plugin {
 			console.error(e);
 			new Notice(e instanceof Error ? e.message : "Import failed");
 		}
+	}
+
+	private requestClipboardPaste(): void {
+		const tableView = this.app.workspace.getActiveViewOfType(TableView);
+		if (!tableView?.requestClipboardPaste()) {
+			new Notice("Open a Tabula table before pasting spreadsheet data from the ribbon");
+		}
+	}
+
+	async createTableFromPaste(doc: TableDocument): Promise<void> {
+		const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
+		await this.app.workspace.getLeaf(true).openFile(file);
+		new Notice(`Created ${file.basename} from pasted data`);
 	}
 
 	private async createNewTable(): Promise<void> {

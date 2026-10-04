@@ -3,26 +3,20 @@ import { createElement } from "react";
 import { TableApp } from "./TableApp";
 import { TableDocument } from "../data/types";
 
-export function mountTableApp(
-	container: HTMLElement,
-	props: {
-		doc: TableDocument;
-		onChange: (doc: TableDocument) => void;
-		airtableToken?: string;
-	}
-): Root {
+interface TableAppProps {
+	doc: TableDocument;
+	onChange: (doc: TableDocument) => void;
+	onCreateTableFromPaste: (doc: TableDocument) => Promise<void>;
+	onRegisterClipboardPaste: (handler: (() => void) | null) => void;
+	airtableToken?: string;
+}
+
+export function mountTableApp(container: HTMLElement, props: TableAppProps): Root {
 	const root = createRoot(container);
 	root.render(createElement(TableApp, props));
 	return root;
 }
 
-export function updateTableApp(
-	root: Root,
-	props: {
-		doc: TableDocument;
-		onChange: (doc: TableDocument) => void;
-		airtableToken?: string;
-	}
-): void {
+export function updateTableApp(root: Root, props: TableAppProps): void {
 	root.render(createElement(TableApp, props));
 }

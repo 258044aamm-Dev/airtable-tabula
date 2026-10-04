@@ -6,7 +6,8 @@ Each table is a `.tabula` file (JSON) opened in a spreadsheet-style grid.
 
 ## Features
 
-- **Import CSV / Excel** — turn a `.csv` or `.xlsx` file into a table in one command
+- **Import and paste spreadsheets** — import `.csv` / `.xlsx` files, or paste spreadsheet cells/files directly into an open table and choose Replace, Create new, or Append
+- **Reorder rows and columns** — drag row and column handles on desktop or touch devices
 - **Field types** — text, long text, number, currency, percent, duration, rating, checkbox, date, date & time, URL, email, phone, single/multi select, attachments, auto number, created / last modified
 - **Selects** — colored tags, searchable dropdowns, create-on-type, option manager
 - **Views** — search, filter builder + query string, multi-sort, group by, hide fields, column resize/reorder, freeze primary column, row height
@@ -28,7 +29,7 @@ npm run build
 ln -s /absolute/path/to/airtable-tabula /path/to/vault/.obsidian/plugins/airtable-tabula
 ```
 
-Then enable the plugin and use **Create new table** or **Import CSV / Excel as table** from the command palette.
+Then enable the plugin. The left ribbon table icon opens actions for creating a table, pasting spreadsheet data, or importing a CSV/XLSX file. Create and import commands also remain available from the command palette.
 
 ## Import CSV / Excel
 
@@ -42,6 +43,18 @@ What happens:
 - A new `.tabula` file is created in your vault and opened
 
 Tip: In Excel or Google Sheets, “Save as CSV” also works if you don’t need a full workbook.
+
+## Paste spreadsheet data directly
+
+Open a `.tabula` table, focus the grid, and paste a spreadsheet range or a `.csv` / `.xlsx` file from the clipboard. The plugin previews the data and offers three destinations:
+
+- **Replace current table** — replace its fields and rows while keeping the current file and table name. View settings reset. Replacing an Airtable-linked table also unlinks it.
+- **Create new table** — create and open a new `.tabula` file.
+- **Append to current table** — match incoming columns by header name, append the rows, and add any new columns without changing existing data.
+
+The preview treats the first row as headers by default; turn that off when the copied range has no header row. Spreadsheet cell ranges copied from Excel or Google Sheets are supported as clipboard text. Pasting actual files depends on whether the operating system exposes the file to Obsidian’s clipboard; if it does not, use **Import CSV / Excel as table** from the ribbon or command palette.
+
+The left ribbon table icon opens the create, paste, and import actions. The command **Paste spreadsheet from clipboard** is also available in the command palette when a Tabula table is active.
 
 ## Optional Airtable sync
 

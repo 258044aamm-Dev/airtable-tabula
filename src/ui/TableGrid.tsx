@@ -1,4 +1,10 @@
-import { useRef, useState, type JSX } from "react";
+import {
+	useEffect,
+	useRef,
+	useState,
+	type JSX,
+	type PointerEvent as ReactPointerEvent,
+} from "react";
 import {
 	CellValue,
 	Field,
@@ -10,10 +16,21 @@ import { RowGroup } from "../data/query";
 import { CellEditor } from "./CellEditor";
 import { FieldHeaderMenu } from "./FieldHeaderMenu";
 
+export type DropSide = "before" | "after";
+type ReorderKind = "row" | "field";
+
+interface ReorderDragState {
+	kind: ReorderKind;
+	sourceId: string;
+	targetId: string | null;
+	side: DropSide | null;
+}
+
 interface Props {
 	doc: TableDocument;
 	groups: RowGroup[];
 	selectedRowId: string | null;
+	canReorderRows: boolean;
 	onSelectRow: (rowId: string | null) => void;
 	onSetCell: (rowId: string, fieldId: string, value: CellValue) => void;
 	onDeleteRow: (rowId: string) => void;
@@ -24,7 +41,8 @@ interface Props {
 	onSortField: (fieldId: string, direction: "asc" | "desc") => void;
 	onHideField: (fieldId: string) => void;
 	onInsertField: (fieldId: string, side: "left" | "right") => void;
-	onReorderFields: (fromId: string, toId: string) => void;
+	onReorderRows: (fromId: string, toId: string, side: DropSide) => void;
+	onReorderFields: (fromId: string, toId: string, side: DropSide) => void;
 	onResizeColumn: (fieldId: string, width: number) => void;
 	onAddRow: () => void;
 }
@@ -34,6 +52,96 @@ export function TableGrid(props: Props) {
 	const frozen = props.doc.view.frozenPrimary;
 	const widths = props.doc.view.columnWidths;
 	const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
+	const [dragState, setDragState] = useState<ReorderDragState | null>(null);
+	const dragCleanup = useRef<(() => void) | null>(null);
+
+	const startReorder = (
+		kind: ReorderKind,
+		sourceId: string,
+		event: ReactPointerEvent<HTMLElement>
+	) => {
+		if ((event.pointerType === "mouse" && event.button !== 0) || (kind === "row" && !props.canReorderRows)) return;
+		event.preventDefault();
+		event.stopPropagation();
+		dragCleanup.current?.();
+		setDragState({ kind, sourceId, targetId: null, side: null });
+
+		const pointerId = event.pointerId;
+		const scrollContainer = event.currentTarget.closest<HTMLElement>(".tabula-grid-wrap");
+		const findDropTarget = (pointerEvent: PointerEvent) => {
+			const element = document.elementFromPoint(pointerEvent.clientX, pointerEvent.clientY);
+			const target = element?.closest<HTMLElement>("[data-reorder-kind]");
+			if (!target || target.dataset.reorderKind !== kind) return null;
+			const targetId = target.dataset.reorderId;
+			if (!targetId) return null;
+			const rect = target.getBoundingClientRect();
+			const coordinate = kind === "row" ? pointerEvent.clientY : pointerEvent.clientX;
+			const midpoint = kind === "row" ? rect.top + rect.height / 2 : rect.left + rect.width / 2;
+			return { targetId, side: coordinate < midpoint ? "before" as const : "after" as const };
+		};
+
+		const cleanup = () => {
+			document.removeEventListener("pointermove", onMove);
+			document.removeEventListener("pointerup", onUp);
+			document.removeEventListener("pointercancel", onCancel);
+			window.removeEventListener("blur", onCancel);
+			if (dragCleanup.current === cleanup) dragCleanup.current = null;
+		};
+		const onMove = (pointerEvent: PointerEvent) => {
+			if (pointerEvent.pointerId !== pointerId) return;
+			pointerEvent.preventDefault();
+			if (scrollContainer) {
+				const bounds = scrollContainer.getBoundingClientRect();
+				const edge = 36;
+				if (kind === "row") {
+					if (pointerEvent.clientY < bounds.top + edge) scrollContainer.scrollTop -= 14;
+					else if (pointerEvent.clientY > bounds.bottom - edge) scrollContainer.scrollTop += 14;
+				} else {
+					if (pointerEvent.clientX < bounds.left + edge) scrollContainer.scrollLeft -= 14;
+					else if (pointerEvent.clientX > bounds.right - edge) scrollContainer.scrollLeft += 14;
+				}
+			}
+			const target = findDropTarget(pointerEvent);
+			setDragState((current) => {
+				if (!current || current.sourceId !== sourceId || current.kind !== kind) return current;
+				if (current.targetId === (target?.targetId ?? null) && current.side === (target?.side ?? null)) {
+					return current;
+				}
+				return {
+					...current,
+					targetId: target?.targetId ?? null,
+					side: target?.side ?? null,
+				};
+			});
+		};
+		const onUp = (pointerEvent: PointerEvent) => {
+			if (pointerEvent.pointerId !== pointerId) return;
+			pointerEvent.preventDefault();
+			const target = findDropTarget(pointerEvent);
+			cleanup();
+			setDragState(null);
+			if (!target || target.targetId === sourceId) return;
+			if (kind === "row") props.onReorderRows(sourceId, target.targetId, target.side);
+			else props.onReorderFields(sourceId, target.targetId, target.side);
+		};
+		const onCancel = () => {
+			cleanup();
+			setDragState(null);
+		};
+
+		dragCleanup.current = cleanup;
+		document.addEventListener("pointermove", onMove, { passive: false });
+		document.addEventListener("pointerup", onUp);
+		document.addEventListener("pointercancel", onCancel);
+		window.addEventListener("blur", onCancel);
+	};
+
+	useEffect(
+		() => () => {
+			dragCleanup.current?.();
+		},
+		[]
+	);
 
 	let rowIndex = 0;
 	const body: JSX.Element[] = [];
@@ -52,13 +160,47 @@ export function TableGrid(props: Props) {
 		for (const row of group.rows) {
 			rowIndex += 1;
 			const index = rowIndex;
+			const isDragSource = dragState?.kind === "row" && dragState.sourceId === row.id;
+			const dropClass =
+				dragState?.kind === "row" && dragState.targetId === row.id
+					? dragState.side === "before"
+						? "is-drop-before"
+						: "is-drop-after"
+					: "";
 			body.push(
 				<tr
 					key={row.id}
-					className={props.selectedRowId === row.id ? "is-selected" : undefined}
+					data-reorder-kind={props.canReorderRows ? "row" : undefined}
+					data-reorder-id={props.canReorderRows ? row.id : undefined}
+					className={[
+						props.selectedRowId === row.id ? "is-selected" : "",
+						isDragSource ? "is-dragging" : "",
+						dropClass,
+					]
+						.filter(Boolean)
+						.join(" ") || undefined}
 					onClick={() => props.onSelectRow(row.id)}
 				>
-					<td className="tabula-row-num sticky-col">{index}</td>
+					<td className="tabula-row-num sticky-col">
+						<div className="tabula-row-num-content">
+							<span>{index}</span>
+							<button
+								className="tabula-row-drag-handle"
+								type="button"
+								aria-label={`Drag row ${index} to reorder`}
+								title={
+									props.canReorderRows
+										? "Drag to reorder row"
+										: "Clear sorting to manually reorder rows"
+								}
+								disabled={!props.canReorderRows}
+								onPointerDown={(event) => startReorder("row", row.id, event)}
+								onClick={(event) => event.stopPropagation()}
+							>
+								⠿
+							</button>
+						</div>
+					</td>
 					{fields.map((field, fi) => (
 						<td
 							key={field.id}
@@ -96,47 +238,53 @@ export function TableGrid(props: Props) {
 	}
 
 	return (
-		<div className="tabula-grid-wrap">
+		<div className="tabula-grid-wrap" tabIndex={0} aria-label="Table data grid">
 			<table
 				className={`tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`}
 			>
 				<thead>
 					<tr>
 						<th className="tabula-row-num sticky-col">#</th>
-						{fields.map((field, fi) => (
-							<th
-								key={field.id}
-								className={fi === 0 && frozen ? "sticky-primary" : undefined}
-								style={{
-									width: widths[field.id] ?? 160,
-									minWidth: widths[field.id] ?? 160,
-								}}
-								draggable
-								onDragStart={(e) => {
-									e.dataTransfer.setData("text/field-id", field.id);
-								}}
-								onDragOver={(e) => e.preventDefault()}
-								onDrop={(e) => {
-									e.preventDefault();
-									const fromId = e.dataTransfer.getData("text/field-id");
-									if (fromId && fromId !== field.id) {
-										props.onReorderFields(fromId, field.id);
-									}
-								}}
-							>
-								<FieldHeader
-									field={field}
-									onRename={props.onRenameField}
-									onDelete={props.onDeleteField}
-									onManageOptions={props.onManageOptions}
-									onSort={props.onSortField}
-									onHide={props.onHideField}
-									onInsert={props.onInsertField}
-									onResize={props.onResizeColumn}
-									width={widths[field.id] ?? 160}
-								/>
-							</th>
-						))}
+						{fields.map((field, fi) => {
+							const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
+							const dropClass =
+								dragState?.kind === "field" && dragState.targetId === field.id
+									? dragState.side === "before"
+										? "is-drop-before"
+										: "is-drop-after"
+									: "";
+							return (
+								<th
+									key={field.id}
+									data-reorder-kind="field"
+									data-reorder-id={field.id}
+									className={[
+										fi === 0 && frozen ? "sticky-primary" : "",
+										isDragSource ? "is-dragging" : "",
+										dropClass,
+									]
+										.filter(Boolean)
+										.join(" ") || undefined}
+									style={{
+										width: widths[field.id] ?? 160,
+										minWidth: widths[field.id] ?? 160,
+									}}
+								>
+									<FieldHeader
+										field={field}
+										onRename={props.onRenameField}
+										onDelete={props.onDeleteField}
+										onManageOptions={props.onManageOptions}
+										onSort={props.onSortField}
+										onHide={props.onHideField}
+										onInsert={props.onInsertField}
+										onResize={props.onResizeColumn}
+										onBeginReorder={(event) => startReorder("field", field.id, event)}
+										width={widths[field.id] ?? 160}
+									/>
+								</th>
+							);
+						})}
 						<th className="tabula-row-actions" />
 					</tr>
 				</thead>
@@ -167,6 +315,7 @@ function FieldHeader({
 	onHide,
 	onInsert,
 	onResize,
+	onBeginReorder,
 	width,
 }: {
 	field: Field;
@@ -177,6 +326,7 @@ function FieldHeader({
 	onHide: (fieldId: string) => void;
 	onInsert: (fieldId: string, side: "left" | "right") => void;
 	onResize: (fieldId: string, width: number) => void;
+	onBeginReorder: (event: ReactPointerEvent<HTMLElement>) => void;
 	width: number;
 }) {
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -185,6 +335,16 @@ function FieldHeader({
 
 	return (
 		<div className="tabula-th">
+			<button
+				className="tabula-col-drag-handle"
+				type="button"
+				aria-label={`Drag ${field.name} column to reorder`}
+				title="Drag to move column left or right"
+				onPointerDown={onBeginReorder}
+				onClick={(event) => event.stopPropagation()}
+			>
+				⠿
+			</button>
 			<input
 				className="tabula-th-name"
 				value={field.name}
