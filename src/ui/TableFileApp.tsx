@@ -8,7 +8,6 @@ import {
 } from "react";
 import { Menu, Notice } from "obsidian";
 import { TableDocument, TableFileDocument } from "../data/types";
-import type { TabulaTheme } from "../settings";
 import {
 	pickSpreadsheetFile,
 	readSpreadsheetClipboard,
@@ -28,7 +27,6 @@ interface Props {
 	airtableToken?: string;
 	showTopScrollbar: boolean;
 	stackedTableGap: number;
-	appearanceTheme: TabulaTheme;
 }
 
 export function TableFileApp({
@@ -42,7 +40,6 @@ export function TableFileApp({
 	airtableToken = "",
 	showTopScrollbar,
 	stackedTableGap,
-	appearanceTheme = "native",
 }: Props) {
 	const [activeTableId, setActiveTableId] = useState(file.tables[0]?.id ?? "");
 	const [stackedImportCandidate, setStackedImportCandidate] = useState<{
@@ -154,7 +151,7 @@ export function TableFileApp({
 
 	return (
 		<div
-			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""} tabula-theme-${appearanceTheme}`}
+			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`}
 			style={{
 				"--tabula-stacked-table-gap": `${stackedTableGap}px`,
 				"--tabula-stacked-table-divider-offset": `${-stackedTableGap / 2}px`,

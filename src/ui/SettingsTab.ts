@@ -64,23 +64,6 @@ export class TabulaSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName("Table display").setHeading();
 
 		new Setting(containerEl)
-			.setName("Visual theme")
-			.setDesc(
-				"Choose whether tables adapt directly to your active Obsidian vault theme or use the warm paper aesthetic (ivory, charcoal, and terracotta accents)."
-			)
-			.addDropdown((dropdown) => {
-				dropdown
-					.addOption("native", "Obsidian native (Vault theme)")
-					.addOption("warm", "Warm Paper (Anthropic-inspired)")
-					.setValue(this.plugin.settings.appearanceTheme)
-					.onChange(async (value) => {
-						this.plugin.settings.appearanceTheme = value as "native" | "warm";
-						await this.plugin.saveSettings();
-						this.plugin.refreshOpenViews();
-					});
-			});
-
-		new Setting(containerEl)
 			.setName("Top horizontal scrollbar")
 			.setDesc(
 				"Show a synchronized scrollbar above wide tables. This setting applies to all tables and is off by default."

@@ -105,7 +105,6 @@ export class TableView extends TextFileView {
 			airtableToken: this.plugin.settings.airtableToken,
 			showTopScrollbar: this.plugin.settings.showTopScrollbar,
 			stackedTableGap: this.plugin.settings.stackedTableGap,
-			appearanceTheme: this.plugin.settings.appearanceTheme,
 		};
 	}
 

@@ -33510,8 +33510,7 @@ function TableFileApp({
   onRegisterClipboardPaste,
   airtableToken = "",
   showTopScrollbar,
-  stackedTableGap,
-  appearanceTheme = "native"
+  stackedTableGap
 }) {
   const [activeTableId, setActiveTableId] = (0, import_react13.useState)(file.tables[0]?.id ?? "");
   const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react13.useState)(null);
@@ -33606,7 +33605,7 @@ function TableFileApp({
   return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
     "div",
     {
-      className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""} tabula-theme-${appearanceTheme}`,
+      className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`,
       style: {
         "--tabula-stacked-table-gap": `${stackedTableGap}px`,
         "--tabula-stacked-table-divider-offset": `${-stackedTableGap / 2}px`
@@ -33768,8 +33767,7 @@ var TableView = class extends import_obsidian5.TextFileView {
       onRegisterClipboardPaste: this.registerClipboardPaste,
       airtableToken: this.plugin.settings.airtableToken,
       showTopScrollbar: this.plugin.settings.showTopScrollbar,
-      stackedTableGap: this.plugin.settings.stackedTableGap,
-      appearanceTheme: this.plugin.settings.appearanceTheme
+      stackedTableGap: this.plugin.settings.stackedTableGap
     };
   }
   remount() {
@@ -33844,8 +33842,7 @@ var DEFAULT_SETTINGS = {
   airtableToken: "",
   showTopScrollbar: false,
   stackedTableGap: DEFAULT_STACKED_TABLE_GAP,
-  newTableFolder: "",
-  appearanceTheme: "native"
+  newTableFolder: ""
 };
 
 // src/ui/SettingsTab.ts
@@ -33882,15 +33879,6 @@ var TabulaSettingTab = class extends import_obsidian6.PluginSettingTab {
       });
     });
     new import_obsidian6.Setting(containerEl).setName("Table display").setHeading();
-    new import_obsidian6.Setting(containerEl).setName("Visual theme").setDesc(
-      "Choose whether tables adapt directly to your active Obsidian vault theme or use the warm paper aesthetic (ivory, charcoal, and terracotta accents)."
-    ).addDropdown((dropdown) => {
-      dropdown.addOption("native", "Obsidian native (Vault theme)").addOption("warm", "Warm Paper (Anthropic-inspired)").setValue(this.plugin.settings.appearanceTheme).onChange(async (value) => {
-        this.plugin.settings.appearanceTheme = value;
-        await this.plugin.saveSettings();
-        this.plugin.refreshOpenViews();
-      });
-    });
     new import_obsidian6.Setting(containerEl).setName("Top horizontal scrollbar").setDesc(
       "Show a synchronized scrollbar above wide tables. This setting applies to all tables and is off by default."
     ).addToggle((toggle) => {
@@ -33990,6 +33978,21 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
     });
     ribbonIcon.addClass("tabula-ribbon-action");
     ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
+    const applyRibbonPurple = () => {
+      const setPurple = (element) => {
+        element.style.setProperty("color", "#8B5CF6", "important");
+        element.style.setProperty("--icon-color", "#8B5CF6", "important");
+      };
+      setPurple(ribbonIcon);
+      for (const svgElement of Array.from(ribbonIcon.querySelectorAll("svg, svg *"))) {
+        setPurple(svgElement);
+        svgElement.style.setProperty("stroke", "#8B5CF6", "important");
+      }
+    };
+    applyRibbonPurple();
+    const ribbonColorObserver = new MutationObserver(applyRibbonPurple);
+    ribbonColorObserver.observe(ribbonIcon, { childList: true, subtree: true });
+    this.register(() => ribbonColorObserver.disconnect());
   }
   async loadSettings() {
     const data = await this.loadData();
@@ -33997,22 +34000,19 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
     let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
     let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
     let newTableFolder = DEFAULT_SETTINGS.newTableFolder;
-    let appearanceTheme = DEFAULT_SETTINGS.appearanceTheme;
     if (typeof data === "object" && data !== null) {
       const rawToken = Reflect.get(data, "airtableToken");
       const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
       const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
       const rawNewTableFolder = Reflect.get(data, "newTableFolder");
-      const rawTheme = Reflect.get(data, "appearanceTheme");
       if (typeof rawToken === "string") token = rawToken;
       if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
       if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
         stackedTableGap = clampStackedTableGap(rawStackedTableGap);
       }
       if (typeof rawNewTableFolder === "string") newTableFolder = rawNewTableFolder.trim();
-      if (rawTheme === "warm" || rawTheme === "native") appearanceTheme = rawTheme;
     }
-    this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap, newTableFolder, appearanceTheme };
+    this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap, newTableFolder };
   }
   async saveSettings() {
     await this.saveData(this.settings);

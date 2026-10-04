@@ -2,7 +2,6 @@ import { createRoot, Root } from "react-dom/client";
 import { createElement } from "react";
 import { TableFileApp } from "./TableFileApp";
 import { TableDocument, TableFileDocument } from "../data/types";
-import type { TabulaTheme } from "../settings";
 
 export interface TableFileAppProps {
 	file: TableFileDocument;
@@ -15,7 +14,6 @@ export interface TableFileAppProps {
 	airtableToken?: string;
 	showTopScrollbar: boolean;
 	stackedTableGap: number;
-	appearanceTheme: TabulaTheme;
 }
 
 export function mountTableFileApp(container: HTMLElement, props: TableFileAppProps): Root {

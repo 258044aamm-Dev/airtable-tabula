@@ -9,14 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.16] - 2026-10-04
 
 ### Added
-- **Obsidian Vault Theme Compatibility:** Tables now inherit active Obsidian vault theme styling by default (`--background-primary`, `--text-normal`, `--interactive-accent`, etc.).
-- **Visual Theme Setting:** Added an Appearance dropdown under *Settings → Airtable Tabula → Table display* to choose between **Obsidian native (Vault theme)** (default) and **Warm Paper (Anthropic-inspired)**.
+- **Restored Signature Warm Branding:** Restored the permanent Anthropic-inspired warm paper aesthetic (ivory card surfaces `#fffdf9`, page `#f5f1eb`, dark mode `#1f1b18`/`#292320`, terracotta accents `#c66d52`/`#a95035`, Georgia serif headers, and warm shadows).
+- **Restored Purple Ribbon Action:** Restored the signature `#8B5CF6` purple ribbon icon branding and active styling.
 - **Spreadsheet Grid Keyboard Navigation:**
   - `Enter`: Commits current cell and navigates to the row below in the same column. If on the last row, automatically creates a new row.
   - `Tab` / `Shift+Tab`: Moves focus horizontally across cells in the row (wraps at row edges).
   - `ArrowUp` / `ArrowDown`: Navigates vertically between rows.
   - `Escape`: Deselects the active row and blurs cell inputs.
-- **Floating Popover for Long Text:** Replaced the in-place expanding `<textarea>` with a floating popover overlay card featuring character/word counters and `Ctrl+Enter` / `Esc` shortcuts, completely eliminating cumulative layout shift (CLS).
+- **Floating Popover for Long Text:** Replaced the in-place expanding `<textarea>` with an anchored floating popover card with character/word counters and `Ctrl+Enter` / `Esc` shortcuts, completely eliminating cumulative layout shift (CLS).
 - **Collapsible Group Rows:** Added interactive chevrons (`▾` / `▸`) to group headers, allowing users to collapse or expand grouped rows.
 - **Segmented Filter Bar:** Added a mode switcher between **Condition Builder** and **Query Syntax**, cutting vertical toolbar height by more than half.
 - **Keyboard Navigation in Select Combobox:** Added `ArrowUp` and `ArrowDown` navigation and Enter selection in the select options dropdown.
@@ -28,13 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Column Header Renaming:** Headers are now rendered as static text labels to prevent accidental renaming while clicking or dragging. Renaming is triggered deliberately via double-click, right-click context menu, or the `···` column menu.
 - **Numeric & Currency Alignment:** Numbers, currencies, and percentages are now right-aligned with hidden browser number spin buttons.
 - **Clipboard Handling:** Single-cell copy/paste no longer opens the global spreadsheet import modal.
-- **Contrast Compliance (WCAG AA):** Refined muted and faint text colors in the warm palette (`#5e554d` and `#786d62` on `#fffdf9`) to exceed 4.5:1 contrast ratios.
-- **Mobile Usability:** Reduced mobile row-number column width from 68px to 42px and unhid the bottom `+ New row` footer on mobile screens.
+- **Mobile Usability:** Reduced mobile row-number column width to 48px and unhid the bottom `+ New row` footer on mobile screens.
 - **Stacked Table Headers:** Removed redundant duplicated table title text from stacked section headers.
-- **Stylesheet Architecture:** Consolidated `styles.css` from 2,140 lines of duplicate rules down to a clean, maintainable stylesheet.
-
-### Removed
-- **Forced Purple Ribbon Overrides:** Removed the `MutationObserver` and `#8B5CF6` `!important` ribbon styling to comply with Obsidian community plugin standards.
 
 ---
 
