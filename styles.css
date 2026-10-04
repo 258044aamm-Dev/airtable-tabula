@@ -47,38 +47,39 @@
 	--tabula-surface: #ffffff;
 	--tabula-surface-2: #faf8f5;
 	--tabula-ink: #2a2521;
-	--tabula-ink-muted: #6b6459;
-	--tabula-ink-faint: #8a8177;
-	--tabula-border: #e3ded6;
-	--tabula-border-strong: #d2cabf;
-	--tabula-accent: #3b5fcb;
-	--tabula-accent-strong: #2c4ba6;
-	--tabula-accent-soft: #e8edfa;
+	--tabula-ink-muted: #6f6a78;
+	--tabula-ink-faint: #8b8694;
+	--tabula-border: #e2e0ea;
+	--tabula-border-strong: #cfcbd9;
+	--tabula-accent: #5a6796;
+	--tabula-accent-strong: #46527c;
+	--tabula-accent-soft: #eef0f7;
 	--tabula-row-hover: #f3efe9;
 	--tabula-row-selected: var(--tabula-surface);
-	--tabula-primary-bg: #2c4ba6;
+	--tabula-primary-bg: #5a6796;
 	--tabula-primary-fg: #ffffff;
 	--tabula-card-shadow: 0 10px 30px rgba(44, 38, 32, 0.06);
 	--tabula-row-number-width: 56px;
 
 	/* Card-cell grid tokens */
 	--tabula-grid-surface: #faf8f5;
-	--tabula-grid-border: #e3ded6;
+	--tabula-grid-border: #e8e0da;
 	--tabula-cell-bg: #ffffff;
-	--tabula-cell-border: #e3ded6;
-	--tabula-cell-radius: 10px;
+	--tabula-cell-border: #e2e0ea;
+	--tabula-cell-radius: 16px;
 	--tabula-cell-h: 42px;
 	--tabula-cell-xpad: 12px;
 	--tabula-cell-td-pad: 4px;
-	--tabula-gap-x: 12px;
-	--tabula-gap-y: 22px;
-	--tabula-header-border: #d8d2c9;
-	--tabula-header-ink: #3d6e96;
-	--tabula-chip-bg: #edf1f6;
-	--tabula-chrome: #3b5fcb;
-	--tabula-chrome-dim: #a8b0bc;
-	--tabula-muted: #7a8590;
-	--tabula-focus: #3b5fcb;
+	--tabula-gap-x: 6px;
+	--tabula-gap-y: 10px;
+	--tabula-header-border: #e2e0ea;
+	--tabula-header-ink: #3a3550;
+	--tabula-chip-bg: #f0eef6;
+	--tabula-chip-border: #dfdbe9;
+	--tabula-chrome: #5a6796;
+	--tabula-chrome-dim: #8b8694;
+	--tabula-muted: #8b8694;
+	--tabula-focus: #5a6796;
 
 	--at-radius: 12px;
 	--at-radius-sm: 8px;
@@ -108,30 +109,31 @@
 	--tabula-surface: #211b18;
 	--tabula-surface-2: #1e1917;
 	--tabula-ink: #ede4da;
-	--tabula-ink-muted: #9ca3af;
-	--tabula-ink-faint: #6b7280;
-	--tabula-border: #47413e;
-	--tabula-border-strong: #5a524d;
-	--tabula-accent: #8fb4e8;
-	--tabula-accent-strong: #a9c6f0;
-	--tabula-accent-soft: #1e2632;
+	--tabula-ink-muted: #7e7a8a;
+	--tabula-ink-faint: #716c7e;
+	--tabula-border: #282635;
+	--tabula-border-strong: #363347;
+	--tabula-accent: #818cb8;
+	--tabula-accent-strong: #939dc7;
+	--tabula-accent-soft: #252233;
 	--tabula-row-hover: #262019;
 	--tabula-row-selected: var(--tabula-surface);
-	--tabula-primary-bg: #2f4a7a;
-	--tabula-primary-fg: #eaf1fb;
+	--tabula-primary-bg: #818cb8;
+	--tabula-primary-fg: #0f0e13;
 	--tabula-card-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 
 	--tabula-grid-surface: #1e1917;
-	--tabula-grid-border: #2b2420;
+	--tabula-grid-border: #2c2320;
 	--tabula-cell-bg: #211b18;
-	--tabula-cell-border: #47413e;
-	--tabula-header-border: #2f3140;
-	--tabula-header-ink: #9dc6db;
-	--tabula-chip-bg: #1e2230;
-	--tabula-chrome: #99b4fc;
-	--tabula-chrome-dim: #666a7f;
-	--tabula-muted: #6b7280;
-	--tabula-focus: #99b4fc;
+	--tabula-cell-border: #282635;
+	--tabula-header-border: #282635;
+	--tabula-header-ink: #c4c0ce;
+	--tabula-chip-bg: #1c1a26;
+	--tabula-chip-border: #2b283a;
+	--tabula-chrome: #818cb8;
+	--tabula-chrome-dim: #716c7e;
+	--tabula-muted: #716c7e;
+	--tabula-focus: #818cb8;
 	--at-shadow: 0 0 0 1px var(--at-border), 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
@@ -228,7 +230,7 @@
 	flex-direction: column;
 	min-height: 0;
 	border: 1px solid var(--tabula-border-strong);
-	border-radius: 20px;
+	border-radius: 24px;
 	background: var(--tabula-surface);
 	color: var(--tabula-ink);
 	box-shadow: var(--tabula-card-shadow);
@@ -261,7 +263,7 @@
 	background: transparent;
 	border-radius: 4px;
 	color: var(--tabula-ink);
-	font-family: var(--font-interface, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif);
+	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
 	font-size: 23px;
 	font-weight: 600;
 	letter-spacing: -0.035em;
@@ -300,7 +302,7 @@
 .tabula-query-input,
 .tabula-select-search {
 	border: 1px solid var(--tabula-border-strong);
-	border-radius: 8px;
+	border-radius: 16px;
 	background: var(--tabula-surface);
 	color: var(--tabula-ink);
 	padding: 5px 9px;
@@ -312,6 +314,7 @@
 
 .tabula-search {
 	width: 170px;
+	border-radius: 999px;
 }
 
 .tabula-search:focus,
@@ -327,7 +330,7 @@
 	border: 1px solid var(--tabula-border-strong);
 	background: var(--tabula-surface);
 	color: var(--tabula-ink-muted);
-	border-radius: 8px;
+	border-radius: 16px;
 	padding: 0 11px;
 	min-height: 34px;
 	height: 34px;
@@ -412,7 +415,7 @@
 	border: 1px solid var(--tabula-border-strong);
 	background: var(--tabula-surface);
 	color: var(--tabula-ink-muted);
-	border-radius: 8px;
+	border-radius: 16px;
 	padding: 0 9px;
 	min-height: 34px;
 	height: 34px;
@@ -703,7 +706,7 @@
 	flex-direction: column;
 	min-height: 0;
 	gap: 0;
-	padding: 4px 20px 20px;
+	padding: 4px 16px 16px;
 }
 
 .tabula-file-root.is-single-table .tabula-grid-area {
@@ -717,8 +720,8 @@
 	background: var(--tabula-grid-surface);
 	border: 1px solid var(--tabula-grid-border);
 	border-bottom: 0;
-	border-top-left-radius: 20px;
-	border-top-right-radius: 20px;
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
 }
 
 .tabula-top-scrollbar-inner {
@@ -732,7 +735,7 @@
 	overflow-x: auto;
 	overflow-y: auto;
 	border: 1px solid var(--tabula-grid-border);
-	border-radius: 20px;
+	border-radius: 16px;
 	background: var(--tabula-grid-surface);
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior-x: contain;
@@ -844,6 +847,7 @@
 	color: var(--tabula-ink-faint);
 	background: var(--tabula-grid-surface) !important;
 	font-variant-numeric: tabular-nums;
+	font-family: var(--font-monospace, ui-monospace, "SFMono-Regular", Menlo, monospace);
 	font-size: 12px;
 	user-select: none;
 }
@@ -989,8 +993,9 @@
 	color: var(--tabula-ink-muted);
 	text-transform: uppercase;
 	background: var(--tabula-chip-bg);
-	border-radius: 6px;
-	padding: 2px 6px;
+	border: 1px solid var(--tabula-chip-border);
+	border-radius: 4px;
+	padding: 1px 6px;
 	line-height: 1.5;
 	white-space: nowrap;
 }
@@ -1511,7 +1516,7 @@
 	height: 46px;
 	min-height: 46px;
 	border: 1px solid var(--tabula-chrome-dim);
-	border-radius: 12px;
+	border-radius: 16px;
 	background: var(--tabula-cell-bg);
 	color: var(--tabula-chrome);
 	font-size: 12px;
@@ -1589,7 +1594,7 @@
 
 .tabula-modal-header h3 {
 	margin: 0;
-	font-family: var(--font-interface, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif);
+	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
 	font-size: 17px;
 	font-weight: 600;
 	color: var(--tabula-ink);
@@ -1677,24 +1682,24 @@
    Select Tag Colors (Muted, Sharper Warm Tags)
    ========================================================================== */
 
-.tabula-color-gray { background: #eeebe6; color: #4a443c; border-color: #dcd6cd; --pill-dot: #8a8177; }
-.tabula-color-blue { background: #e4edf9; color: #24457a; border-color: #c9dbf2; --pill-dot: #3b7dd8; }
-.tabula-color-green { background: #e2eee5; color: #24562e; border-color: #c8decc; --pill-dot: #3e9a56; }
-.tabula-color-yellow { background: #fbf0d8; color: #7a5a12; border-color: #f0dfb4; --pill-dot: #e0a21a; }
-.tabula-color-orange { background: #fbeadc; color: #8a481c; border-color: #f2d3b8; --pill-dot: #e2762a; }
-.tabula-color-red { background: #fae5e1; color: #8b3426; border-color: #f0c6be; --pill-dot: #d9503f; }
-.tabula-color-pink { background: #fae5ee; color: #87335d; border-color: #efc6d8; --pill-dot: #de6ca6; }
-.tabula-color-purple { background: #ece7f9; color: #563c88; border-color: #d8ccee; --pill-dot: #7c5cd0; }
-.tabula-color-cyan { background: #e0f0f2; color: #1b5660; border-color: #c2dfe5; --pill-dot: #2aa0b0; }
-.theme-dark .tabula-color-gray { background: #2a2621; color: #c8c0b6; border-color: #3c3730; --pill-dot: #9a9188; }
-.theme-dark .tabula-color-blue { background: #1f2c3c; color: #bbd3ee; border-color: #2f4459; --pill-dot: #5e9be0; }
-.theme-dark .tabula-color-green { background: #1e2e20; color: #bcd9c0; border-color: #2d442f; --pill-dot: #55b368; }
-.theme-dark .tabula-color-yellow { background: #42321c; color: #fde067; border-color: #5a4526; --pill-dot: #fdca4a; }
-.theme-dark .tabula-color-orange { background: #40291b; color: #f0be94; border-color: #593920; --pill-dot: #f0862f; }
-.theme-dark .tabula-color-red { background: #40231f; color: #efb8b2; border-color: #57332d; --pill-dot: #e4665a; }
-.theme-dark .tabula-color-pink { background: #3f2333; color: #edbbd3; border-color: #563146; --pill-dot: #de6ca6; }
-.theme-dark .tabula-color-purple { background: #322a44; color: #d2c3ee; border-color: #443958; --pill-dot: #9b82e0; }
-.theme-dark .tabula-color-cyan { background: #1d3d3a; color: #5dd6c9; border-color: #2a544f; --pill-dot: #39c7d9; }
+.tabula-color-gray { background: #ecebef; color: #4a4752; border-color: #d6d3dc; --pill-dot: #8b8694; }
+.tabula-color-blue { background: #e3e8f7; color: #2f4478; border-color: #c6d0e8; --pill-dot: #3f5c9e; }
+.tabula-color-green { background: #dff3e4; color: #1c6b2e; border-color: #bfe5c7; --pill-dot: #2e9e4a; }
+.tabula-color-yellow { background: #fbf0dc; color: #8a5a14; border-color: #f0ddb2; --pill-dot: #c98a16; }
+.tabula-color-orange { background: #fbe9d8; color: #8c4a16; border-color: #f2d3b2; --pill-dot: #d4761f; }
+.tabula-color-red { background: #fbe4e6; color: #9a2430; border-color: #f3cbd0; --pill-dot: #d9455a; }
+.tabula-color-pink { background: #fae5ee; color: #8a2f58; border-color: #efc9d9; --pill-dot: #d9539a; }
+.tabula-color-purple { background: #ece6f9; color: #513a8c; border-color: #d6c9ef; --pill-dot: #7c5cd0; }
+.tabula-color-cyan { background: #dcf2ea; color: #146b58; border-color: #bee5d8; --pill-dot: #17a184; }
+.theme-dark .tabula-color-gray { background: #22202c; color: #a19dae; border-color: #312e3f; --pill-dot: #a19dae; }
+.theme-dark .tabula-color-blue { background: #1c2136; color: #8fa6e8; border-color: #2c3454; --pill-dot: #8fa6e8; }
+.theme-dark .tabula-color-green { background: #13321a; color: #50e372; border-color: #1e4e29; --pill-dot: #50e372; }
+.theme-dark .tabula-color-yellow { background: #3a2a14; color: #e5a855; border-color: #5b421c; --pill-dot: #e5a855; }
+.theme-dark .tabula-color-orange { background: #3a2416; color: #e08a4c; border-color: #553720; --pill-dot: #e08a4c; }
+.theme-dark .tabula-color-red { background: #3a141a; color: #e55567; border-color: #5b1c25; --pill-dot: #e55567; }
+.theme-dark .tabula-color-pink { background: #3a1b2c; color: #e87bb0; border-color: #552840; --pill-dot: #e87bb0; }
+.theme-dark .tabula-color-purple { background: #241e3a; color: #a98be8; border-color: #362b54; --pill-dot: #a98be8; }
+.theme-dark .tabula-color-cyan { background: #133129; color: #4ee2b8; border-color: #1e4e41; --pill-dot: #4ee2b8; }
 
 /* ==========================================================================
    Mobile & Responsive (max-width: 720px)
@@ -1876,4 +1881,35 @@
 .tabula-rating {
 	padding: 0 var(--tabula-cell-xpad);
 	gap: 2px;
+}
+
+
+/* ==========================================================================
+   Scoped Scrollbar (reference design)
+   Must stay nested under .tabula-file-root: a bare ::-webkit-scrollbar rule
+   would restyle the whole Obsidian chrome.
+   ========================================================================== */
+
+/* Two selectors on purpose: .tabula-file-root scrolls itself (overflow-y: auto),
+   and its descendants (.tabula-grid-wrap) scroll independently. */
+.tabula-file-root::-webkit-scrollbar,
+.tabula-file-root ::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+.tabula-file-root::-webkit-scrollbar-track,
+.tabula-file-root ::-webkit-scrollbar-track {
+	background: var(--tabula-grid-border);
+}
+
+.tabula-file-root::-webkit-scrollbar-thumb,
+.tabula-file-root ::-webkit-scrollbar-thumb {
+	background: var(--tabula-border-strong);
+	border-radius: 9999px;
+}
+
+.tabula-file-root::-webkit-scrollbar-corner,
+.tabula-file-root ::-webkit-scrollbar-corner {
+	background: transparent;
 }

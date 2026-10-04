@@ -6,6 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.19] - 2026-10-04
+
+Adopts the indigo chrome and component styling from the `database_table_view.html` reference, on top of the v0.1.18 card-cell layout. Visual only - no TypeScript, JSX or logic changes; `main.js` rebuilds byte-identical.
+
+### Changed
+- **Chrome moved to indigo/neutral; warm surfaces kept.** Capsule and header borders `#282635`, strong border `#363347`, accent `#818CB8` (hover `#939DC7`), focus ring `#818CB8`, header label `#C4C0CE`, row counter `#7E7A8A`. Surfaces (page, cards, cells) stay warm.
+- **Duplicate greys removed.** `--tabula-ink-faint`, `--tabula-muted` and `--tabula-chrome-dim` were split across `#6B7280` and `#666A7F`. Both hexes are gone from the file; all three tokens now use `#716C7E`. This drives the row numbers, the select chevron and the "+ New row" border.
+- **Type chip:** now has a real border (`#1C1A26` / `#2B283A` / text `#716C7E`) via a new `--tabula-chip-border` token, declared in both theme blocks.
+- **Status pills:** rebuilt on the reference's model - dark saturated fill, bright text, mid border, bright dot. Todo `#3A2A14`/`#E5A855`, In progress `#133129`/`#4EE2B8`, Done `#13321A`/`#50E372`, Blocked `#3A141A`/`#E55567`. The other five colours were derived on the same model.
+- **Radii:** outer card 24px, grid container 16px, cell and header capsules 16px, buttons 16px, "+ New row" 16px, type chip 4px, search field a full pill.
+- **Tighter grid:** `border-spacing` 6px / 10px (was 12px / 22px), matching the reference.
+- **Typography:** serif table title restored; row numbers use the monospace stack via `--font-monospace`.
+- **Scrollbar:** 6px with a rounded thumb, **scoped to `.tabula-file-root`** so the rest of Obsidian is untouched.
+- **Light theme re-derived** to match the new chrome, keeping warm cream surfaces.
+
+### Kept deliberately
+- FontAwesome icons are not adopted - the existing `⠿` grip, `···` menu and CSS-drawn chevron match visually with no new dependency.
+- The reference's `select-none` on the table body is not adopted, so cell text stays copyable.
+- Warm body ink `#EDE4DA` on the warm surfaces (see plan decision D1).
+- Purple ribbon branding and Obsidian's error colour.
+
+### Notes
+- The reference mixes a warm inner container (`#2C2320`) with indigo capsules; `--tabula-grid-border` was set to that exact warm value.
+- Tokens remain scoped to `.tabula-file-root`; portaled modals and native Obsidian menus still fall back to theme defaults. Pre-existing, unchanged.
+
+---
+
 ## [0.1.18] - 2026-10-04
 
 ### Changed
