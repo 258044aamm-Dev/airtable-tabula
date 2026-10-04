@@ -1251,7 +1251,19 @@
 }
 
 .tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table {
+	position: relative;
 	margin-top: var(--tabula-stacked-table-gap, 100px);
+}
+
+.tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table::before {
+	content: "";
+	position: absolute;
+	top: var(--tabula-stacked-table-divider-offset, -50px);
+	left: 2px;
+	right: 2px;
+	height: 1px;
+	background: var(--tabula-border-strong, var(--at-border-strong));
+	pointer-events: none;
 }
 
 .tabula-file-controls {
@@ -1855,13 +1867,13 @@
 		padding: 10px 0 12px;
 	}
 
-	.tabula-file-root .tabula-toolbar-actions .tabula-search {
+	.tabula-file-root .tabula-mobile-primary-row .tabula-search {
 		box-sizing: border-box;
-		width: 100%;
+		width: auto;
 		min-width: 0;
 		min-height: 44px;
 		height: 44px;
-		flex: 1 1 100%;
+		flex: 1 1 0;
 		font-size: 16px;
 	}
 
@@ -1873,11 +1885,11 @@
 		flex-shrink: 0;
 	}
 
-	.tabula-file-root .tabula-toolbar-actions .tabula-count {
-		min-height: 44px;
+	.tabula-file-root .tabula-mobile-count {
+		min-height: 20px;
 		display: inline-flex;
 		align-items: center;
-		margin-left: auto;
+		align-self: flex-end;
 		white-space: nowrap;
 	}
 
@@ -1997,5 +2009,131 @@
 
 	.tabula-file-root .tabula-file-table .tabula-grid-wrap {
 		max-height: 65vh;
+	}
+}
+
+/* Desktop keeps the original flat toolbar order; mobile renders the tool group on demand. */
+.tabula-toolbar-tools-desktop {
+	display: contents;
+}
+
+.tabula-mobile-more .tabula-menu-chevron {
+	transition: transform 0.15s ease;
+}
+
+.tabula-mobile-more[aria-expanded="true"] .tabula-menu-chevron {
+	transform: rotate(180deg);
+}
+
+@media (max-width: 720px) {
+	.tabula-toolbar-actions-mobile {
+		box-sizing: border-box;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		align-items: stretch;
+	}
+
+	.tabula-mobile-primary-row {
+		box-sizing: border-box;
+		width: 100%;
+		min-width: 0;
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: stretch;
+		gap: 6px;
+	}
+
+	.tabula-mobile-primary-row .tabula-search {
+		box-sizing: border-box;
+		width: auto;
+		min-width: 0;
+		min-height: 44px;
+		height: 44px;
+		flex: 1 1 0;
+		font-size: 16px;
+	}
+
+	.tabula-mobile-primary-row .tabula-add-row-btn,
+	.tabula-mobile-primary-row .tabula-mobile-more,
+	.tabula-mobile-primary-row .tabula-add-field-control .tabula-menu-btn {
+		box-sizing: border-box;
+		min-height: 44px;
+		height: 44px;
+		flex: 0 0 auto;
+		padding-right: 8px;
+		padding-left: 8px;
+	}
+
+	.tabula-mobile-primary-row .tabula-add-field-control {
+		min-width: 0;
+		flex: 0 0 auto;
+	}
+
+	.tabula-mobile-tools {
+		position: relative;
+		z-index: 10;
+		box-sizing: border-box;
+		width: 100%;
+		min-width: 0;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 0 0;
+		border-top: 1px solid var(--at-border);
+		overflow: visible;
+	}
+
+	.tabula-mobile-tools .tabula-btn,
+	.tabula-mobile-tools .tabula-inline-control,
+	.tabula-mobile-tools .tabula-menu-btn {
+		box-sizing: border-box;
+		min-height: 44px;
+		height: 44px;
+		flex: 0 0 auto;
+	}
+
+	.tabula-mobile-tools .tabula-menu-select {
+		flex: 0 0 auto;
+	}
+
+	.tabula-mobile-tools .tabula-toolbar-sep {
+		display: none;
+	}
+
+	.tabula-mobile-count {
+		box-sizing: border-box;
+		min-height: 20px;
+		align-self: flex-end;
+		white-space: nowrap;
+	}
+
+	/* Keep the scroller viewport-bounded and the table at its intrinsic column width. */
+	.tabula-root .tabula-grid-area,
+	.tabula-root .tabula-grid-wrap {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+	}
+
+	.tabula-root .tabula-grid-wrap {
+		overflow-x: auto;
+		overflow-y: auto;
+		touch-action: pan-x pan-y;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior-x: contain;
+	}
+
+	.tabula-root .tabula-grid {
+		flex-shrink: 0;
+		width: max-content;
+		min-width: 100%;
+	}
+
+	.tabula-root .tabula-add-row-footer {
+		display: none;
 	}
 }

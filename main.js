@@ -1093,7 +1093,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState12(initialState) {
+        function useState13(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1105,7 +1105,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect10(create, deps) {
+        function useEffect11(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1143,7 +1143,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useDeferredValue(value);
         }
-        function useId() {
+        function useId2() {
           var dispatcher = resolveDispatcher();
           return dispatcher.useId();
         }
@@ -1888,15 +1888,15 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect10;
-        exports.useId = useId;
+        exports.useEffect = useEffect11;
+        exports.useId = useId2;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect;
         exports.useMemo = useMemo4;
         exports.useReducer = useReducer;
         exports.useRef = useRef9;
-        exports.useState = useState12;
+        exports.useState = useState13;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2443,7 +2443,7 @@ var require_react_dom_development = __commonJS({
         var HostPortal = 4;
         var HostComponent = 5;
         var HostText = 6;
-        var Fragment4 = 7;
+        var Fragment5 = 7;
         var Mode = 8;
         var ContextConsumer = 9;
         var ContextProvider = 10;
@@ -3600,7 +3600,7 @@ var require_react_dom_development = __commonJS({
               return "DehydratedFragment";
             case ForwardRef:
               return getWrappedName$1(type, type.render, "ForwardRef");
-            case Fragment4:
+            case Fragment5:
               return "Fragment";
             case HostComponent:
               return type;
@@ -12029,7 +12029,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-            if (current2 === null || current2.tag !== Fragment4) {
+            if (current2 === null || current2.tag !== Fragment5) {
               var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
               created.return = returnFiber;
               return created;
@@ -12432,7 +12432,7 @@ var require_react_dom_development = __commonJS({
               if (child.key === key) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
-                  if (child.tag === Fragment4) {
+                  if (child.tag === Fragment5) {
                     deleteRemainingChildren(returnFiber, child.sibling);
                     var existing = useFiber(child, element.props.children);
                     existing.return = returnFiber;
@@ -17908,7 +17908,7 @@ var require_react_dom_development = __commonJS({
               var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
               return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
             }
-            case Fragment4:
+            case Fragment5:
               return updateFragment(current2, workInProgress2, renderLanes2);
             case Mode:
               return updateMode(current2, workInProgress2, renderLanes2);
@@ -18180,7 +18180,7 @@ var require_react_dom_development = __commonJS({
             case SimpleMemoComponent:
             case FunctionComponent:
             case ForwardRef:
-            case Fragment4:
+            case Fragment5:
             case Mode:
             case Profiler:
             case ContextConsumer:
@@ -22441,7 +22441,7 @@ var require_react_dom_development = __commonJS({
           return fiber;
         }
         function createFiberFromFragment(elements, mode, lanes, key) {
-          var fiber = createFiber(Fragment4, elements, key, mode);
+          var fiber = createFiber(Fragment5, elements, key, mode);
           fiber.lanes = lanes;
           return fiber;
         }
@@ -25050,10 +25050,10 @@ function parseDuration(input) {
 
 // src/ui/mount.tsx
 var import_client = __toESM(require_client());
-var import_react12 = __toESM(require_react());
+var import_react13 = __toESM(require_react());
 
 // src/ui/TableFileApp.tsx
-var import_react11 = __toESM(require_react());
+var import_react12 = __toESM(require_react());
 var import_obsidian4 = require("obsidian");
 
 // node_modules/saxen/dist/index.js
@@ -29555,7 +29555,7 @@ function PasteSpreadsheetModal(props) {
 }
 
 // src/ui/TableApp.tsx
-var import_react10 = __toESM(require_react());
+var import_react11 = __toESM(require_react());
 var import_obsidian3 = require("obsidian");
 
 // src/data/cellClipboard.ts
@@ -30589,6 +30589,9 @@ function toAirtableValue(field, value) {
   }
 }
 
+// src/ui/Toolbar.tsx
+var import_react3 = __toESM(require_react());
+
 // src/ui/MenuSelect.tsx
 var import_react2 = __toESM(require_react());
 var import_jsx_runtime2 = __toESM(require_jsx_runtime());
@@ -30696,8 +30699,163 @@ function MenuSelect({
 
 // src/ui/Toolbar.tsx
 var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+var MOBILE_TOOLBAR_QUERY = "(max-width: 720px)";
 function Toolbar(props) {
   const { doc } = props;
+  const [isMobile, setIsMobile] = (0, import_react3.useState)(
+    () => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(MOBILE_TOOLBAR_QUERY).matches
+  );
+  const [mobileToolsOpen, setMobileToolsOpen] = (0, import_react3.useState)(false);
+  const mobileToolsId = `tabula-mobile-tools-${(0, import_react3.useId)().replace(/:/g, "")}`;
+  (0, import_react3.useEffect)(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia(MOBILE_TOOLBAR_QUERY);
+    const onChange = (event) => {
+      setIsMobile(event.matches);
+      if (!event.matches) setMobileToolsOpen(false);
+    };
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", onChange);
+      return () => media.removeEventListener("change", onChange);
+    }
+    media.addListener(onChange);
+    return () => media.removeListener(onChange);
+  }, []);
+  const searchControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    "input",
+    {
+      className: "tabula-search",
+      type: "search",
+      placeholder: "Search\u2026",
+      value: doc.view.search,
+      onChange: (e) => props.onSearch(e.target.value),
+      "aria-label": "Search rows"
+    }
+  );
+  const addRowControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    "button",
+    {
+      className: "tabula-btn tabula-btn-primary tabula-add-row-btn",
+      onClick: props.onAddRow,
+      type: "button",
+      title: "Add a new row",
+      children: "+ Row"
+    }
+  );
+  const addFieldControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    MenuSelect,
+    {
+      className: "tabula-add-field-control",
+      variant: "button",
+      triggerLabel: "+ Field",
+      title: "Add a column",
+      ariaLabel: "Add field type",
+      value: "",
+      align: "right",
+      onChange: (type) => {
+        if (type) props.onAddField(type);
+      },
+      options: ALL_FIELD_TYPES.map((ft) => ({
+        value: ft.type,
+        label: ft.label
+      }))
+    }
+  );
+  const toolControls = /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+      "button",
+      {
+        className: `tabula-btn ${props.showFilters ? "is-active" : ""}`,
+        onClick: props.onToggleFilters,
+        type: "button",
+        "aria-pressed": props.showFilters,
+        title: "Show filter and query panel",
+        children: [
+          "Filter",
+          doc.view.filters.conditions.length > 0 ? ` (${doc.view.filters.conditions.length})` : ""
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+      "button",
+      {
+        className: `tabula-btn ${props.showSorts || doc.view.sorts.length > 0 ? "is-active" : ""}`,
+        onClick: props.onToggleSorts,
+        type: "button",
+        "aria-pressed": props.showSorts,
+        title: "Show sort panel",
+        children: [
+          "Sort",
+          doc.view.sorts.length ? ` (${doc.view.sorts.length})` : ""
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      MenuSelect,
+      {
+        label: "Group",
+        title: "Group rows by field",
+        ariaLabel: "Group by field",
+        value: doc.view.groupBy.fieldId ?? "",
+        onChange: (v) => props.onGroupBy(v || null),
+        options: [
+          { value: "", label: "None" },
+          ...doc.fields.map((f) => ({ value: f.id, label: f.name }))
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+      "button",
+      {
+        className: `tabula-btn ${props.showHide ? "is-active" : ""}`,
+        onClick: props.onToggleHide,
+        type: "button",
+        "aria-pressed": props.showHide,
+        title: "Show or hide columns",
+        children: [
+          "Hide",
+          doc.view.hiddenFieldIds.length ? ` (${doc.view.hiddenFieldIds.length})` : ""
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      MenuSelect,
+      {
+        label: "Height",
+        title: "Row height",
+        ariaLabel: "Row height",
+        value: doc.view.rowHeight,
+        onChange: (v) => props.onRowHeight(v),
+        options: [
+          { value: "short", label: "Short" },
+          { value: "medium", label: "Medium" },
+          { value: "tall", label: "Tall" }
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      MenuSelect,
+      {
+        label: "Freeze",
+        title: "Keep the first column fixed while scrolling",
+        ariaLabel: "Freeze primary column",
+        value: doc.view.frozenPrimary ? "on" : "off",
+        onChange: (v) => {
+          const next = v === "on";
+          if (next !== doc.view.frozenPrimary) props.onToggleFrozen();
+        },
+        options: [
+          { value: "on", label: "On" },
+          { value: "off", label: "Off" }
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
+    props.syncControl
+  ] });
+  const rowCountText = `${props.rowCount}${props.rowCount !== doc.rows.length ? ` / ${doc.rows.length}` : ""} rows`;
+  const rowCountControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-count", children: rowCountText });
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar", children: [
     /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
       "input",
@@ -30708,142 +30866,46 @@ function Toolbar(props) {
         "aria-label": "Table name"
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar-actions", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        "input",
+    isMobile ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar-actions tabula-toolbar-actions-mobile", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-mobile-primary-row", children: [
+        searchControl,
+        addRowControl,
+        addFieldControl,
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+          "button",
+          {
+            className: "tabula-btn tabula-mobile-more",
+            type: "button",
+            "aria-expanded": mobileToolsOpen,
+            "aria-controls": mobileToolsOpen ? mobileToolsId : void 0,
+            "aria-label": mobileToolsOpen ? "Hide table tools" : "More table tools",
+            title: mobileToolsOpen ? "Hide table tools" : "Show more table tools",
+            onClick: () => setMobileToolsOpen((open) => !open),
+            children: [
+              "More",
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
+            ]
+          }
+        )
+      ] }),
+      mobileToolsOpen && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        "div",
         {
-          className: "tabula-search",
-          type: "search",
-          placeholder: "Search\u2026",
-          value: doc.view.search,
-          onChange: (e) => props.onSearch(e.target.value),
-          "aria-label": "Search rows"
+          className: "tabula-mobile-tools",
+          id: mobileToolsId,
+          role: "toolbar",
+          "aria-label": "More table tools",
+          "aria-orientation": "horizontal",
+          children: toolControls
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-        "button",
-        {
-          className: `tabula-btn ${props.showFilters ? "is-active" : ""}`,
-          onClick: props.onToggleFilters,
-          type: "button",
-          "aria-pressed": props.showFilters,
-          title: "Show filter and query panel",
-          children: [
-            "Filter",
-            doc.view.filters.conditions.length > 0 ? ` (${doc.view.filters.conditions.length})` : ""
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-        "button",
-        {
-          className: `tabula-btn ${props.showSorts || doc.view.sorts.length > 0 ? "is-active" : ""}`,
-          onClick: props.onToggleSorts,
-          type: "button",
-          "aria-pressed": props.showSorts,
-          title: "Show sort panel",
-          children: [
-            "Sort",
-            doc.view.sorts.length ? ` (${doc.view.sorts.length})` : ""
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        MenuSelect,
-        {
-          label: "Group",
-          title: "Group rows by field",
-          ariaLabel: "Group by field",
-          value: doc.view.groupBy.fieldId ?? "",
-          onChange: (v) => props.onGroupBy(v || null),
-          options: [
-            { value: "", label: "None" },
-            ...doc.fields.map((f) => ({ value: f.id, label: f.name }))
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-        "button",
-        {
-          className: `tabula-btn ${props.showHide ? "is-active" : ""}`,
-          onClick: props.onToggleHide,
-          type: "button",
-          "aria-pressed": props.showHide,
-          title: "Show or hide columns",
-          children: [
-            "Hide",
-            doc.view.hiddenFieldIds.length ? ` (${doc.view.hiddenFieldIds.length})` : ""
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        MenuSelect,
-        {
-          label: "Height",
-          title: "Row height",
-          ariaLabel: "Row height",
-          value: doc.view.rowHeight,
-          onChange: (v) => props.onRowHeight(v),
-          options: [
-            { value: "short", label: "Short" },
-            { value: "medium", label: "Medium" },
-            { value: "tall", label: "Tall" }
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        MenuSelect,
-        {
-          label: "Freeze",
-          title: "Keep the first column fixed while scrolling",
-          ariaLabel: "Freeze primary column",
-          value: doc.view.frozenPrimary ? "on" : "off",
-          onChange: (v) => {
-            const next = v === "on";
-            if (next !== doc.view.frozenPrimary) props.onToggleFrozen();
-          },
-          options: [
-            { value: "on", label: "On" },
-            { value: "off", label: "Off" }
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
-      props.syncControl,
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        "button",
-        {
-          className: "tabula-btn tabula-btn-primary",
-          onClick: props.onAddRow,
-          type: "button",
-          title: "Add a new row",
-          children: "+ Row"
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-        MenuSelect,
-        {
-          variant: "button",
-          triggerLabel: "+ Field",
-          title: "Add a column",
-          ariaLabel: "Add field type",
-          value: "",
-          align: "right",
-          onChange: (type) => {
-            if (type) props.onAddField(type);
-          },
-          options: ALL_FIELD_TYPES.map((ft) => ({
-            value: ft.type,
-            label: ft.label
-          }))
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "tabula-count", children: [
-        props.rowCount,
-        props.rowCount !== doc.rows.length ? ` / ${doc.rows.length}` : "",
-        " rows"
-      ] })
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-count tabula-mobile-count", children: rowCountText })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar-actions", children: [
+      searchControl,
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "tabula-toolbar-tools-desktop", children: toolControls }),
+      addRowControl,
+      addFieldControl,
+      rowCountControl
     ] })
   ] });
 }
@@ -31172,14 +31234,14 @@ function HideFieldsMenu({ doc, onChange }) {
 }
 
 // src/ui/TableGrid.tsx
-var import_react6 = __toESM(require_react());
+var import_react7 = __toESM(require_react());
 var import_obsidian2 = require("obsidian");
 
 // src/ui/CellEditor.tsx
-var import_react4 = __toESM(require_react());
+var import_react5 = __toESM(require_react());
 
 // src/ui/SelectEditor.tsx
-var import_react3 = __toESM(require_react());
+var import_react4 = __toESM(require_react());
 var import_jsx_runtime7 = __toESM(require_jsx_runtime());
 function SelectEditor({
   field,
@@ -31188,16 +31250,16 @@ function SelectEditor({
   onAddOption,
   onManageOptions
 }) {
-  const [open, setOpen] = (0, import_react3.useState)(false);
-  const [q, setQ] = (0, import_react3.useState)("");
-  const rootRef = (0, import_react3.useRef)(null);
+  const [open, setOpen] = (0, import_react4.useState)(false);
+  const [q, setQ] = (0, import_react4.useState)("");
+  const rootRef = (0, import_react4.useRef)(null);
   const selectedIds = field.type === "singleSelect" ? typeof value === "string" ? [value] : [] : Array.isArray(value) ? value : [];
-  const filtered = (0, import_react3.useMemo)(() => {
+  const filtered = (0, import_react4.useMemo)(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return field.options;
     return field.options.filter((o) => o.name.toLowerCase().includes(needle));
   }, [field.options, q]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     const onDoc = (e) => {
       if (!rootRef.current?.contains(e.target)) {
         setOpen(false);
@@ -31508,9 +31570,9 @@ function TextCell({
   value,
   onChange
 }) {
-  const [draft, setDraft] = (0, import_react4.useState)(value);
-  const focused = (0, import_react4.useRef)(false);
-  (0, import_react4.useEffect)(() => {
+  const [draft, setDraft] = (0, import_react5.useState)(value);
+  const focused = (0, import_react5.useRef)(false);
+  (0, import_react5.useEffect)(() => {
     if (!focused.current) setDraft(value);
   }, [value]);
   return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
@@ -31542,9 +31604,9 @@ function LongTextCell({
   value,
   onChange
 }) {
-  const [draft, setDraft] = (0, import_react4.useState)(value);
-  const [expanded, setExpanded] = (0, import_react4.useState)(false);
-  (0, import_react4.useEffect)(() => setDraft(value), [value]);
+  const [draft, setDraft] = (0, import_react5.useState)(value);
+  const [expanded, setExpanded] = (0, import_react5.useState)(false);
+  (0, import_react5.useEffect)(() => setDraft(value), [value]);
   if (!expanded) {
     return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       "button",
@@ -31581,9 +31643,9 @@ function LinkTextCell({
   value,
   onChange
 }) {
-  const [editing, setEditing] = (0, import_react4.useState)(!value);
-  const [draft, setDraft] = (0, import_react4.useState)(value);
-  (0, import_react4.useEffect)(() => setDraft(value), [value]);
+  const [editing, setEditing] = (0, import_react5.useState)(!value);
+  const [draft, setDraft] = (0, import_react5.useState)(value);
+  (0, import_react5.useEffect)(() => setDraft(value), [value]);
   if (!editing && value) {
     const href = kind === "email" ? `mailto:${value}` : value;
     return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-link-cell", children: [
@@ -31618,7 +31680,7 @@ function AttachmentCell({
   value,
   onChange
 }) {
-  const [draft, setDraft] = (0, import_react4.useState)("");
+  const [draft, setDraft] = (0, import_react5.useState)("");
   const add = () => {
     const path = draft.trim();
     if (!path) return;
@@ -31662,12 +31724,12 @@ function AttachmentCell({
 }
 
 // src/ui/FieldHeaderMenu.tsx
-var import_react5 = __toESM(require_react());
+var import_react6 = __toESM(require_react());
 var import_jsx_runtime9 = __toESM(require_jsx_runtime());
 function FieldHeaderMenu(props) {
-  const ref = (0, import_react5.useRef)(null);
-  const [confirmDelete, setConfirmDelete] = (0, import_react5.useState)(false);
-  (0, import_react5.useEffect)(() => {
+  const ref = (0, import_react6.useRef)(null);
+  const [confirmDelete, setConfirmDelete] = (0, import_react6.useState)(false);
+  (0, import_react6.useEffect)(() => {
     const onDoc = (e) => {
       if (!ref.current?.contains(e.target)) props.onClose();
     };
@@ -31711,12 +31773,12 @@ function TableGrid(props) {
   const frozen = props.doc.view.frozenPrimary;
   const widths = props.doc.view.columnWidths;
   const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
-  const [dragState, setDragState] = (0, import_react6.useState)(null);
-  const dragCleanup = (0, import_react6.useRef)(null);
-  const gridWrapRef = (0, import_react6.useRef)(null);
-  const topScrollbarRef = (0, import_react6.useRef)(null);
-  const topScrollbarInnerRef = (0, import_react6.useRef)(null);
-  (0, import_react6.useEffect)(() => {
+  const [dragState, setDragState] = (0, import_react7.useState)(null);
+  const dragCleanup = (0, import_react7.useRef)(null);
+  const gridWrapRef = (0, import_react7.useRef)(null);
+  const topScrollbarRef = (0, import_react7.useRef)(null);
+  const topScrollbarInnerRef = (0, import_react7.useRef)(null);
+  (0, import_react7.useEffect)(() => {
     if (!props.showTopScrollbar) return;
     const gridWrap = gridWrapRef.current;
     const topScrollbar = topScrollbarRef.current;
@@ -31873,7 +31935,7 @@ function TableGrid(props) {
     document.addEventListener("pointercancel", onCancel);
     window.addEventListener("blur", onCancel);
   };
-  (0, import_react6.useEffect)(
+  (0, import_react7.useEffect)(
     () => () => {
       dragCleanup.current?.();
     },
@@ -32043,10 +32105,10 @@ function FieldHeader({
   onBeginReorder,
   width
 }) {
-  const [menuOpen, setMenuOpen] = (0, import_react6.useState)(false);
-  const startX = (0, import_react6.useRef)(0);
-  const startW = (0, import_react6.useRef)(width);
-  const nameInputRef = (0, import_react6.useRef)(null);
+  const [menuOpen, setMenuOpen] = (0, import_react7.useState)(false);
+  const startX = (0, import_react7.useRef)(0);
+  const startW = (0, import_react7.useRef)(width);
+  const nameInputRef = (0, import_react7.useRef)(null);
   const showFieldContextMenu = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -32197,10 +32259,10 @@ function fieldTypeLabel(field) {
 }
 
 // src/ui/OptionManager.tsx
-var import_react7 = __toESM(require_react());
+var import_react8 = __toESM(require_react());
 var import_jsx_runtime11 = __toESM(require_jsx_runtime());
 function OptionManager({ field, onClose, onChange, onRemoveOption }) {
-  const [pendingDeleteId, setPendingDeleteId] = (0, import_react7.useState)(null);
+  const [pendingDeleteId, setPendingDeleteId] = (0, import_react8.useState)(null);
   const updateOption = (optionId, patch) => {
     onChange({
       ...field,
@@ -32324,7 +32386,7 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
 }
 
 // src/ui/SyncMenu.tsx
-var import_react8 = __toESM(require_react());
+var import_react9 = __toESM(require_react());
 var import_jsx_runtime12 = __toESM(require_jsx_runtime());
 function SyncMenu({
   linked,
@@ -32336,9 +32398,9 @@ function SyncMenu({
   onPush,
   onUnlink
 }) {
-  const [open, setOpen] = (0, import_react8.useState)(false);
-  const ref = (0, import_react8.useRef)(null);
-  (0, import_react8.useEffect)(() => {
+  const [open, setOpen] = (0, import_react9.useState)(false);
+  const ref = (0, import_react9.useRef)(null);
+  (0, import_react9.useEffect)(() => {
     if (!open) return;
     const onDoc = (e) => {
       if (!ref.current?.contains(e.target)) setOpen(false);
@@ -32442,19 +32504,19 @@ function SyncMenu({
 }
 
 // src/ui/LinkSyncModal.tsx
-var import_react9 = __toESM(require_react());
+var import_react10 = __toESM(require_react());
 var import_jsx_runtime13 = __toESM(require_jsx_runtime());
 function LinkSyncModal({ token, doc, onClose, onLinked }) {
-  const [bases, setBases] = (0, import_react9.useState)([]);
-  const [tables, setTables] = (0, import_react9.useState)([]);
-  const [baseId, setBaseId] = (0, import_react9.useState)(doc.sync?.baseId ?? "");
-  const [tableId, setTableId] = (0, import_react9.useState)(doc.sync?.tableId ?? "");
-  const [replaceSchema, setReplaceSchema] = (0, import_react9.useState)(!doc.fields.length || doc.rows.length === 0);
-  const [loading, setLoading] = (0, import_react9.useState)(true);
-  const [loadingTables, setLoadingTables] = (0, import_react9.useState)(false);
-  const [error2, setError] = (0, import_react9.useState)(null);
-  const [busy, setBusy] = (0, import_react9.useState)(false);
-  (0, import_react9.useEffect)(() => {
+  const [bases, setBases] = (0, import_react10.useState)([]);
+  const [tables, setTables] = (0, import_react10.useState)([]);
+  const [baseId, setBaseId] = (0, import_react10.useState)(doc.sync?.baseId ?? "");
+  const [tableId, setTableId] = (0, import_react10.useState)(doc.sync?.tableId ?? "");
+  const [replaceSchema, setReplaceSchema] = (0, import_react10.useState)(!doc.fields.length || doc.rows.length === 0);
+  const [loading, setLoading] = (0, import_react10.useState)(true);
+  const [loadingTables, setLoadingTables] = (0, import_react10.useState)(false);
+  const [error2, setError] = (0, import_react10.useState)(null);
+  const [busy, setBusy] = (0, import_react10.useState)(false);
+  (0, import_react10.useEffect)(() => {
     let cancelled = false;
     void (async () => {
       try {
@@ -32475,7 +32537,7 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
       cancelled = true;
     };
   }, [token]);
-  (0, import_react9.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     if (!baseId) {
       setTables([]);
       return;
@@ -32610,22 +32672,22 @@ function TableApp({
   airtableToken = "",
   showTopScrollbar = false
 }) {
-  const [showFilters, setShowFilters] = (0, import_react10.useState)(
+  const [showFilters, setShowFilters] = (0, import_react11.useState)(
     doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
   );
-  const [showSorts, setShowSorts] = (0, import_react10.useState)(doc.view.sorts.length > 0);
-  const [showHide, setShowHide] = (0, import_react10.useState)(false);
-  const [optionFieldId, setOptionFieldId] = (0, import_react10.useState)(null);
-  const [queryError, setQueryError] = (0, import_react10.useState)();
-  const [selectedRowId, setSelectedRowId] = (0, import_react10.useState)(null);
-  const [showLinkModal, setShowLinkModal] = (0, import_react10.useState)(false);
-  const [syncBusy, setSyncBusy] = (0, import_react10.useState)(false);
-  const [pasteCandidate, setPasteCandidate] = (0, import_react10.useState)(null);
-  const groups = (0, import_react10.useMemo)(() => getGroupedRows(doc), [doc]);
+  const [showSorts, setShowSorts] = (0, import_react11.useState)(doc.view.sorts.length > 0);
+  const [showHide, setShowHide] = (0, import_react11.useState)(false);
+  const [optionFieldId, setOptionFieldId] = (0, import_react11.useState)(null);
+  const [queryError, setQueryError] = (0, import_react11.useState)();
+  const [selectedRowId, setSelectedRowId] = (0, import_react11.useState)(null);
+  const [showLinkModal, setShowLinkModal] = (0, import_react11.useState)(false);
+  const [syncBusy, setSyncBusy] = (0, import_react11.useState)(false);
+  const [pasteCandidate, setPasteCandidate] = (0, import_react11.useState)(null);
+  const groups = (0, import_react11.useMemo)(() => getGroupedRows(doc), [doc]);
   const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
   const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
   const hasToken = Boolean(airtableToken.trim());
-  const requestClipboardPaste = (0, import_react10.useCallback)(() => {
+  const requestClipboardPaste = (0, import_react11.useCallback)(() => {
     void readSpreadsheetClipboard().then((payload) => {
       if (!payload) {
         new import_obsidian3.Notice("Clipboard has no CSV, XLSX, or spreadsheet cell data");
@@ -32637,7 +32699,7 @@ function TableApp({
       new import_obsidian3.Notice("Clipboard access was unavailable. Focus the table and press Ctrl/Cmd+V instead.");
     });
   }, []);
-  (0, import_react10.useEffect)(() => {
+  (0, import_react11.useEffect)(() => {
     onRegisterClipboardPaste(requestClipboardPaste);
     return () => onRegisterClipboardPaste(null);
   }, [onRegisterClipboardPaste, requestClipboardPaste]);
@@ -33097,28 +33159,28 @@ function TableFileApp({
   showTopScrollbar,
   stackedTableGap
 }) {
-  const [activeTableId, setActiveTableId] = (0, import_react11.useState)(file.tables[0]?.id ?? "");
-  const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react11.useState)(null);
-  const activeTableIdRef = (0, import_react11.useRef)(activeTableId);
-  const clipboardHandlers = (0, import_react11.useRef)(/* @__PURE__ */ new Map());
+  const [activeTableId, setActiveTableId] = (0, import_react12.useState)(file.tables[0]?.id ?? "");
+  const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react12.useState)(null);
+  const activeTableIdRef = (0, import_react12.useRef)(activeTableId);
+  const clipboardHandlers = (0, import_react12.useRef)(/* @__PURE__ */ new Map());
   activeTableIdRef.current = activeTableId;
-  (0, import_react11.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     if (!file.tables.some((entry) => entry.id === activeTableId)) {
       const nextId = file.tables[0]?.id ?? "";
       activeTableIdRef.current = nextId;
       setActiveTableId(nextId);
     }
   }, [activeTableId, file.tables]);
-  const dispatchClipboardPaste = (0, import_react11.useCallback)(() => {
+  const dispatchClipboardPaste = (0, import_react12.useCallback)(() => {
     const handler = clipboardHandlers.current.get(activeTableIdRef.current);
     if (handler) handler();
     else new import_obsidian4.Notice("Click inside a table before pasting from the ribbon");
   }, []);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     onRegisterClipboardPaste(dispatchClipboardPaste);
     return () => onRegisterClipboardPaste(null);
   }, [dispatchClipboardPaste, onRegisterClipboardPaste]);
-  const registerTableClipboardPaste = (0, import_react11.useCallback)(
+  const registerTableClipboardPaste = (0, import_react12.useCallback)(
     (tableId, handler) => {
       if (handler) clipboardHandlers.current.set(tableId, handler);
       else clipboardHandlers.current.delete(tableId);
@@ -33191,7 +33253,10 @@ function TableFileApp({
     "div",
     {
       className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`,
-      style: { "--tabula-stacked-table-gap": `${stackedTableGap}px` },
+      style: {
+        "--tabula-stacked-table-gap": `${stackedTableGap}px`,
+        "--tabula-stacked-table-divider-offset": `${-stackedTableGap / 2}px`
+      },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
           /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-file-count", children: [
@@ -33266,11 +33331,11 @@ function TableFileApp({
 // src/ui/mount.tsx
 function mountTableFileApp(container, props) {
   const root = (0, import_client.createRoot)(container);
-  root.render((0, import_react12.createElement)(TableFileApp, props));
+  root.render((0, import_react13.createElement)(TableFileApp, props));
   return root;
 }
 function updateTableFileApp(root, props) {
-  root.render((0, import_react12.createElement)(TableFileApp, props));
+  root.render((0, import_react13.createElement)(TableFileApp, props));
 }
 
 // src/views/TableView.ts

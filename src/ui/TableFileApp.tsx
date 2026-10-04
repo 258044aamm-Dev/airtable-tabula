@@ -152,7 +152,10 @@ export function TableFileApp({
 	return (
 		<div
 			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`}
-			style={{ "--tabula-stacked-table-gap": `${stackedTableGap}px` } as CSSProperties}
+			style={{
+				"--tabula-stacked-table-gap": `${stackedTableGap}px`,
+				"--tabula-stacked-table-divider-offset": `${-stackedTableGap / 2}px`,
+			} as CSSProperties}
 		>
 			<div className="tabula-file-controls">
 				<span className="tabula-file-count">
