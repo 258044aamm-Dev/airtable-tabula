@@ -1,4 +1,4 @@
-import { Menu, Notice, Plugin, TFile } from "obsidian";
+import { Menu, Notice, normalizePath, Plugin, TFile, TFolder } from "obsidian";
 import {
 	TABULA_EXTENSION,
 	TableView,
@@ -95,17 +95,20 @@ export default class TabulaPlugin extends Plugin {
 		let token = DEFAULT_SETTINGS.airtableToken;
 		let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
 		let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
+		let newTableFolder = DEFAULT_SETTINGS.newTableFolder;
 		if (typeof data === "object" && data !== null) {
 			const rawToken = Reflect.get(data, "airtableToken");
 			const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
 			const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
+			const rawNewTableFolder = Reflect.get(data, "newTableFolder");
 			if (typeof rawToken === "string") token = rawToken;
 			if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
 			if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
 				stackedTableGap = clampStackedTableGap(rawStackedTableGap);
 			}
+			if (typeof rawNewTableFolder === "string") newTableFolder = rawNewTableFolder.trim();
 		}
-		this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap };
+		this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap, newTableFolder };
 	}
 
 	async saveSettings(): Promise<void> {
@@ -158,13 +161,25 @@ export default class TabulaPlugin extends Plugin {
 			new Notice(`Created ${file.basename}`);
 		} catch (e) {
 			console.error(e);
-			new Notice("Failed to create table");
+			new Notice(e instanceof Error ? e.message : "Failed to create table");
 		}
 	}
 
 	private async writeTableFile(baseName: string, content: string): Promise<TFile> {
-		const folder = this.app.fileManager.getNewFileParent("");
-		const folderPath = folder.path === "/" || folder.path === "" ? "" : folder.path;
+		const configuredFolder = this.settings.newTableFolder.trim();
+		let folderPath: string;
+		if (configuredFolder) {
+			const pathSegments = configuredFolder.replace(/\\/g, "/").split("/").filter(Boolean);
+			if (pathSegments.includes("..") || /^[A-Za-z]:$/.test(pathSegments[0] ?? "")) {
+				throw new Error("Default table folder must be a vault-relative path, for example, Tables.");
+			}
+			folderPath = normalizePath(pathSegments.filter((segment) => segment !== ".").join("/"));
+			if (folderPath) await this.ensureFolderPath(folderPath);
+		} else {
+			const folder = this.app.fileManager.getNewFileParent("");
+			folderPath = folder.path === "/" || folder.path === "" ? "" : folder.path;
+		}
+
 		const safeBase = baseName.replace(/[\\/:*?"<>|]/g, "-").trim() || "Untitled Table";
 
 		const makePath = (name: string) =>
@@ -178,5 +193,24 @@ export default class TabulaPlugin extends Plugin {
 		}
 
 		return this.app.vault.create(fullPath, content);
+	}
+
+	private async ensureFolderPath(folderPath: string): Promise<void> {
+		let currentPath = "";
+		for (const segment of folderPath.split("/").filter(Boolean)) {
+			currentPath = currentPath ? `${currentPath}/${segment}` : segment;
+			const existing = this.app.vault.getAbstractFileByPath(currentPath);
+			if (existing instanceof TFolder) continue;
+			if (existing) {
+				throw new Error(`Cannot use "${currentPath}" as a default table folder because it is a file.`);
+			}
+
+			try {
+				await this.app.vault.createFolder(currentPath);
+			} catch (error) {
+				const created = this.app.vault.getAbstractFileByPath(currentPath);
+				if (!(created instanceof TFolder)) throw error;
+			}
+		}
 	}
 }

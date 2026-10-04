@@ -443,8 +443,13 @@ export function TableApp({
 	};
 
 	const createFromPaste = async (incoming: TableDocument) => {
-		await onCreateTableFromPaste(incoming);
-		setPasteCandidate(null);
+		try {
+			await onCreateTableFromPaste(incoming);
+			setPasteCandidate(null);
+		} catch (error) {
+			console.error(error);
+			new Notice(error instanceof Error ? error.message : "Could not create a table from pasted data");
+		}
 	};
 
 	const runPull = async () => {

@@ -1243,6 +1243,7 @@
 
 .tabula-file-root:not(.is-single-table) {
 	gap: 0;
+	padding-bottom: var(--tabula-stacked-table-gap, 120px);
 }
 
 /* Preserve the controls-to-first-table spacing; customize only table-to-table spacing. */
@@ -1252,13 +1253,13 @@
 
 .tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table {
 	position: relative;
-	margin-top: var(--tabula-stacked-table-gap, 100px);
+	margin-top: var(--tabula-stacked-table-gap, 120px);
 }
 
 .tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table::before {
 	content: "";
 	position: absolute;
-	top: var(--tabula-stacked-table-divider-offset, -50px);
+	top: var(--tabula-stacked-table-divider-offset, -60px);
 	left: 2px;
 	right: 2px;
 	height: 1px;

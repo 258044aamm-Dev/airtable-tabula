@@ -1,6 +1,6 @@
 {
 	"name": "airtable-tabula",
-	"version": "0.1.12",
+	"version": "0.1.13",
 	"description": "Local Airtable-like tables with selects, filters, query, CSV/Excel import, and optional Airtable sync",
 	"main": "main.js",
 	"scripts": {

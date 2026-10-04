@@ -45,6 +45,22 @@ export class TabulaSettingTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(containerEl).setName("Table files").setHeading();
+
+		new Setting(containerEl)
+			.setName("Default folder for new tables")
+			.setDesc(
+				"Vault-relative folder for new standalone tables, spreadsheet imports, and pasted tables. Leave blank to use Obsidian’s current folder. Stacked tables stay in their existing file."
+			)
+			.addText((text: TextComponent) => {
+				text.setPlaceholder("e.g. Tables")
+					.setValue(this.plugin.settings.newTableFolder)
+					.onChange(async (value) => {
+						this.plugin.settings.newTableFolder = value.trim();
+						await this.plugin.saveSettings();
+					});
+			});
+
 		new Setting(containerEl).setName("Table display").setHeading();
 
 		new Setting(containerEl)
@@ -75,7 +91,7 @@ export class TabulaSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Gap between stacked tables")
-			.setDesc("Set the vertical gap between tables in the same file (0–500 px). Default: 100 px.")
+			.setDesc("Set the vertical gap between tables in the same file and after the last table (0–500 px). Default: 120 px.")
 			.addSlider((slider) => {
 				gapSlider = slider;
 				slider

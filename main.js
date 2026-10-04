@@ -32989,8 +32989,13 @@ function TableApp({
     }
   };
   const createFromPaste = async (incoming) => {
-    await onCreateTableFromPaste(incoming);
-    setPasteCandidate(null);
+    try {
+      await onCreateTableFromPaste(incoming);
+      setPasteCandidate(null);
+    } catch (error2) {
+      console.error(error2);
+      new import_obsidian3.Notice(error2 instanceof Error ? error2.message : "Could not create a table from pasted data");
+    }
   };
   const runPull = async () => {
     if (!hasToken || !doc.sync) return;
@@ -33484,14 +33489,15 @@ var TableView = class extends import_obsidian5.TextFileView {
 // src/settings.ts
 var MIN_STACKED_TABLE_GAP = 0;
 var MAX_STACKED_TABLE_GAP = 500;
-var DEFAULT_STACKED_TABLE_GAP = 100;
+var DEFAULT_STACKED_TABLE_GAP = 120;
 function clampStackedTableGap(value) {
   return Math.min(MAX_STACKED_TABLE_GAP, Math.max(MIN_STACKED_TABLE_GAP, Math.round(value)));
 }
 var DEFAULT_SETTINGS = {
   airtableToken: "",
   showTopScrollbar: false,
-  stackedTableGap: DEFAULT_STACKED_TABLE_GAP
+  stackedTableGap: DEFAULT_STACKED_TABLE_GAP,
+  newTableFolder: ""
 };
 
 // src/ui/SettingsTab.ts
@@ -33518,6 +33524,15 @@ var TabulaSettingTab = class extends import_obsidian6.PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
+    new import_obsidian6.Setting(containerEl).setName("Table files").setHeading();
+    new import_obsidian6.Setting(containerEl).setName("Default folder for new tables").setDesc(
+      "Vault-relative folder for new standalone tables, spreadsheet imports, and pasted tables. Leave blank to use Obsidian\u2019s current folder. Stacked tables stay in their existing file."
+    ).addText((text) => {
+      text.setPlaceholder("e.g. Tables").setValue(this.plugin.settings.newTableFolder).onChange(async (value) => {
+        this.plugin.settings.newTableFolder = value.trim();
+        await this.plugin.saveSettings();
+      });
+    });
     new import_obsidian6.Setting(containerEl).setName("Table display").setHeading();
     new import_obsidian6.Setting(containerEl).setName("Top horizontal scrollbar").setDesc(
       "Show a synchronized scrollbar above wide tables. This setting applies to all tables and is off by default."
@@ -33538,7 +33553,7 @@ var TabulaSettingTab = class extends import_obsidian6.PluginSettingTab {
       await this.plugin.saveSettings();
       this.plugin.refreshOpenViews();
     };
-    new import_obsidian6.Setting(containerEl).setName("Gap between stacked tables").setDesc("Set the vertical gap between tables in the same file (0\u2013500 px). Default: 100 px.").addSlider((slider) => {
+    new import_obsidian6.Setting(containerEl).setName("Gap between stacked tables").setDesc("Set the vertical gap between tables in the same file and after the last table (0\u2013500 px). Default: 120 px.").addSlider((slider) => {
       gapSlider = slider;
       slider.setLimits(MIN_STACKED_TABLE_GAP, MAX_STACKED_TABLE_GAP, 1).setValue(this.plugin.settings.stackedTableGap).setInstant(false).onChange((value) => void persistGap(value, "slider"));
     }).addText((text) => {
@@ -33639,17 +33654,20 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
     let token = DEFAULT_SETTINGS.airtableToken;
     let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
     let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
+    let newTableFolder = DEFAULT_SETTINGS.newTableFolder;
     if (typeof data === "object" && data !== null) {
       const rawToken = Reflect.get(data, "airtableToken");
       const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
       const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
+      const rawNewTableFolder = Reflect.get(data, "newTableFolder");
       if (typeof rawToken === "string") token = rawToken;
       if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
       if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
         stackedTableGap = clampStackedTableGap(rawStackedTableGap);
       }
+      if (typeof rawNewTableFolder === "string") newTableFolder = rawNewTableFolder.trim();
     }
-    this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap };
+    this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap, newTableFolder };
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -33694,12 +33712,23 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
       new import_obsidian7.Notice(`Created ${file.basename}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian7.Notice("Failed to create table");
+      new import_obsidian7.Notice(e instanceof Error ? e.message : "Failed to create table");
     }
   }
   async writeTableFile(baseName, content) {
-    const folder = this.app.fileManager.getNewFileParent("");
-    const folderPath = folder.path === "/" || folder.path === "" ? "" : folder.path;
+    const configuredFolder = this.settings.newTableFolder.trim();
+    let folderPath;
+    if (configuredFolder) {
+      const pathSegments = configuredFolder.replace(/\\/g, "/").split("/").filter(Boolean);
+      if (pathSegments.includes("..") || /^[A-Za-z]:$/.test(pathSegments[0] ?? "")) {
+        throw new Error("Default table folder must be a vault-relative path, for example, Tables.");
+      }
+      folderPath = (0, import_obsidian7.normalizePath)(pathSegments.filter((segment) => segment !== ".").join("/"));
+      if (folderPath) await this.ensureFolderPath(folderPath);
+    } else {
+      const folder = this.app.fileManager.getNewFileParent("");
+      folderPath = folder.path === "/" || folder.path === "" ? "" : folder.path;
+    }
     const safeBase = baseName.replace(/[\\/:*?"<>|]/g, "-").trim() || "Untitled Table";
     const makePath = (name) => folderPath ? `${folderPath}/${name}.${TABULA_EXTENSION}` : `${name}.${TABULA_EXTENSION}`;
     let fullPath = makePath(safeBase);
@@ -33709,6 +33738,23 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
       i += 1;
     }
     return this.app.vault.create(fullPath, content);
+  }
+  async ensureFolderPath(folderPath) {
+    let currentPath = "";
+    for (const segment of folderPath.split("/").filter(Boolean)) {
+      currentPath = currentPath ? `${currentPath}/${segment}` : segment;
+      const existing = this.app.vault.getAbstractFileByPath(currentPath);
+      if (existing instanceof import_obsidian7.TFolder) continue;
+      if (existing) {
+        throw new Error(`Cannot use "${currentPath}" as a default table folder because it is a file.`);
+      }
+      try {
+        await this.app.vault.createFolder(currentPath);
+      } catch (error2) {
+        const created = this.app.vault.getAbstractFileByPath(currentPath);
+        if (!(created instanceof import_obsidian7.TFolder)) throw error2;
+      }
+    }
   }
 };
 /*! Bundled license information:
