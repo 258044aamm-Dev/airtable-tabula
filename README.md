@@ -6,7 +6,8 @@ A `.tabula` file stores one or more independent tables, shown stacked vertically
 
 ## Features
 
-- **Multiple tables per file** — add independent starter tables to one `.tabula` file, or remove a table when it is no longer needed
+- **Multiple tables per file** — add blank tables, create a standalone table, or stack tables from clipboard / CSV / XLSX data in one `.tabula` file
+- **Configurable stacked-table gap** — defaults to 100 px and can be adjusted with a slider or exact pixel value in Settings
 - **Optional top horizontal scrollbar** — enable a synchronized scrollbar above each grid from Settings → Airtable Tabula; disabled by default
 - **Import and paste spreadsheets** — import `.csv` / `.xlsx` files, or paste spreadsheet cells/files directly into an open table and choose Replace, Create new, or Append
 - **Context menus** — right-click a cell for cell and row actions, the row-number gutter for row actions, or a column header for column actions
@@ -46,6 +47,17 @@ What happens:
 - A new `.tabula` file is created in your vault and opened
 
 Tip: In Excel or Google Sheets, “Save as CSV” also works if you don’t need a full workbook.
+
+## Add or stack tables
+
+In an open `.tabula` file, choose **+ Add table** to pick an action:
+
+- **Create stacked** — add a blank table to the current file
+- **New one** — create and open a separate `.tabula` file
+- **Create stacked table from clipboard** — preview tabular clipboard data, choose whether its first row is headers, then add it to the current file
+- **Create stacked table from imported CSV or Excel file** — choose a `.csv` or `.xlsx` file, preview it, then add it to the current file
+
+The gap between stacked table sections defaults to **100 px**. Adjust it in Settings → Airtable Tabula → Table display, using the slider or pixel-value field.
 
 ## Paste spreadsheet data directly
 

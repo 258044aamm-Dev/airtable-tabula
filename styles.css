@@ -1242,7 +1242,16 @@
 }
 
 .tabula-file-root:not(.is-single-table) {
-	gap: 20px;
+	gap: 0;
+}
+
+/* Preserve the controls-to-first-table spacing; customize only table-to-table spacing. */
+.tabula-file-root:not(.is-single-table) > .tabula-file-controls {
+	margin-bottom: 20px;
+}
+
+.tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table {
+	margin-top: var(--tabula-stacked-table-gap, 100px);
 }
 
 .tabula-file-controls {

@@ -25056,119 +25056,6 @@ var import_react12 = __toESM(require_react());
 var import_react11 = __toESM(require_react());
 var import_obsidian4 = require("obsidian");
 
-// src/ui/TableApp.tsx
-var import_react10 = __toESM(require_react());
-var import_obsidian3 = require("obsidian");
-
-// src/data/cellClipboard.ts
-function cellClipboardText(field, value) {
-  if (value == null) return "";
-  switch (field.type) {
-    case "singleSelect":
-      return field.options.find((option) => option.id === value)?.name ?? "";
-    case "multiSelect":
-      return Array.isArray(value) ? value.map((id) => field.options.find((option) => option.id === id)?.name ?? "").filter(Boolean).join(", ") : "";
-    case "checkbox":
-      return value ? "TRUE" : "FALSE";
-    case "duration":
-      return typeof value === "number" ? formatDuration(value) : "";
-    case "attachment":
-      return Array.isArray(value) ? value.join("\n") : "";
-    default:
-      return Array.isArray(value) ? value.join(", ") : String(value);
-  }
-}
-function parseCellClipboardText(field, text) {
-  if (isReadOnlyField(field)) {
-    return { ok: false, error: `${field.name} is read-only` };
-  }
-  const trimmed = text.trim();
-  if (!trimmed) return { ok: true, value: emptyCellValue(field.type) };
-  switch (field.type) {
-    case "number":
-    case "currency":
-    case "percent":
-    case "rating": {
-      const normalized = trimmed.replace(/[$€£¥,\s]/g, "").replace(/%$/, "");
-      const value = Number(normalized);
-      return Number.isFinite(value) ? { ok: true, value } : { ok: false, error: `\u201C${text}\u201D is not a valid number for ${field.name}` };
-    }
-    case "duration": {
-      const value = parseDuration(trimmed);
-      return value == null ? { ok: false, error: `\u201C${text}\u201D is not a valid duration for ${field.name}` } : { ok: true, value };
-    }
-    case "checkbox": {
-      const value = trimmed.toLocaleLowerCase();
-      if (["true", "yes", "y", "1", "on", "checked"].includes(value)) {
-        return { ok: true, value: true };
-      }
-      if (["false", "no", "n", "0", "off", "unchecked"].includes(value)) {
-        return { ok: true, value: false };
-      }
-      return { ok: false, error: `\u201C${text}\u201D is not a valid checkbox value` };
-    }
-    case "date": {
-      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-        return isValidDate(trimmed) ? { ok: true, value: trimmed } : { ok: false, error: `\u201C${text}\u201D is not a valid date for ${field.name}` };
-      }
-      const date = new Date(trimmed);
-      return Number.isNaN(date.getTime()) ? { ok: false, error: `\u201C${text}\u201D is not a valid date for ${field.name}` } : { ok: true, value: date.toISOString().slice(0, 10) };
-    }
-    case "datetime": {
-      const date = new Date(trimmed);
-      return Number.isNaN(date.getTime()) ? { ok: false, error: `\u201C${text}\u201D is not a valid date and time for ${field.name}` } : { ok: true, value: date.toISOString() };
-    }
-    case "singleSelect": {
-      const option = field.options.find(
-        (candidate) => candidate.id === trimmed || candidate.name.toLocaleLowerCase() === trimmed.toLocaleLowerCase()
-      );
-      if (option) return { ok: true, value: option.id };
-      const added = createSelectOption(trimmed);
-      const updatedField = { ...field, options: [...field.options, added] };
-      return { ok: true, value: added.id, field: updatedField };
-    }
-    case "multiSelect": {
-      const names = text.split(/\r?\n|,\s*/).map((name) => name.trim()).filter(Boolean);
-      let options = [...field.options];
-      const ids = [];
-      for (const name of names) {
-        let option = options.find(
-          (candidate) => candidate.id === name || candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
-        );
-        if (!option) {
-          option = createSelectOption(name);
-          options = [...options, option];
-        }
-        if (!ids.includes(option.id)) ids.push(option.id);
-      }
-      const updatedField = options.length === field.options.length ? field : { ...field, options };
-      return {
-        ok: true,
-        value: ids,
-        ...updatedField === field ? {} : { field: updatedField }
-      };
-    }
-    case "attachment": {
-      const paths = text.split(/\r?\n/).map((path) => path.trim()).filter(Boolean);
-      return { ok: true, value: Array.from(new Set(paths)) };
-    }
-    case "text":
-    case "longText":
-    case "url":
-    case "email":
-    case "phone":
-      return { ok: true, value: text };
-    case "autoNumber":
-    case "createdTime":
-    case "lastModifiedTime":
-      return { ok: false, error: `${field.name} is read-only` };
-  }
-}
-function isValidDate(value) {
-  const date = /* @__PURE__ */ new Date(`${value}T00:00:00.000Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
-}
-
 // node_modules/saxen/dist/index.js
 var fromCharCode = String.fromCharCode;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -29500,15 +29387,8 @@ function pickSpreadsheetFile() {
 // src/ui/PasteSpreadsheetModal.tsx
 var import_react = __toESM(require_react());
 var import_jsx_runtime = __toESM(require_jsx_runtime());
-function PasteSpreadsheetModal({
-  matrix,
-  sourceName,
-  currentDoc,
-  onClose,
-  onReplace,
-  onAppend,
-  onCreateNew
-}) {
+function PasteSpreadsheetModal(props) {
+  const { matrix, sourceName, onClose } = props;
   const [firstRowIsHeader, setFirstRowIsHeader] = (0, import_react.useState)(true);
   const [busy, setBusy] = (0, import_react.useState)(false);
   const [confirmReplace, setConfirmReplace] = (0, import_react.useState)(false);
@@ -29527,29 +29407,31 @@ function PasteSpreadsheetModal({
   );
   const buildIncoming = () => matrixToTable(matrix, sourceName, firstRowIsHeader);
   const handleReplace = () => {
+    if (props.mode === "stacked") return;
     setError("");
     try {
       const incoming = buildIncoming();
-      if (currentDoc.sync) {
+      if (props.currentDoc.sync) {
         setReplaceCandidate(incoming);
         setConfirmReplace(true);
         return;
       }
-      onReplace(incoming);
+      props.onReplace(incoming);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read spreadsheet data");
     }
   };
   const confirmReplacement = () => {
-    if (!replaceCandidate) return;
-    onReplace(replaceCandidate);
+    if (!replaceCandidate || props.mode === "stacked") return;
+    props.onReplace(replaceCandidate);
     setReplaceCandidate(null);
     setConfirmReplace(false);
   };
   const handleAppend = () => {
+    if (props.mode === "stacked") return;
     setError("");
     try {
-      onAppend(buildIncoming());
+      props.onAppend(buildIncoming());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read spreadsheet data");
     }
@@ -29557,12 +29439,20 @@ function PasteSpreadsheetModal({
   const handleCreate = async () => {
     setError("");
     setBusy(true);
+    let stackedTableCreated = false;
     try {
-      await onCreateNew(buildIncoming());
+      const incoming = buildIncoming();
+      if (props.mode === "stacked") {
+        await props.onCreateStacked(incoming);
+        stackedTableCreated = true;
+        props.onClose();
+      } else {
+        await props.onCreateNew(incoming);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create a new table");
     } finally {
-      setBusy(false);
+      if (!stackedTableCreated) setBusy(false);
     }
   };
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
@@ -29576,7 +29466,7 @@ function PasteSpreadsheetModal({
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-modal-header", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { id: "tabula-paste-title", children: "Paste spreadsheet data" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { id: "tabula-paste-title", children: props.mode === "stacked" ? "Create stacked table" : "Paste spreadsheet data" }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-muted tabula-paste-source", children: [
               sourceName,
               " \xB7 ",
@@ -29619,8 +29509,17 @@ function PasteSpreadsheetModal({
           },
           rowIndex
         )) }) }) }),
-        currentDoc.sync && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-warning", children: "This table is linked to Airtable. Replacing it will unlink the table. Appended rows will be new local records; new columns will not be included in sync." }),
-        confirmReplace ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-paste-confirm", children: [
+        props.mode !== "stacked" && props.currentDoc.sync && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-warning", children: "This table is linked to Airtable. Replacing it will unlink the table. Appended rows will be new local records; new columns will not be included in sync." }),
+        props.mode === "stacked" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-actions", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          "button",
+          {
+            className: "tabula-btn tabula-btn-primary",
+            type: "button",
+            disabled: busy,
+            onClick: () => void handleCreate(),
+            children: busy ? "Adding\u2026" : "Create stacked table"
+          }
+        ) }) : confirmReplace ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-paste-confirm", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Replace this table and unlink Airtable?" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "The imported columns and rows will replace the current data. This cannot be undone from this dialog." }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "tabula-paste-actions", children: [
@@ -29653,6 +29552,119 @@ function PasteSpreadsheetModal({
       ]
     }
   ) });
+}
+
+// src/ui/TableApp.tsx
+var import_react10 = __toESM(require_react());
+var import_obsidian3 = require("obsidian");
+
+// src/data/cellClipboard.ts
+function cellClipboardText(field, value) {
+  if (value == null) return "";
+  switch (field.type) {
+    case "singleSelect":
+      return field.options.find((option) => option.id === value)?.name ?? "";
+    case "multiSelect":
+      return Array.isArray(value) ? value.map((id) => field.options.find((option) => option.id === id)?.name ?? "").filter(Boolean).join(", ") : "";
+    case "checkbox":
+      return value ? "TRUE" : "FALSE";
+    case "duration":
+      return typeof value === "number" ? formatDuration(value) : "";
+    case "attachment":
+      return Array.isArray(value) ? value.join("\n") : "";
+    default:
+      return Array.isArray(value) ? value.join(", ") : String(value);
+  }
+}
+function parseCellClipboardText(field, text) {
+  if (isReadOnlyField(field)) {
+    return { ok: false, error: `${field.name} is read-only` };
+  }
+  const trimmed = text.trim();
+  if (!trimmed) return { ok: true, value: emptyCellValue(field.type) };
+  switch (field.type) {
+    case "number":
+    case "currency":
+    case "percent":
+    case "rating": {
+      const normalized = trimmed.replace(/[$€£¥,\s]/g, "").replace(/%$/, "");
+      const value = Number(normalized);
+      return Number.isFinite(value) ? { ok: true, value } : { ok: false, error: `\u201C${text}\u201D is not a valid number for ${field.name}` };
+    }
+    case "duration": {
+      const value = parseDuration(trimmed);
+      return value == null ? { ok: false, error: `\u201C${text}\u201D is not a valid duration for ${field.name}` } : { ok: true, value };
+    }
+    case "checkbox": {
+      const value = trimmed.toLocaleLowerCase();
+      if (["true", "yes", "y", "1", "on", "checked"].includes(value)) {
+        return { ok: true, value: true };
+      }
+      if (["false", "no", "n", "0", "off", "unchecked"].includes(value)) {
+        return { ok: true, value: false };
+      }
+      return { ok: false, error: `\u201C${text}\u201D is not a valid checkbox value` };
+    }
+    case "date": {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        return isValidDate(trimmed) ? { ok: true, value: trimmed } : { ok: false, error: `\u201C${text}\u201D is not a valid date for ${field.name}` };
+      }
+      const date = new Date(trimmed);
+      return Number.isNaN(date.getTime()) ? { ok: false, error: `\u201C${text}\u201D is not a valid date for ${field.name}` } : { ok: true, value: date.toISOString().slice(0, 10) };
+    }
+    case "datetime": {
+      const date = new Date(trimmed);
+      return Number.isNaN(date.getTime()) ? { ok: false, error: `\u201C${text}\u201D is not a valid date and time for ${field.name}` } : { ok: true, value: date.toISOString() };
+    }
+    case "singleSelect": {
+      const option = field.options.find(
+        (candidate) => candidate.id === trimmed || candidate.name.toLocaleLowerCase() === trimmed.toLocaleLowerCase()
+      );
+      if (option) return { ok: true, value: option.id };
+      const added = createSelectOption(trimmed);
+      const updatedField = { ...field, options: [...field.options, added] };
+      return { ok: true, value: added.id, field: updatedField };
+    }
+    case "multiSelect": {
+      const names = text.split(/\r?\n|,\s*/).map((name) => name.trim()).filter(Boolean);
+      let options = [...field.options];
+      const ids = [];
+      for (const name of names) {
+        let option = options.find(
+          (candidate) => candidate.id === name || candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+        );
+        if (!option) {
+          option = createSelectOption(name);
+          options = [...options, option];
+        }
+        if (!ids.includes(option.id)) ids.push(option.id);
+      }
+      const updatedField = options.length === field.options.length ? field : { ...field, options };
+      return {
+        ok: true,
+        value: ids,
+        ...updatedField === field ? {} : { field: updatedField }
+      };
+    }
+    case "attachment": {
+      const paths = text.split(/\r?\n/).map((path) => path.trim()).filter(Boolean);
+      return { ok: true, value: Array.from(new Set(paths)) };
+    }
+    case "text":
+    case "longText":
+    case "url":
+    case "email":
+    case "phone":
+      return { ok: true, value: text };
+    case "autoNumber":
+    case "createdTime":
+    case "lastModifiedTime":
+      return { ok: false, error: `${field.name} is read-only` };
+  }
+}
+function isValidDate(value) {
+  const date = /* @__PURE__ */ new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 // src/data/query.ts
@@ -33079,11 +33091,14 @@ function TableFileApp({
   onAddTable,
   onRemoveTable,
   onCreateTableFromPaste,
+  onCreateStandaloneTable,
   onRegisterClipboardPaste,
   airtableToken = "",
-  showTopScrollbar
+  showTopScrollbar,
+  stackedTableGap
 }) {
   const [activeTableId, setActiveTableId] = (0, import_react11.useState)(file.tables[0]?.id ?? "");
+  const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react11.useState)(null);
   const activeTableIdRef = (0, import_react11.useRef)(activeTableId);
   const clipboardHandlers = (0, import_react11.useRef)(/* @__PURE__ */ new Map());
   activeTableIdRef.current = activeTableId;
@@ -33110,10 +33125,56 @@ function TableFileApp({
     },
     []
   );
-  const addTable = () => {
-    const tableId = onAddTable();
+  const addTable = (table) => {
+    const tableId = onAddTable(table);
     activeTableIdRef.current = tableId;
     setActiveTableId(tableId);
+  };
+  const createStackedFromClipboard = async () => {
+    try {
+      const payload = await readSpreadsheetClipboard();
+      if (!payload) {
+        new import_obsidian4.Notice("Clipboard does not contain spreadsheet data. Copy a cell range first.");
+        return;
+      }
+      setStackedImportCandidate(payload);
+    } catch (error2) {
+      console.error(error2);
+      new import_obsidian4.Notice(error2 instanceof Error ? error2.message : "Could not read spreadsheet data from clipboard");
+    }
+  };
+  const createStackedFromFile = async () => {
+    try {
+      const selectedFile = await pickSpreadsheetFile();
+      if (!selectedFile) return;
+      const matrix = await spreadsheetToMatrix(selectedFile);
+      setStackedImportCandidate({ matrix, sourceName: selectedFile.name });
+    } catch (error2) {
+      console.error(error2);
+      new import_obsidian4.Notice(error2 instanceof Error ? error2.message : "Could not import spreadsheet");
+    }
+  };
+  const showAddTableMenu = (event) => {
+    event.preventDefault();
+    const menu = new import_obsidian4.Menu();
+    menu.addItem((item) => item.setTitle("Create stacked").onClick(() => addTable()));
+    menu.addItem(
+      (item) => item.setTitle("New one").onClick(() => void onCreateStandaloneTable())
+    );
+    menu.addSeparator();
+    menu.addItem(
+      (item) => item.setTitle("Create stacked table from clipboard").onClick(() => void createStackedFromClipboard())
+    );
+    menu.addItem(
+      (item) => item.setTitle("Create stacked table from imported CSV or Excel file").onClick(() => void createStackedFromFile())
+    );
+    menu.showAtMouseEvent(event.nativeEvent);
+  };
+  const createStackedFromPreview = async (table) => {
+    const tableId = onAddTable(table);
+    activeTableIdRef.current = tableId;
+    setActiveTableId(tableId);
+    new import_obsidian4.Notice(`Added \u201C${table.name}\u201D as a stacked table`);
   };
   const removeTable = (tableId, tableName, nextId) => {
     if (file.tables.length <= 1) return;
@@ -33126,63 +33187,80 @@ function TableFileApp({
     onRemoveTable(tableId);
     new import_obsidian4.Notice(`Removed ${tableName || "table"}`);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-file-count", children: [
-        file.tables.length,
-        " ",
-        file.tables.length === 1 ? "table" : "tables",
-        " in this file"
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: addTable, children: "+ Add table" })
-    ] }),
-    file.tables.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
-      "section",
-      {
-        className: "tabula-file-table",
-        onPointerDownCapture: () => setActiveTableId(entry.id),
-        onFocusCapture: () => setActiveTableId(entry.id),
-        children: [
-          file.tables.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-header", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-title", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-table-section-index", children: [
-                "Table ",
-                index + 1
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "tabula-table-section-name", children: entry.table.name })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-              "button",
-              {
-                className: "tabula-btn tabula-btn-danger",
-                type: "button",
-                title: `Remove ${entry.table.name || "table"}`,
-                "aria-label": `Remove table ${index + 1}: ${entry.table.name || "Untitled"}`,
-                onClick: () => removeTable(
-                  entry.id,
-                  entry.table.name,
-                  file.tables[index === 0 ? 1 : index - 1]?.id ?? ""
-                ),
-                children: "Remove table"
-              }
-            )
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+    "div",
+    {
+      className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`,
+      style: { "--tabula-stacked-table-gap": `${stackedTableGap}px` },
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-file-count", children: [
+            file.tables.length,
+            " ",
+            file.tables.length === 1 ? "table" : "tables",
+            " in this file"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-            TableApp,
-            {
-              doc: entry.table,
-              onChange: (doc) => onTableChange(entry.id, doc),
-              onCreateTableFromPaste,
-              onRegisterClipboardPaste: (handler) => registerTableClipboardPaste(entry.id, handler),
-              airtableToken,
-              showTopScrollbar
-            }
-          )
-        ]
-      },
-      entry.id
-    ))
-  ] });
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: showAddTableMenu, children: "+ Add table" })
+        ] }),
+        file.tables.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+          "section",
+          {
+            className: "tabula-file-table",
+            onPointerDownCapture: () => setActiveTableId(entry.id),
+            onFocusCapture: () => setActiveTableId(entry.id),
+            children: [
+              file.tables.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-header", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-title", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-table-section-index", children: [
+                    "Table ",
+                    index + 1
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "tabula-table-section-name", children: entry.table.name })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+                  "button",
+                  {
+                    className: "tabula-btn tabula-btn-danger",
+                    type: "button",
+                    title: `Remove ${entry.table.name || "table"}`,
+                    "aria-label": `Remove table ${index + 1}: ${entry.table.name || "Untitled"}`,
+                    onClick: () => removeTable(
+                      entry.id,
+                      entry.table.name,
+                      file.tables[index === 0 ? 1 : index - 1]?.id ?? ""
+                    ),
+                    children: "Remove table"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+                TableApp,
+                {
+                  doc: entry.table,
+                  onChange: (doc) => onTableChange(entry.id, doc),
+                  onCreateTableFromPaste,
+                  onRegisterClipboardPaste: (handler) => registerTableClipboardPaste(entry.id, handler),
+                  airtableToken,
+                  showTopScrollbar
+                }
+              )
+            ]
+          },
+          entry.id
+        )),
+        stackedImportCandidate && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+          PasteSpreadsheetModal,
+          {
+            mode: "stacked",
+            matrix: stackedImportCandidate.matrix,
+            sourceName: stackedImportCandidate.sourceName,
+            onClose: () => setStackedImportCandidate(null),
+            onCreateStacked: createStackedFromPreview
+          }
+        )
+      ]
+    }
+  );
 }
 
 // src/ui/mount.tsx
@@ -33267,12 +33345,14 @@ var TableView = class extends import_obsidian5.TextFileView {
     return {
       file: this.fileDoc,
       onTableChange: (tableId, doc) => this.handleTableChange(tableId, doc),
-      onAddTable: () => this.addTable(),
+      onAddTable: (doc) => this.addTable(doc),
       onRemoveTable: (tableId) => this.removeTable(tableId),
       onCreateTableFromPaste: (doc) => this.plugin.createTableFromPaste(doc),
+      onCreateStandaloneTable: () => this.plugin.createStandaloneTable(),
       onRegisterClipboardPaste: this.registerClipboardPaste,
       airtableToken: this.plugin.settings.airtableToken,
-      showTopScrollbar: this.plugin.settings.showTopScrollbar
+      showTopScrollbar: this.plugin.settings.showTopScrollbar,
+      stackedTableGap: this.plugin.settings.stackedTableGap
     };
   }
   remount() {
@@ -33295,10 +33375,11 @@ var TableView = class extends import_obsidian5.TextFileView {
     if (tables.every((entry, index) => entry === this.fileDoc.tables[index])) return;
     this.commitFileChange({ ...this.fileDoc, tables });
   }
-  addTable() {
+  addTable(table) {
     if (!this.fileDoc) return "";
-    const name = `Untitled Table ${this.fileDoc.tables.length + 1}`;
-    const entry = createTableEntry(createDefaultTable(name));
+    const fallbackName = `Untitled Table ${this.fileDoc.tables.length + 1}`;
+    const tableToAdd = table ? { ...table, name: table.name.trim() || fallbackName } : createDefaultTable(fallbackName);
+    const entry = createTableEntry(tableToAdd);
     this.commitFileChange({ ...this.fileDoc, tables: [...this.fileDoc.tables, entry] });
     return entry.id;
   }
@@ -33336,9 +33417,16 @@ var TableView = class extends import_obsidian5.TextFileView {
 };
 
 // src/settings.ts
+var MIN_STACKED_TABLE_GAP = 0;
+var MAX_STACKED_TABLE_GAP = 500;
+var DEFAULT_STACKED_TABLE_GAP = 100;
+function clampStackedTableGap(value) {
+  return Math.min(MAX_STACKED_TABLE_GAP, Math.max(MIN_STACKED_TABLE_GAP, Math.round(value)));
+}
 var DEFAULT_SETTINGS = {
   airtableToken: "",
-  showTopScrollbar: false
+  showTopScrollbar: false,
+  stackedTableGap: DEFAULT_STACKED_TABLE_GAP
 };
 
 // src/ui/SettingsTab.ts
@@ -33373,6 +33461,49 @@ var TabulaSettingTab = class extends import_obsidian6.PluginSettingTab {
         this.plugin.settings.showTopScrollbar = value;
         await this.plugin.saveSettings();
         this.plugin.refreshOpenViews();
+      });
+    });
+    let gapSlider = null;
+    let gapInput = null;
+    const persistGap = async (rawValue, source) => {
+      const value = clampStackedTableGap(rawValue);
+      this.plugin.settings.stackedTableGap = value;
+      gapSlider?.setValue(value);
+      if (source === "slider") gapInput?.setValue(String(value));
+      await this.plugin.saveSettings();
+      this.plugin.refreshOpenViews();
+    };
+    new import_obsidian6.Setting(containerEl).setName("Gap between stacked tables").setDesc("Set the vertical gap between tables in the same file (0\u2013500 px). Default: 100 px.").addSlider((slider) => {
+      gapSlider = slider;
+      slider.setLimits(MIN_STACKED_TABLE_GAP, MAX_STACKED_TABLE_GAP, 1).setValue(this.plugin.settings.stackedTableGap).setInstant(false).onChange((value) => void persistGap(value, "slider"));
+    }).addText((text) => {
+      gapInput = text;
+      text.inputEl.type = "number";
+      text.inputEl.min = String(MIN_STACKED_TABLE_GAP);
+      text.inputEl.max = String(MAX_STACKED_TABLE_GAP);
+      text.inputEl.step = "1";
+      text.inputEl.setAttribute("aria-label", "Gap between stacked tables in pixels");
+      text.setValue(String(this.plugin.settings.stackedTableGap));
+      text.inputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          text.inputEl.blur();
+        }
+      });
+      text.inputEl.addEventListener("blur", () => {
+        const rawValue = text.getValue().trim();
+        if (!rawValue) {
+          text.setValue(String(this.plugin.settings.stackedTableGap));
+          return;
+        }
+        const parsed = Number(rawValue);
+        if (!Number.isFinite(parsed)) {
+          text.setValue(String(this.plugin.settings.stackedTableGap));
+          return;
+        }
+        const value = clampStackedTableGap(parsed);
+        text.setValue(String(value));
+        void persistGap(value, "number");
       });
     });
   }
@@ -33442,13 +33573,18 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
     const data = await this.loadData();
     let token = DEFAULT_SETTINGS.airtableToken;
     let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
+    let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
     if (typeof data === "object" && data !== null) {
       const rawToken = Reflect.get(data, "airtableToken");
       const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
+      const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
       if (typeof rawToken === "string") token = rawToken;
       if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
+      if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
+        stackedTableGap = clampStackedTableGap(rawStackedTableGap);
+      }
     }
-    this.settings = { airtableToken: token, showTopScrollbar };
+    this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap };
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -33481,6 +33617,9 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
     const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
     await this.app.workspace.getLeaf(true).openFile(file);
     new import_obsidian7.Notice(`Created ${file.basename} from pasted data`);
+  }
+  async createStandaloneTable() {
+    await this.createNewTable();
   }
   async createNewTable() {
     const doc = createDefaultTable("Untitled Table");

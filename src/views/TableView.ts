@@ -97,12 +97,14 @@ export class TableView extends TextFileView {
 		return {
 			file: this.fileDoc!,
 			onTableChange: (tableId, doc) => this.handleTableChange(tableId, doc),
-			onAddTable: () => this.addTable(),
+			onAddTable: (doc) => this.addTable(doc),
 			onRemoveTable: (tableId) => this.removeTable(tableId),
 			onCreateTableFromPaste: (doc: TableDocument) => this.plugin.createTableFromPaste(doc),
+			onCreateStandaloneTable: () => this.plugin.createStandaloneTable(),
 			onRegisterClipboardPaste: this.registerClipboardPaste,
 			airtableToken: this.plugin.settings.airtableToken,
 			showTopScrollbar: this.plugin.settings.showTopScrollbar,
+			stackedTableGap: this.plugin.settings.stackedTableGap,
 		};
 	}
 
@@ -129,10 +131,13 @@ export class TableView extends TextFileView {
 		this.commitFileChange({ ...this.fileDoc, tables });
 	}
 
-	private addTable(): string {
+	private addTable(table?: TableDocument): string {
 		if (!this.fileDoc) return "";
-		const name = `Untitled Table ${this.fileDoc.tables.length + 1}`;
-		const entry = createTableEntry(createDefaultTable(name));
+		const fallbackName = `Untitled Table ${this.fileDoc.tables.length + 1}`;
+		const tableToAdd = table
+			? { ...table, name: table.name.trim() || fallbackName }
+			: createDefaultTable(fallbackName);
+		const entry = createTableEntry(tableToAdd);
 		this.commitFileChange({ ...this.fileDoc, tables: [...this.fileDoc.tables, entry] });
 		return entry.id;
 	}

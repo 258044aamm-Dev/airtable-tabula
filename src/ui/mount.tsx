@@ -6,12 +6,14 @@ import { TableDocument, TableFileDocument } from "../data/types";
 export interface TableFileAppProps {
 	file: TableFileDocument;
 	onTableChange: (tableId: string, doc: TableDocument) => void;
-	onAddTable: () => string;
+	onAddTable: (doc?: TableDocument) => string;
 	onRemoveTable: (tableId: string) => void;
 	onCreateTableFromPaste: (doc: TableDocument) => Promise<void>;
+	onCreateStandaloneTable: () => Promise<void>;
 	onRegisterClipboardPaste: (handler: (() => void) | null) => void;
 	airtableToken?: string;
 	showTopScrollbar: boolean;
+	stackedTableGap: number;
 }
 
 export function mountTableFileApp(container: HTMLElement, props: TableFileAppProps): Root {

@@ -2,25 +2,29 @@ import { useMemo, useState } from "react";
 import { TableDocument } from "../data/types";
 import { matrixToTable } from "../import/spreadsheet";
 
-interface Props {
+interface SharedProps {
 	matrix: unknown[][];
 	sourceName: string;
-	currentDoc: TableDocument;
 	onClose: () => void;
+}
+
+interface TablePasteProps extends SharedProps {
+	mode?: "table";
+	currentDoc: TableDocument;
 	onReplace: (incoming: TableDocument) => void;
 	onAppend: (incoming: TableDocument) => void;
 	onCreateNew: (incoming: TableDocument) => Promise<void>;
 }
 
-export function PasteSpreadsheetModal({
-	matrix,
-	sourceName,
-	currentDoc,
-	onClose,
-	onReplace,
-	onAppend,
-	onCreateNew,
-}: Props) {
+interface StackedTableProps extends SharedProps {
+	mode: "stacked";
+	onCreateStacked: (incoming: TableDocument) => Promise<void>;
+}
+
+type Props = TablePasteProps | StackedTableProps;
+
+export function PasteSpreadsheetModal(props: Props) {
+	const { matrix, sourceName, onClose } = props;
 	const [firstRowIsHeader, setFirstRowIsHeader] = useState(true);
 	const [busy, setBusy] = useState(false);
 	const [confirmReplace, setConfirmReplace] = useState(false);
@@ -45,31 +49,33 @@ export function PasteSpreadsheetModal({
 		matrixToTable(matrix, sourceName, firstRowIsHeader);
 
 	const handleReplace = () => {
+		if (props.mode === "stacked") return;
 		setError("");
 		try {
 			const incoming = buildIncoming();
-			if (currentDoc.sync) {
+			if (props.currentDoc.sync) {
 				setReplaceCandidate(incoming);
 				setConfirmReplace(true);
 				return;
 			}
-			onReplace(incoming);
+			props.onReplace(incoming);
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Could not read spreadsheet data");
 		}
 	};
 
 	const confirmReplacement = () => {
-		if (!replaceCandidate) return;
-		onReplace(replaceCandidate);
+		if (!replaceCandidate || props.mode === "stacked") return;
+		props.onReplace(replaceCandidate);
 		setReplaceCandidate(null);
 		setConfirmReplace(false);
 	};
 
 	const handleAppend = () => {
+		if (props.mode === "stacked") return;
 		setError("");
 		try {
-			onAppend(buildIncoming());
+			props.onAppend(buildIncoming());
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Could not read spreadsheet data");
 		}
@@ -78,12 +84,20 @@ export function PasteSpreadsheetModal({
 	const handleCreate = async () => {
 		setError("");
 		setBusy(true);
+		let stackedTableCreated = false;
 		try {
-			await onCreateNew(buildIncoming());
+			const incoming = buildIncoming();
+			if (props.mode === "stacked") {
+				await props.onCreateStacked(incoming);
+				stackedTableCreated = true;
+				props.onClose();
+			} else {
+				await props.onCreateNew(incoming);
+			}
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Could not create a new table");
 		} finally {
-			setBusy(false);
+			if (!stackedTableCreated) setBusy(false);
 		}
 	};
 
@@ -98,7 +112,9 @@ export function PasteSpreadsheetModal({
 			>
 				<div className="tabula-modal-header">
 					<div>
-						<h3 id="tabula-paste-title">Paste spreadsheet data</h3>
+						<h3 id="tabula-paste-title">
+							{props.mode === "stacked" ? "Create stacked table" : "Paste spreadsheet data"}
+						</h3>
 						<div className="tabula-muted tabula-paste-source">
 							{sourceName} · {Math.max(0, rowCount)} rows · {columnCount} columns
 						</div>
@@ -144,14 +160,25 @@ export function PasteSpreadsheetModal({
 					</table>
 				</div>
 
-				{currentDoc.sync && (
+				{props.mode !== "stacked" && props.currentDoc.sync && (
 					<div className="tabula-paste-warning">
 						This table is linked to Airtable. Replacing it will unlink the table. Appended
 						rows will be new local records; new columns will not be included in sync.
 					</div>
 				)}
 
-				{confirmReplace ? (
+				{props.mode === "stacked" ? (
+					<div className="tabula-paste-actions">
+						<button
+							className="tabula-btn tabula-btn-primary"
+							type="button"
+							disabled={busy}
+							onClick={() => void handleCreate()}
+						>
+							{busy ? "Adding…" : "Create stacked table"}
+						</button>
+					</div>
+				) : confirmReplace ? (
 					<div className="tabula-paste-confirm">
 						<strong>Replace this table and unlink Airtable?</strong>
 						<span>

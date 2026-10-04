@@ -8,7 +8,11 @@ import {
 	createDefaultTable,
 	serializeTableDocument,
 } from "./data/store";
-import { DEFAULT_SETTINGS, PluginSettings } from "./settings";
+import {
+	clampStackedTableGap,
+	DEFAULT_SETTINGS,
+	PluginSettings,
+} from "./settings";
 import type { TableDocument } from "./data/types";
 import { TabulaSettingTab } from "./ui/SettingsTab";
 import {
@@ -90,13 +94,18 @@ export default class TabulaPlugin extends Plugin {
 		const data: unknown = await this.loadData();
 		let token = DEFAULT_SETTINGS.airtableToken;
 		let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
+		let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
 		if (typeof data === "object" && data !== null) {
 			const rawToken = Reflect.get(data, "airtableToken");
 			const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
+			const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
 			if (typeof rawToken === "string") token = rawToken;
 			if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
+			if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
+				stackedTableGap = clampStackedTableGap(rawStackedTableGap);
+			}
 		}
-		this.settings = { airtableToken: token, showTopScrollbar };
+		this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap };
 	}
 
 	async saveSettings(): Promise<void> {
@@ -135,6 +144,10 @@ export default class TabulaPlugin extends Plugin {
 		const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
 		await this.app.workspace.getLeaf(true).openFile(file);
 		new Notice(`Created ${file.basename} from pasted data`);
+	}
+
+	async createStandaloneTable(): Promise<void> {
+		await this.createNewTable();
 	}
 
 	private async createNewTable(): Promise<void> {

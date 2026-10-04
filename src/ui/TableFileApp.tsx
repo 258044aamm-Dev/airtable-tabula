@@ -1,17 +1,32 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Notice } from "obsidian";
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	type CSSProperties,
+	type MouseEvent as ReactMouseEvent,
+} from "react";
+import { Menu, Notice } from "obsidian";
 import { TableDocument, TableFileDocument } from "../data/types";
+import {
+	pickSpreadsheetFile,
+	readSpreadsheetClipboard,
+	spreadsheetToMatrix,
+} from "../import/spreadsheet";
+import { PasteSpreadsheetModal } from "./PasteSpreadsheetModal";
 import { TableApp } from "./TableApp";
 
 interface Props {
 	file: TableFileDocument;
 	onTableChange: (tableId: string, doc: TableDocument) => void;
-	onAddTable: () => string;
+	onAddTable: (doc?: TableDocument) => string;
 	onRemoveTable: (tableId: string) => void;
 	onCreateTableFromPaste: (doc: TableDocument) => Promise<void>;
+	onCreateStandaloneTable: () => Promise<void>;
 	onRegisterClipboardPaste: (handler: (() => void) | null) => void;
 	airtableToken?: string;
 	showTopScrollbar: boolean;
+	stackedTableGap: number;
 }
 
 export function TableFileApp({
@@ -20,11 +35,17 @@ export function TableFileApp({
 	onAddTable,
 	onRemoveTable,
 	onCreateTableFromPaste,
+	onCreateStandaloneTable,
 	onRegisterClipboardPaste,
 	airtableToken = "",
 	showTopScrollbar,
+	stackedTableGap,
 }: Props) {
 	const [activeTableId, setActiveTableId] = useState(file.tables[0]?.id ?? "");
+	const [stackedImportCandidate, setStackedImportCandidate] = useState<{
+		matrix: unknown[][];
+		sourceName: string;
+	} | null>(null);
 	const activeTableIdRef = useRef(activeTableId);
 	const clipboardHandlers = useRef(new Map<string, () => void>());
 	activeTableIdRef.current = activeTableId;
@@ -56,10 +77,64 @@ export function TableFileApp({
 		[]
 	);
 
-	const addTable = () => {
-		const tableId = onAddTable();
+	const addTable = (table?: TableDocument) => {
+		const tableId = onAddTable(table);
 		activeTableIdRef.current = tableId;
 		setActiveTableId(tableId);
+	};
+
+	const createStackedFromClipboard = async () => {
+		try {
+			const payload = await readSpreadsheetClipboard();
+			if (!payload) {
+				new Notice("Clipboard does not contain spreadsheet data. Copy a cell range first.");
+				return;
+			}
+			setStackedImportCandidate(payload);
+		} catch (error) {
+			console.error(error);
+			new Notice(error instanceof Error ? error.message : "Could not read spreadsheet data from clipboard");
+		}
+	};
+
+	const createStackedFromFile = async () => {
+		try {
+			const selectedFile = await pickSpreadsheetFile();
+			if (!selectedFile) return;
+			const matrix = await spreadsheetToMatrix(selectedFile);
+			setStackedImportCandidate({ matrix, sourceName: selectedFile.name });
+		} catch (error) {
+			console.error(error);
+			new Notice(error instanceof Error ? error.message : "Could not import spreadsheet");
+		}
+	};
+
+	const showAddTableMenu = (event: ReactMouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+		const menu = new Menu();
+		menu.addItem((item) => item.setTitle("Create stacked").onClick(() => addTable()));
+		menu.addItem((item) =>
+			item.setTitle("New one").onClick(() => void onCreateStandaloneTable())
+		);
+		menu.addSeparator();
+		menu.addItem((item) =>
+			item
+				.setTitle("Create stacked table from clipboard")
+				.onClick(() => void createStackedFromClipboard())
+		);
+		menu.addItem((item) =>
+			item
+				.setTitle("Create stacked table from imported CSV or Excel file")
+				.onClick(() => void createStackedFromFile())
+		);
+		menu.showAtMouseEvent(event.nativeEvent);
+	};
+
+	const createStackedFromPreview = async (table: TableDocument) => {
+		const tableId = onAddTable(table);
+		activeTableIdRef.current = tableId;
+		setActiveTableId(tableId);
+		new Notice(`Added “${table.name}” as a stacked table`);
 	};
 
 	const removeTable = (tableId: string, tableName: string, nextId: string) => {
@@ -75,12 +150,15 @@ export function TableFileApp({
 	};
 
 	return (
-		<div className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`}>
+		<div
+			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`}
+			style={{ "--tabula-stacked-table-gap": `${stackedTableGap}px` } as CSSProperties}
+		>
 			<div className="tabula-file-controls">
 				<span className="tabula-file-count">
 					{file.tables.length} {file.tables.length === 1 ? "table" : "tables"} in this file
 				</span>
-				<button className="tabula-btn tabula-btn-primary" type="button" onClick={addTable}>
+				<button className="tabula-btn tabula-btn-primary" type="button" onClick={showAddTableMenu}>
 					+ Add table
 				</button>
 			</div>
@@ -126,6 +204,15 @@ export function TableFileApp({
 					/>
 				</section>
 			))}
+			{stackedImportCandidate && (
+				<PasteSpreadsheetModal
+					mode="stacked"
+					matrix={stackedImportCandidate.matrix}
+					sourceName={stackedImportCandidate.sourceName}
+					onClose={() => setStackedImportCandidate(null)}
+					onCreateStacked={createStackedFromPreview}
+				/>
+			)}
 		</div>
 	);
 }
