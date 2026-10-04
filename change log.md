@@ -6,6 +6,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.18] - 2026-10-04
+
+### Changed
+- **Card Grid Redesign:** Replaced the dense bordered spreadsheet grid with floating rounded card cells. The `<table>` markup, keyboard navigation, drag-reorder, frozen columns and clipboard handling are unchanged; only presentation changed.
+  - `border-spacing: 12px 22px` now provides the gutters, and per-cell `th`/`td` rules were removed.
+  - Every cell surface (text, select, currency, checkbox, rating, long text, link, attachments) is now a rounded card with its own border.
+  - Row heights retuned to 42 / 56 / 72px for short / medium / tall.
+- **Nested Card Chrome:** The table card and the inner grid card now render as separate rounded surfaces (20px radius) with their own borders.
+- **Field Headers:** Column headers render as rounded pills with a blue label, a filled type chip (`TEXT`, `SELECT`, ...), and a right-aligned overflow menu.
+- **Select Cells:** Added a CSS-drawn chevron and a coloured status dot on every pill. Pills are now fully rounded. The chevron and dot are pure CSS, so no JSX changed.
+- **Add Row:** `+ New row` is now a standalone rounded, bordered button instead of a flat footer rule.
+- **Palette:** Warm card surfaces with blue-gray chrome and a blue accent (replacing the terracotta accent). The accent now drives focus rings, hover states, drop indicators and stars.
+- **Typography:** Table title now uses the interface sans stack instead of Georgia serif.
+
+### Added
+- **Light Theme Variant:** A full light palette for the new card design, since the reference is a dark theme.
+
+### Fixed
+- **Sticky Cell Opacity:** Frozen row-number and primary columns now keep an opaque background so card cells no longer bleed through while scrolling.
+- **Top Scrollbar Corners:** The optional synced top scrollbar and the grid wrap now form a single rounded card.
+
+### Notes
+- Ribbon branding (`#8B5CF6` purple) and Obsidian's standard error colour are intentionally unchanged.
+- Focus rings are deliberately retained (blue) for keyboard accessibility, even though the reference image shows no focus state.
+- Tokens remain scoped to `.tabula-file-root`; UI rendered outside that subtree (portaled modals, native Obsidian menus) still falls back to theme defaults. Pre-existing behaviour, not changed here.
+
+---
+
 ## [0.1.16] - 2026-10-04
 
 ### Added

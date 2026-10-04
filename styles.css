@@ -42,24 +42,44 @@
 	gap: 14px;
 	padding: 14px 18px 18px;
 
-	/* Fixed Anthropic-inspired Warm Palette (Light Mode) */
-	--tabula-page: #f5f1eb;
-	--tabula-surface: #fffdf9;
-	--tabula-surface-2: #faf7f2;
-	--tabula-ink: #29231f;
-	--tabula-ink-muted: #625a52;
-	--tabula-ink-faint: #91877d;
-	--tabula-border: #ebe4db;
-	--tabula-border-strong: #ded5ca;
-	--tabula-accent: #c66d52;
-	--tabula-accent-strong: #a95035;
-	--tabula-accent-soft: #f7e9e1;
-	--tabula-row-hover: #f8f4ef;
+	/* Warm Card Palette (Light Mode) */
+	--tabula-page: #f7f5f2;
+	--tabula-surface: #ffffff;
+	--tabula-surface-2: #faf8f5;
+	--tabula-ink: #2a2521;
+	--tabula-ink-muted: #6b6459;
+	--tabula-ink-faint: #8a8177;
+	--tabula-border: #e3ded6;
+	--tabula-border-strong: #d2cabf;
+	--tabula-accent: #3b5fcb;
+	--tabula-accent-strong: #2c4ba6;
+	--tabula-accent-soft: #e8edfa;
+	--tabula-row-hover: #f3efe9;
 	--tabula-row-selected: var(--tabula-surface);
-	--tabula-primary-bg: #342a25;
-	--tabula-primary-fg: #fffdf9;
-	--tabula-card-shadow: 0 10px 30px rgba(61, 44, 31, 0.055);
+	--tabula-primary-bg: #2c4ba6;
+	--tabula-primary-fg: #ffffff;
+	--tabula-card-shadow: 0 10px 30px rgba(44, 38, 32, 0.06);
 	--tabula-row-number-width: 56px;
+
+	/* Card-cell grid tokens */
+	--tabula-grid-surface: #faf8f5;
+	--tabula-grid-border: #e3ded6;
+	--tabula-cell-bg: #ffffff;
+	--tabula-cell-border: #e3ded6;
+	--tabula-cell-radius: 10px;
+	--tabula-cell-h: 42px;
+	--tabula-cell-xpad: 12px;
+	--tabula-cell-td-pad: 4px;
+	--tabula-gap-x: 12px;
+	--tabula-gap-y: 22px;
+	--tabula-header-border: #d8d2c9;
+	--tabula-header-ink: #3d6e96;
+	--tabula-chip-bg: #edf1f6;
+	--tabula-chrome: #3b5fcb;
+	--tabula-chrome-dim: #a8b0bc;
+	--tabula-muted: #7a8590;
+	--tabula-focus: #3b5fcb;
+
 	--at-radius: 12px;
 	--at-radius-sm: 8px;
 	--at-border: var(--tabula-border);
@@ -82,25 +102,37 @@
 	-webkit-font-smoothing: antialiased;
 }
 
-/* Fixed Warm Palette (Dark Mode) */
+/* Warm Card Palette (Dark Mode) */
 .theme-dark .tabula-file-root {
-	--tabula-page: #1f1b18;
-	--tabula-surface: #292320;
-	--tabula-surface-2: #302925;
-	--tabula-ink: #f1e9e1;
-	--tabula-ink-muted: #c8bdb2;
-	--tabula-ink-faint: #a39588;
-	--tabula-border: #443a32;
-	--tabula-border-strong: #584a3f;
-	--tabula-accent: #df8b6e;
-	--tabula-accent-strong: #e29a7d;
-	--tabula-accent-soft: #443027;
-	--tabula-row-hover: #332b26;
+	--tabula-page: #141318;
+	--tabula-surface: #211b18;
+	--tabula-surface-2: #1e1917;
+	--tabula-ink: #ede4da;
+	--tabula-ink-muted: #9ca3af;
+	--tabula-ink-faint: #6b7280;
+	--tabula-border: #47413e;
+	--tabula-border-strong: #5a524d;
+	--tabula-accent: #8fb4e8;
+	--tabula-accent-strong: #a9c6f0;
+	--tabula-accent-soft: #1e2632;
+	--tabula-row-hover: #262019;
 	--tabula-row-selected: var(--tabula-surface);
-	--tabula-primary-bg: #e2a087;
-	--tabula-primary-fg: #2d211c;
-	--tabula-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-	--at-shadow: 0 0 0 1px var(--at-border), 0 12px 30px rgba(0, 0, 0, 0.28);
+	--tabula-primary-bg: #2f4a7a;
+	--tabula-primary-fg: #eaf1fb;
+	--tabula-card-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+	--tabula-grid-surface: #1e1917;
+	--tabula-grid-border: #2b2420;
+	--tabula-cell-bg: #211b18;
+	--tabula-cell-border: #47413e;
+	--tabula-header-border: #2f3140;
+	--tabula-header-ink: #9dc6db;
+	--tabula-chip-bg: #1e2230;
+	--tabula-chrome: #99b4fc;
+	--tabula-chrome-dim: #666a7f;
+	--tabula-muted: #6b7280;
+	--tabula-focus: #99b4fc;
+	--at-shadow: 0 0 0 1px var(--at-border), 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
 /* ==========================================================================
@@ -195,8 +227,8 @@
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
-	border: 1px solid var(--tabula-border);
-	border-radius: 14px;
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: 20px;
 	background: var(--tabula-surface);
 	color: var(--tabula-ink);
 	box-shadow: var(--tabula-card-shadow);
@@ -229,7 +261,7 @@
 	background: transparent;
 	border-radius: 4px;
 	color: var(--tabula-ink);
-	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	font-family: var(--font-interface, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif);
 	font-size: 23px;
 	font-weight: 600;
 	letter-spacing: -0.035em;
@@ -671,7 +703,7 @@
 	flex-direction: column;
 	min-height: 0;
 	gap: 0;
-	padding: 0 12px 12px;
+	padding: 4px 20px 20px;
 }
 
 .tabula-file-root.is-single-table .tabula-grid-area {
@@ -682,11 +714,11 @@
 	min-height: 20px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: var(--tabula-surface-2);
-	border: 1px solid var(--tabula-border);
+	background: var(--tabula-grid-surface);
+	border: 1px solid var(--tabula-grid-border);
 	border-bottom: 0;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
+	border-top-left-radius: 20px;
+	border-top-right-radius: 20px;
 }
 
 .tabula-top-scrollbar-inner {
@@ -699,11 +731,18 @@
 	min-width: 0;
 	overflow-x: auto;
 	overflow-y: auto;
-	border: 1px solid var(--tabula-border);
-	border-radius: 10px;
-	background: var(--tabula-surface);
+	border: 1px solid var(--tabula-grid-border);
+	border-radius: 20px;
+	background: var(--tabula-grid-surface);
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior-x: contain;
+}
+
+/* The synced top scrollbar is optional: only flatten the wrap's top corners when present. */
+.tabula-grid-area:has(> .tabula-top-scrollbar) .tabula-grid-wrap {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-top: 0;
 }
 
 .tabula-file-root.is-single-table .tabula-grid-wrap {
@@ -727,7 +766,7 @@
 
 .tabula-grid {
 	border-collapse: separate;
-	border-spacing: 0;
+	border-spacing: var(--tabula-gap-x) var(--tabula-gap-y);
 	width: max-content;
 	min-width: 100%;
 	font-size: 13px;
@@ -736,12 +775,16 @@
 .tabula-grid th,
 .tabula-grid td {
 	box-sizing: border-box;
-	border-bottom: 1px solid var(--tabula-border);
-	border-right: 1px solid var(--tabula-border);
+	border: 0;
 	padding: 0;
 	margin: 0;
-	background: var(--tabula-surface);
+	background: var(--tabula-grid-surface);
 	vertical-align: middle;
+}
+
+/* Body cells are inset so the card inside clears the column gutter. */
+.tabula-grid tbody td {
+	padding: 0 var(--tabula-cell-td-pad);
 }
 
 .tabula-grid th:last-child,
@@ -753,13 +796,24 @@
 	position: sticky;
 	top: 0;
 	z-index: 3;
-	background: var(--tabula-surface-2);
+	background: var(--tabula-grid-surface);
 	color: var(--tabula-ink-muted);
-	box-shadow: inset 0 -1px 0 var(--tabula-border);
 }
 
 .tabula-grid tbody tr:hover td {
 	background: var(--tabula-row-hover);
+}
+
+/* Hover reads on the card itself, not just the gutter behind it. */
+.tabula-grid tbody tr:hover .tabula-cell-input,
+.tabula-grid tbody tr:hover .tabula-select-trigger,
+.tabula-grid tbody tr:hover .tabula-affix-cell,
+.tabula-grid tbody tr:hover .tabula-longtext-preview,
+.tabula-grid tbody tr:hover .tabula-checkbox-cell,
+.tabula-grid tbody tr:hover .tabula-rating,
+.tabula-grid tbody tr:hover .tabula-link-cell,
+.tabula-grid tbody tr:hover .tabula-attachments {
+	border-color: var(--tabula-accent);
 }
 
 /* Selection and focus remain functional, but cells stay on the table surface. */
@@ -768,7 +822,7 @@
 }
 
 .tabula-grid tbody td:focus-within {
-	background: var(--tabula-surface) !important;
+	background: var(--tabula-grid-surface) !important;
 }
 
 /* Frozen cells use a secondary surface normally; keep selected/focused cells consistent. */
@@ -779,7 +833,7 @@
 
 .tabula-grid.is-frozen tbody .sticky-col:focus-within,
 .tabula-grid.is-frozen tbody .sticky-primary:focus-within {
-	background: var(--tabula-surface) !important;
+	background: var(--tabula-grid-surface) !important;
 }
 
 /* Sticky row numbers & primary column */
@@ -788,18 +842,19 @@
 	width: var(--tabula-row-number-width, 56px);
 	text-align: center;
 	color: var(--tabula-ink-faint);
-	background: var(--tabula-surface-2) !important;
+	background: var(--tabula-grid-surface) !important;
 	font-variant-numeric: tabular-nums;
 	font-size: 12px;
 	user-select: none;
 }
 
+/* Sticky cells must stay opaque or the card cells bleed through while scrolling. */
 .tabula-grid.is-frozen .sticky-col,
 .tabula-grid.is-frozen .sticky-primary {
 	position: sticky;
 	left: 0;
 	z-index: 2;
-	background: var(--tabula-surface-2) !important;
+	background: var(--tabula-grid-surface) !important;
 }
 
 .tabula-grid.is-frozen thead .sticky-col,
@@ -809,7 +864,7 @@
 
 .tabula-grid.is-frozen .sticky-primary {
 	left: var(--tabula-row-number-width, 56px);
-	box-shadow: 2px 0 6px rgba(41, 35, 31, 0.06);
+	box-shadow: 6px 0 14px rgba(0, 0, 0, 0.22);
 }
 
 .tabula-row-num-content {
@@ -825,8 +880,8 @@
 	appearance: none;
 	border: 0;
 	background: transparent;
-	color: var(--tabula-ink-faint);
-	font-size: 14px;
+	color: var(--tabula-muted);
+	font-size: 15px;
 	line-height: 1;
 	padding: 2px;
 	cursor: grab;
@@ -859,13 +914,23 @@
    ========================================================================== */
 
 .tabula-th {
+	box-sizing: border-box;
 	display: flex;
 	align-items: center;
-	gap: 6px;
-	padding: 6px 8px;
+	gap: 8px;
+	padding: 0 10px;
 	position: relative;
 	user-select: none;
-	min-height: 38px;
+	height: var(--tabula-cell-h);
+	min-height: var(--tabula-cell-h);
+	border: 1px solid var(--tabula-header-border);
+	border-radius: var(--tabula-cell-radius);
+	background: var(--tabula-grid-surface);
+	transition: border-color 0.12s ease;
+}
+
+.tabula-grid th:hover .tabula-th {
+	border-color: var(--tabula-accent);
 }
 
 .tabula-th-name {
@@ -873,7 +938,7 @@
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.045em;
-	color: var(--tabula-ink-muted);
+	color: var(--tabula-header-ink);
 	cursor: pointer;
 	padding: 2px 4px;
 	border-radius: 4px;
@@ -899,10 +964,35 @@
 	outline: none;
 }
 
+.tabula-th .tabula-icon-btn {
+	margin-left: auto;
+	flex: 0 0 auto;
+	min-height: 24px;
+	height: 24px;
+	padding: 0 6px;
+	border-color: transparent;
+	background: transparent;
+	color: var(--tabula-muted);
+}
+
+.tabula-th .tabula-icon-btn:hover {
+	background: var(--tabula-row-hover);
+	border-color: var(--tabula-header-border);
+	color: var(--tabula-ink);
+}
+
 .tabula-th-type {
+	flex: 0 0 auto;
 	font-size: 10px;
-	color: var(--tabula-ink-faint);
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	color: var(--tabula-ink-muted);
 	text-transform: uppercase;
+	background: var(--tabula-chip-bg);
+	border-radius: 6px;
+	padding: 2px 6px;
+	line-height: 1.5;
+	white-space: nowrap;
 }
 
 .tabula-col-resize {
@@ -963,22 +1053,22 @@
 .tabula-grid.height-short td,
 .tabula-grid.height-short .tabula-cell-input,
 .tabula-grid.height-short .tabula-select-trigger {
-	min-height: 38px;
-	height: 38px;
+	min-height: var(--tabula-cell-h);
+	height: var(--tabula-cell-h);
 }
 
 .tabula-grid.height-medium td,
 .tabula-grid.height-medium .tabula-cell-input,
 .tabula-grid.height-medium .tabula-select-trigger {
-	min-height: 46px;
-	height: 46px;
+	min-height: 56px;
+	height: 56px;
 }
 
 .tabula-grid.height-tall td,
 .tabula-grid.height-tall .tabula-cell-input,
 .tabula-grid.height-tall .tabula-select-trigger {
-	min-height: 58px;
-	height: 58px;
+	min-height: 72px;
+	height: 72px;
 }
 
 /* ==========================================================================
@@ -989,18 +1079,20 @@
 	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
-	border: none;
-	border-radius: 0;
-	background: transparent;
-	padding: 6px 8px;
+	border: 1px solid var(--tabula-cell-border);
+	border-radius: var(--tabula-cell-radius);
+	background: var(--tabula-cell-bg);
+	padding: 0 var(--tabula-cell-xpad);
 	color: var(--tabula-ink);
 	font-size: 13px;
 	outline: none;
 	box-shadow: none;
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .tabula-cell-input:focus {
-	box-shadow: inset 0 0 0 2px var(--tabula-accent);
+	border-color: var(--tabula-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--tabula-focus) 26%, transparent);
 }
 
 /* Numeric & Currency: Right-aligned */
@@ -1103,16 +1195,38 @@
 
 .tabula-select-trigger {
 	appearance: none;
-	border: none;
-	background: transparent;
+	border: 1px solid var(--tabula-cell-border);
+	border-radius: var(--tabula-cell-radius);
+	background: var(--tabula-cell-bg);
 	width: 100%;
 	height: 100%;
 	text-align: left;
-	padding: 6px 8px;
+	padding: 0 32px 0 var(--tabula-cell-xpad);
 	cursor: pointer;
 	color: inherit;
 	display: flex;
 	align-items: center;
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.tabula-select-trigger:focus-visible {
+	outline: none;
+	border-color: var(--tabula-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--tabula-focus) 26%, transparent);
+}
+
+/* Chevron drawn in CSS so no JSX change is required. */
+.tabula-select-trigger::after {
+	content: "";
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	width: 9px;
+	height: 9px;
+	margin-top: -5px;
+	background-color: var(--tabula-muted);
+	clip-path: polygon(0 0, 100% 0, 50% 100%);
+	pointer-events: none;
 }
 
 .tabula-placeholder {
@@ -1130,9 +1244,9 @@
 .tabula-pill {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	border-radius: 6px;
-	padding: 1px 7px;
+	gap: 6px;
+	border-radius: 999px;
+	padding: 3px 10px;
 	font-size: 11px;
 	font-weight: 600;
 	letter-spacing: -0.01em;
@@ -1142,6 +1256,15 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	border: 1px solid transparent;
+}
+
+.tabula-pill::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--pill-dot, currentColor);
 }
 
 .tabula-pill-x {
@@ -1381,24 +1504,29 @@
 
 .tabula-add-row-footer {
 	appearance: none;
-	width: 100%;
-	height: 38px;
-	border: none;
-	border-top: 1px solid var(--tabula-border);
-	background: transparent;
-	color: var(--tabula-ink-muted);
+	box-sizing: border-box;
+	flex: 0 0 auto;
+	width: calc(100% - 32px);
+	margin: 10px 16px 16px;
+	height: 46px;
+	min-height: 46px;
+	border: 1px solid var(--tabula-chrome-dim);
+	border-radius: 12px;
+	background: var(--tabula-cell-bg);
+	color: var(--tabula-chrome);
 	font-size: 12px;
 	font-weight: 600;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	transition: all 0.12s ease;
+	transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
 
 .tabula-add-row-footer:hover {
-	background: var(--tabula-row-hover);
-	color: var(--tabula-accent-strong);
+	background: var(--tabula-accent-soft);
+	border-color: var(--tabula-chrome);
+	color: var(--tabula-chrome);
 }
 
 /* Drag drop highlights */
@@ -1461,7 +1589,7 @@
 
 .tabula-modal-header h3 {
 	margin: 0;
-	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	font-family: var(--font-interface, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif);
 	font-size: 17px;
 	font-weight: 600;
 	color: var(--tabula-ink);
@@ -1549,25 +1677,24 @@
    Select Tag Colors (Muted, Sharper Warm Tags)
    ========================================================================== */
 
-.tabula-color-gray { background: #eee9e1; color: #433b35; border-color: #ded5ca; }
-.tabula-color-blue { background: #e2ecf5; color: #225178; border-color: #c9dbec; }
-.tabula-color-green { background: #e2ece3; color: #275630; border-color: #cadcca; }
-.tabula-color-yellow { background: #fbf0d8; color: #765612; border-color: #f1dfb3; }
-.tabula-color-orange { background: #fbeadb; color: #8a481c; border-color: #f4d4ba; }
-.tabula-color-red { background: #fae4e0; color: #8b3426; border-color: #f2c7bf; }
-.tabula-color-pink { background: #fae4ed; color: #87335d; border-color: #f1c7d8; }
-.tabula-color-purple { background: #ede7f8; color: #5a3d8c; border-color: #dacfef; }
-.tabula-color-cyan { background: #e0eff2; color: #1e5964; border-color: #c4e1e7; }
-
-.theme-dark .tabula-color-gray { background: #37302b; color: #ded5cb; border-color: #4a413a; }
-.theme-dark .tabula-color-blue { background: #223746; color: #bedaf0; border-color: #314d61; }
-.theme-dark .tabula-color-green { background: #223725; color: #c0dec4; border-color: #314e35; }
-.theme-dark .tabula-color-yellow { background: #3f351e; color: #f2dc9b; border-color: #55482b; }
-.theme-dark .tabula-color-orange { background: #432e22; color: #f0caa8; border-color: #5d4030; }
-.theme-dark .tabula-color-red { background: #432622; color: #efbeba; border-color: #5e3630; }
-.theme-dark .tabula-color-pink { background: #432537; color: #efbed6; border-color: #5d354e; }
-.theme-dark .tabula-color-purple { background: #352a48; color: #d6c6f0; border-color: #4a3b63; }
-.theme-dark .tabula-color-cyan { background: #1f373d; color: #bde0e7; border-color: #2c4d54; }
+.tabula-color-gray { background: #eeebe6; color: #4a443c; border-color: #dcd6cd; --pill-dot: #8a8177; }
+.tabula-color-blue { background: #e4edf9; color: #24457a; border-color: #c9dbf2; --pill-dot: #3b7dd8; }
+.tabula-color-green { background: #e2eee5; color: #24562e; border-color: #c8decc; --pill-dot: #3e9a56; }
+.tabula-color-yellow { background: #fbf0d8; color: #7a5a12; border-color: #f0dfb4; --pill-dot: #e0a21a; }
+.tabula-color-orange { background: #fbeadc; color: #8a481c; border-color: #f2d3b8; --pill-dot: #e2762a; }
+.tabula-color-red { background: #fae5e1; color: #8b3426; border-color: #f0c6be; --pill-dot: #d9503f; }
+.tabula-color-pink { background: #fae5ee; color: #87335d; border-color: #efc6d8; --pill-dot: #de6ca6; }
+.tabula-color-purple { background: #ece7f9; color: #563c88; border-color: #d8ccee; --pill-dot: #7c5cd0; }
+.tabula-color-cyan { background: #e0f0f2; color: #1b5660; border-color: #c2dfe5; --pill-dot: #2aa0b0; }
+.theme-dark .tabula-color-gray { background: #2a2621; color: #c8c0b6; border-color: #3c3730; --pill-dot: #9a9188; }
+.theme-dark .tabula-color-blue { background: #1f2c3c; color: #bbd3ee; border-color: #2f4459; --pill-dot: #5e9be0; }
+.theme-dark .tabula-color-green { background: #1e2e20; color: #bcd9c0; border-color: #2d442f; --pill-dot: #55b368; }
+.theme-dark .tabula-color-yellow { background: #42321c; color: #fde067; border-color: #5a4526; --pill-dot: #fdca4a; }
+.theme-dark .tabula-color-orange { background: #40291b; color: #f0be94; border-color: #593920; --pill-dot: #f0862f; }
+.theme-dark .tabula-color-red { background: #40231f; color: #efb8b2; border-color: #57332d; --pill-dot: #e4665a; }
+.theme-dark .tabula-color-pink { background: #3f2333; color: #edbbd3; border-color: #563146; --pill-dot: #de6ca6; }
+.theme-dark .tabula-color-purple { background: #322a44; color: #d2c3ee; border-color: #443958; --pill-dot: #9b82e0; }
+.theme-dark .tabula-color-cyan { background: #1d3d3a; color: #5dd6c9; border-color: #2a544f; --pill-dot: #39c7d9; }
 
 /* ==========================================================================
    Mobile & Responsive (max-width: 720px)
@@ -1689,4 +1816,64 @@
 		min-height: 44px;
 		height: 44px;
 	}
+}
+
+
+/* ==========================================================================
+   Shared Card Surface (non-input cell contents)
+   The card is the cell. Nested inputs stay transparent so we never double-border.
+   ========================================================================== */
+
+.tabula-affix-cell,
+.tabula-readonly,
+.tabula-longtext-preview,
+.tabula-link-cell,
+.tabula-attachments,
+.tabula-checkbox-cell,
+.tabula-rating {
+	box-sizing: border-box;
+	border: 1px solid var(--tabula-cell-border);
+	border-radius: var(--tabula-cell-radius);
+	background: var(--tabula-cell-bg);
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* Nested inputs inherit the card they sit in. */
+.tabula-affix-cell .tabula-cell-input,
+.tabula-attachments .tabula-cell-input {
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	padding: 0;
+	height: 100%;
+}
+
+.tabula-affix-cell .tabula-cell-input:focus,
+.tabula-attachments .tabula-cell-input:focus {
+	box-shadow: none;
+}
+
+.tabula-affix-cell {
+	padding: 0 var(--tabula-cell-xpad);
+	gap: 2px;
+}
+
+.tabula-readonly {
+	display: flex;
+	align-items: center;
+	padding: 0 var(--tabula-cell-xpad);
+}
+
+.tabula-longtext-preview,
+.tabula-link-cell {
+	padding: 0 var(--tabula-cell-xpad);
+}
+
+.tabula-attachments {
+	padding: 4px 6px;
+}
+
+.tabula-rating {
+	padding: 0 var(--tabula-cell-xpad);
+	gap: 2px;
 }
