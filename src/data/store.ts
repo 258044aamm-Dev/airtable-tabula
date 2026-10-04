@@ -58,7 +58,7 @@ export function createEmptyView(): ViewState {
 		groupBy: { fieldId: null },
 		columnWidths: {},
 		rowHeight: "medium",
-		frozenPrimary: true,
+		frozenPrimary: false,
 	};
 }
 
@@ -475,7 +475,7 @@ function normalizeView(view: Partial<ViewState> | undefined): ViewState {
 				: {},
 		rowHeight,
 		frozenPrimary:
-			typeof view.frozenPrimary === "boolean" ? view.frozenPrimary : true,
+			typeof view.frozenPrimary === "boolean" ? view.frozenPrimary : false,
 	};
 }
 

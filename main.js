@@ -24616,7 +24616,7 @@ function createEmptyView() {
     groupBy: { fieldId: null },
     columnWidths: {},
     rowHeight: "medium",
-    frozenPrimary: true
+    frozenPrimary: false
   };
 }
 function createDefaultTable(name = "Untitled") {
@@ -24962,7 +24962,7 @@ function normalizeView(view) {
     },
     columnWidths: view.columnWidths && typeof view.columnWidths === "object" ? view.columnWidths : {},
     rowHeight,
-    frozenPrimary: typeof view.frozenPrimary === "boolean" ? view.frozenPrimary : true
+    frozenPrimary: typeof view.frozenPrimary === "boolean" ? view.frozenPrimary : false
   };
 }
 function normalizeFilterGroup(group) {
