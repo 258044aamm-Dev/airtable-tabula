@@ -51,6 +51,7 @@ interface Props {
 	onRegisterClipboardPaste: (handler: (() => void) | null) => void;
 	airtableToken?: string;
 	showTopScrollbar?: boolean;
+	defaultColumnWidth?: number;
 }
 
 export function TableApp({
@@ -60,6 +61,7 @@ export function TableApp({
 	onRegisterClipboardPaste,
 	airtableToken = "",
 	showTopScrollbar = false,
+	defaultColumnWidth = 160,
 }: Props) {
 	const [showFilters, setShowFilters] = useState(
 		doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
@@ -531,6 +533,7 @@ export function TableApp({
 				doc={doc}
 				groups={groups}
 				showTopScrollbar={showTopScrollbar}
+				defaultColumnWidth={defaultColumnWidth}
 				selectedRowId={selectedRowId}
 				canReorderRows={doc.view.sorts.length === 0}
 				onSelectRow={setSelectedRowId}

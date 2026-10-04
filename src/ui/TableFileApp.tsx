@@ -15,6 +15,7 @@ import {
 } from "../import/spreadsheet";
 import { PasteSpreadsheetModal } from "./PasteSpreadsheetModal";
 import { TableApp } from "./TableApp";
+import type { TableAppearanceSettings } from "../settings";
 
 interface Props {
 	file: TableFileDocument;
@@ -27,6 +28,7 @@ interface Props {
 	airtableToken?: string;
 	showTopScrollbar: boolean;
 	stackedTableGap: number;
+	appearance: TableAppearanceSettings;
 }
 
 export function TableFileApp({
@@ -40,6 +42,7 @@ export function TableFileApp({
 	airtableToken = "",
 	showTopScrollbar,
 	stackedTableGap,
+	appearance,
 }: Props) {
 	const [activeTableId, setActiveTableId] = useState(file.tables[0]?.id ?? "");
 	const [stackedImportCandidate, setStackedImportCandidate] = useState<{
@@ -152,7 +155,18 @@ export function TableFileApp({
 	return (
 		<div
 			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`}
-			style={{ "--tabula-stacked-table-gap": `${stackedTableGap}px` } as CSSProperties}
+			data-palette={appearance.palette}
+			data-density={appearance.density}
+			data-row-stripes={appearance.rowStripes ? "true" : "false"}
+			data-horizontal-align={appearance.horizontalAlignment}
+			data-vertical-align={appearance.verticalAlignment}
+			data-text-color-mode={appearance.textColorMode}
+			style={{
+				"--tabula-stacked-table-gap": `${stackedTableGap}px`,
+				"--tabula-table-radius": `${appearance.tableRadius}px`,
+				"--tabula-control-radius": `${appearance.controlRadius}px`,
+				"--tabula-custom-text-color": appearance.customTextColor,
+			} as CSSProperties}
 		>
 			<div className="tabula-file-controls">
 				<span className="tabula-file-count">
@@ -201,6 +215,7 @@ export function TableFileApp({
 						}
 						airtableToken={airtableToken}
 						showTopScrollbar={showTopScrollbar}
+						defaultColumnWidth={appearance.defaultColumnWidth}
 					/>
 				</section>
 			))}
