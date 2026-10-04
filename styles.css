@@ -1415,7 +1415,7 @@
 	--tabula-accent-strong: #a95035;
 	--tabula-accent-soft: #f7e9e1;
 	--tabula-row-hover: #f8f4ef;
-	--tabula-row-selected: #f4e0d6;
+	--tabula-row-selected: #f3e5dc;
 	--tabula-primary-bg: #342a25;
 	--tabula-primary-fg: #fffdf9;
 	--tabula-card-shadow: 0 10px 30px rgba(61, 44, 31, 0.055);
@@ -1453,7 +1453,7 @@
 	--tabula-accent-strong: #e29a7d;
 	--tabula-accent-soft: #443027;
 	--tabula-row-hover: #332b26;
-	--tabula-row-selected: #4b332a;
+	--tabula-row-selected: #453128;
 	--tabula-primary-bg: #e2a087;
 	--tabula-primary-fg: #2d211c;
 	--tabula-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -1674,8 +1674,7 @@
 }
 
 .tabula-file-root .tabula-grid tbody tr.is-selected td {
-	background: var(--tabula-row-selected) !important;
-	border-radius: 0 !important;
+	background: var(--tabula-row-selected);
 }
 
 .tabula-file-root .tabula-root .tabula-grid .tabula-row-num {
