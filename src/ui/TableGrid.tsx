@@ -29,6 +29,7 @@ interface ReorderDragState {
 interface Props {
 	doc: TableDocument;
 	groups: RowGroup[];
+	showTopScrollbar: boolean;
 	selectedRowId: string | null;
 	canReorderRows: boolean;
 	onSelectRow: (rowId: string | null) => void;
@@ -54,6 +55,54 @@ export function TableGrid(props: Props) {
 	const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
 	const [dragState, setDragState] = useState<ReorderDragState | null>(null);
 	const dragCleanup = useRef<(() => void) | null>(null);
+	const gridWrapRef = useRef<HTMLDivElement | null>(null);
+	const topScrollbarRef = useRef<HTMLDivElement | null>(null);
+	const topScrollbarInnerRef = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		if (!props.showTopScrollbar) return;
+		const gridWrap = gridWrapRef.current;
+		const topScrollbar = topScrollbarRef.current;
+		const inner = topScrollbarInnerRef.current;
+		if (!gridWrap || !topScrollbar || !inner) return;
+
+		const updateWidth = () => {
+			const gridOverflow = Math.max(0, gridWrap.scrollWidth - gridWrap.clientWidth);
+			topScrollbar.style.display = gridOverflow > 0 ? "" : "none";
+			inner.style.width = `${topScrollbar.clientWidth + gridOverflow}px`;
+			if (topScrollbar.scrollLeft !== gridWrap.scrollLeft) {
+				topScrollbar.scrollLeft = gridWrap.scrollLeft;
+			}
+		};
+		const syncFromGrid = () => {
+			if (topScrollbar.scrollLeft !== gridWrap.scrollLeft) {
+				topScrollbar.scrollLeft = gridWrap.scrollLeft;
+			}
+		};
+		const syncFromTop = () => {
+			if (gridWrap.scrollLeft !== topScrollbar.scrollLeft) {
+				gridWrap.scrollLeft = topScrollbar.scrollLeft;
+			}
+		};
+
+		gridWrap.addEventListener("scroll", syncFromGrid, { passive: true });
+		topScrollbar.addEventListener("scroll", syncFromTop, { passive: true });
+		window.addEventListener("resize", updateWidth);
+		const resizeObserver =
+			typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateWidth) : null;
+		resizeObserver?.observe(gridWrap);
+		resizeObserver?.observe(topScrollbar);
+		const table = gridWrap.querySelector("table");
+		if (table) resizeObserver?.observe(table);
+		updateWidth();
+
+		return () => {
+			gridWrap.removeEventListener("scroll", syncFromGrid);
+			topScrollbar.removeEventListener("scroll", syncFromTop);
+			window.removeEventListener("resize", updateWidth);
+			resizeObserver?.disconnect();
+		};
+	}, [props.showTopScrollbar]);
 
 	const startReorder = (
 		kind: ReorderKind,
@@ -238,70 +287,82 @@ export function TableGrid(props: Props) {
 	}
 
 	return (
-		<div className="tabula-grid-wrap" tabIndex={0} aria-label="Table data grid">
-			<table
-				className={`tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`}
-			>
-				<thead>
-					<tr>
-						<th className="tabula-row-num sticky-col">#</th>
-						{fields.map((field, fi) => {
-							const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
-							const dropClass =
-								dragState?.kind === "field" && dragState.targetId === field.id
-									? dragState.side === "before"
-										? "is-drop-before"
-										: "is-drop-after"
-									: "";
-							return (
-								<th
-									key={field.id}
-									data-reorder-kind="field"
-									data-reorder-id={field.id}
-									className={[
-										fi === 0 && frozen ? "sticky-primary" : "",
-										isDragSource ? "is-dragging" : "",
-										dropClass,
-									]
-										.filter(Boolean)
-										.join(" ") || undefined}
-									style={{
-										width: widths[field.id] ?? 160,
-										minWidth: widths[field.id] ?? 160,
-									}}
-								>
-									<FieldHeader
-										field={field}
-										onRename={props.onRenameField}
-										onDelete={props.onDeleteField}
-										onManageOptions={props.onManageOptions}
-										onSort={props.onSortField}
-										onHide={props.onHideField}
-										onInsert={props.onInsertField}
-										onResize={props.onResizeColumn}
-										onBeginReorder={(event) => startReorder("field", field.id, event)}
-										width={widths[field.id] ?? 160}
-									/>
-								</th>
-							);
-						})}
-						<th className="tabula-row-actions" />
-					</tr>
-				</thead>
-				<tbody>
-					{body}
-					{totalRows === 0 && (
+		<div className="tabula-grid-area">
+			{props.showTopScrollbar && (
+				<div
+					className="tabula-top-scrollbar"
+					ref={topScrollbarRef}
+					tabIndex={0}
+					aria-label="Synchronized horizontal scrollbar for table"
+				>
+					<div className="tabula-top-scrollbar-inner" ref={topScrollbarInnerRef} />
+				</div>
+			)}
+			<div className="tabula-grid-wrap" ref={gridWrapRef} tabIndex={0} aria-label="Table data grid">
+				<table
+					className={`tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`}
+				>
+					<thead>
 						<tr>
-							<td colSpan={fields.length + 2} className="tabula-empty">
-								No rows match the current search/filters.
-							</td>
+							<th className="tabula-row-num sticky-col">#</th>
+							{fields.map((field, fi) => {
+								const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
+								const dropClass =
+									dragState?.kind === "field" && dragState.targetId === field.id
+										? dragState.side === "before"
+											? "is-drop-before"
+											: "is-drop-after"
+										: "";
+								return (
+									<th
+										key={field.id}
+										data-reorder-kind="field"
+										data-reorder-id={field.id}
+										className={[
+											fi === 0 && frozen ? "sticky-primary" : "",
+											isDragSource ? "is-dragging" : "",
+											dropClass,
+										]
+											.filter(Boolean)
+											.join(" ") || undefined}
+										style={{
+											width: widths[field.id] ?? 160,
+											minWidth: widths[field.id] ?? 160,
+										}}
+									>
+										<FieldHeader
+											field={field}
+											onRename={props.onRenameField}
+											onDelete={props.onDeleteField}
+											onManageOptions={props.onManageOptions}
+											onSort={props.onSortField}
+											onHide={props.onHideField}
+											onInsert={props.onInsertField}
+											onResize={props.onResizeColumn}
+											onBeginReorder={(event) => startReorder("field", field.id, event)}
+											width={widths[field.id] ?? 160}
+										/>
+									</th>
+								);
+							})}
+							<th className="tabula-row-actions" />
 						</tr>
-					)}
-				</tbody>
-			</table>
-			<button className="tabula-add-row-footer" type="button" onClick={props.onAddRow}>
-				+ New row
-			</button>
+					</thead>
+					<tbody>
+						{body}
+						{totalRows === 0 && (
+							<tr>
+								<td colSpan={fields.length + 2} className="tabula-empty">
+									No rows match the current search/filters.
+								</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+				<button className="tabula-add-row-footer" type="button" onClick={props.onAddRow}>
+					+ New row
+				</button>
+			</div>
 		</div>
 	);
 }

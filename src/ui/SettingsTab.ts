@@ -33,5 +33,22 @@ export class TabulaSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+
+		new Setting(containerEl).setName("Table display").setHeading();
+
+		new Setting(containerEl)
+			.setName("Top horizontal scrollbar")
+			.setDesc(
+				"Show a synchronized scrollbar above wide tables. This setting applies to all tables and is off by default."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.showTopScrollbar)
+					.onChange(async (value) => {
+						this.plugin.settings.showTopScrollbar = value;
+						await this.plugin.saveSettings();
+						this.plugin.refreshOpenViews();
+					});
+			});
 	}
 }

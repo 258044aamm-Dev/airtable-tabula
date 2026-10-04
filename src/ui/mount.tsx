@@ -1,22 +1,25 @@
 import { createRoot, Root } from "react-dom/client";
 import { createElement } from "react";
-import { TableApp } from "./TableApp";
-import { TableDocument } from "../data/types";
+import { TableFileApp } from "./TableFileApp";
+import { TableDocument, TableFileDocument } from "../data/types";
 
-interface TableAppProps {
-	doc: TableDocument;
-	onChange: (doc: TableDocument) => void;
+export interface TableFileAppProps {
+	file: TableFileDocument;
+	onTableChange: (tableId: string, doc: TableDocument) => void;
+	onAddTable: () => string;
+	onRemoveTable: (tableId: string) => void;
 	onCreateTableFromPaste: (doc: TableDocument) => Promise<void>;
 	onRegisterClipboardPaste: (handler: (() => void) | null) => void;
 	airtableToken?: string;
+	showTopScrollbar: boolean;
 }
 
-export function mountTableApp(container: HTMLElement, props: TableAppProps): Root {
+export function mountTableFileApp(container: HTMLElement, props: TableFileAppProps): Root {
 	const root = createRoot(container);
-	root.render(createElement(TableApp, props));
+	root.render(createElement(TableFileApp, props));
 	return root;
 }
 
-export function updateTableApp(root: Root, props: TableAppProps): void {
-	root.render(createElement(TableApp, props));
+export function updateTableFileApp(root: Root, props: TableFileAppProps): void {
+	root.render(createElement(TableFileApp, props));
 }

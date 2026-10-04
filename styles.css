@@ -415,8 +415,41 @@
 	font-size: 12px;
 }
 
+.tabula-grid-area {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 0;
+	gap: 3px;
+}
+
+.tabula-top-scrollbar {
+	flex: 0 0 auto;
+	min-height: 16px;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	border: 1px solid var(--at-border);
+	border-bottom: 0;
+	border-radius: var(--at-radius) var(--at-radius) 0 0;
+	background: var(--at-surface-2);
+	scrollbar-width: auto;
+}
+
+.tabula-top-scrollbar-inner {
+	height: 1px;
+	pointer-events: none;
+}
+
+.tabula-top-scrollbar + .tabula-grid-wrap {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
 .tabula-grid-wrap {
 	flex: 1 1 auto;
+	min-width: 0;
+	min-height: 0;
 	overflow: auto;
 	border: 1px solid var(--at-border);
 	border-radius: var(--at-radius);
@@ -1192,8 +1225,135 @@
 	outline-offset: 2px;
 }
 
-.tabula-ribbon-action {
-	color: var(--interactive-accent) !important;
+.tabula-file-root {
+	box-sizing: border-box;
+	--at-border: color-mix(in srgb, var(--text-muted) 22%, transparent);
+	--at-fg: var(--text-normal);
+	--at-muted: var(--text-muted);
+	height: 100%;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 12px 14px 14px;
+	background: var(--background-primary);
+	color: var(--text-normal);
+}
+
+.tabula-file-controls {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 0 2px 10px;
+	border-bottom: 1px solid var(--at-border);
+}
+
+.tabula-file-count {
+	color: var(--at-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.tabula-file-table {
+	box-sizing: border-box;
+	flex: 0 0 auto;
+	min-height: 0;
+	padding-bottom: 14px;
+	border-bottom: 1px solid var(--at-border);
+}
+
+.tabula-file-table:last-child {
+	border-bottom: 0;
+}
+
+.tabula-file-root.is-single-table .tabula-file-table {
+	flex: 1 1 auto;
+	padding-bottom: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.tabula-file-root.is-single-table .tabula-file-table > .tabula-root {
+	height: 100%;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.tabula-file-root.is-single-table .tabula-grid-area {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.tabula-file-root.is-single-table .tabula-grid-wrap {
+	flex: 1 1 auto;
+	min-height: 0;
+	max-height: none;
+}
+
+.tabula-table-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 0 0 8px;
+}
+
+.tabula-table-section-title {
+	min-width: 0;
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+}
+
+.tabula-table-section-index {
+	color: var(--at-muted);
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
+}
+
+.tabula-table-section-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.tabula-btn-danger {
+	color: var(--text-error);
+}
+
+.tabula-file-table > .tabula-root {
+	height: auto;
+	min-height: 0;
+	flex: 0 0 auto;
+	padding: 0;
+}
+
+.tabula-file-table .tabula-grid-area {
+	flex: 0 0 auto;
+}
+
+.tabula-file-table .tabula-grid-wrap {
+	flex: 0 1 auto;
+	min-height: 180px;
+	max-height: 55vh;
+}
+
+.tabula-ribbon-action,
+.tabula-ribbon-action svg {
+	color: #8B5CF6 !important;
+}
+
+.tabula-ribbon-action svg {
+	stroke: #8B5CF6 !important;
 }
 
 @media (max-width: 640px) {

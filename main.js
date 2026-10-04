@@ -1093,7 +1093,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState11(initialState) {
+        function useState12(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1101,11 +1101,11 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef7(initialValue) {
+        function useRef8(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect9(create, deps) {
+        function useEffect10(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1117,7 +1117,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useLayoutEffect(create, deps);
         }
-        function useCallback2(callback, deps) {
+        function useCallback3(callback, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
@@ -1884,19 +1884,19 @@ var require_react_development = __commonJS({
         exports.memo = memo;
         exports.startTransition = startTransition;
         exports.unstable_act = act;
-        exports.useCallback = useCallback2;
+        exports.useCallback = useCallback3;
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect9;
+        exports.useEffect = useEffect10;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect;
         exports.useMemo = useMemo4;
         exports.useReducer = useReducer;
-        exports.useRef = useRef7;
-        exports.useState = useState11;
+        exports.useRef = useRef8;
+        exports.useState = useState12;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -24473,11 +24473,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx15 = jsxWithValidationDynamic;
-        var jsxs15 = jsxWithValidationStatic;
+        var jsx16 = jsxWithValidationDynamic;
+        var jsxs16 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx15;
-        exports.jsxs = jsxs15;
+        exports.jsx = jsx16;
+        exports.jsxs = jsxs16;
       })();
     }
   }
@@ -24501,10 +24501,10 @@ __export(main_exports, {
   default: () => TabulaPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian5 = require("obsidian");
+var import_obsidian6 = require("obsidian");
 
 // src/views/TableView.ts
-var import_obsidian3 = require("obsidian");
+var import_obsidian4 = require("obsidian");
 
 // src/data/types.ts
 var SELECT_COLORS = [
@@ -24808,6 +24808,44 @@ function parseTableDocument(raw) {
 function serializeTableDocument(doc) {
   return JSON.stringify(doc, null, "	");
 }
+function createTableEntry(table) {
+  return { id: createId("t"), table };
+}
+function createTableFileDocument(table) {
+  return { tables: [createTableEntry(table)] };
+}
+function parseTableFileDocument(raw) {
+  if (!raw.trim()) return createTableFileDocument(createDefaultTable());
+  const parsed = JSON.parse(raw);
+  if (typeof parsed === "object" && parsed !== null && Reflect.get(parsed, "version") === 2 && Array.isArray(Reflect.get(parsed, "tables"))) {
+    const seenIds = /* @__PURE__ */ new Set();
+    const tables = Reflect.get(parsed, "tables").map((entry) => {
+      const candidate = typeof entry === "object" && entry !== null ? Reflect.get(entry, "table") : void 0;
+      const rawTable = typeof candidate === "object" && candidate !== null ? candidate : {};
+      const table = parseTableDocument(JSON.stringify(rawTable));
+      const candidateId = typeof entry === "object" && entry !== null ? Reflect.get(entry, "id") : void 0;
+      let id = typeof candidateId === "string" && candidateId ? candidateId : createId("t");
+      if (seenIds.has(id)) id = createId("t");
+      seenIds.add(id);
+      return { id, table };
+    });
+    return tables.length > 0 ? { tables } : createTableFileDocument(createDefaultTable());
+  }
+  return createTableFileDocument(parseTableDocument(raw));
+}
+function serializeTableFileDocument(file) {
+  if (file.tables.length === 1) {
+    return serializeTableDocument(file.tables[0].table);
+  }
+  return JSON.stringify(
+    {
+      version: 2,
+      tables: file.tables.map(({ id, table }) => ({ id, table }))
+    },
+    null,
+    "	"
+  );
+}
 function normalizeField(field) {
   const id = typeof field.id === "string" ? field.id : createId("f");
   const name = typeof field.name === "string" ? field.name : "Field";
@@ -25012,7 +25050,11 @@ function parseDuration(input) {
 
 // src/ui/mount.tsx
 var import_client = __toESM(require_client());
+var import_react12 = __toESM(require_react());
+
+// src/ui/TableFileApp.tsx
 var import_react11 = __toESM(require_react());
+var import_obsidian3 = require("obsidian");
 
 // src/ui/TableApp.tsx
 var import_react10 = __toESM(require_react());
@@ -31549,6 +31591,49 @@ function TableGrid(props) {
   const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
   const [dragState, setDragState] = (0, import_react6.useState)(null);
   const dragCleanup = (0, import_react6.useRef)(null);
+  const gridWrapRef = (0, import_react6.useRef)(null);
+  const topScrollbarRef = (0, import_react6.useRef)(null);
+  const topScrollbarInnerRef = (0, import_react6.useRef)(null);
+  (0, import_react6.useEffect)(() => {
+    if (!props.showTopScrollbar) return;
+    const gridWrap = gridWrapRef.current;
+    const topScrollbar = topScrollbarRef.current;
+    const inner = topScrollbarInnerRef.current;
+    if (!gridWrap || !topScrollbar || !inner) return;
+    const updateWidth = () => {
+      const gridOverflow = Math.max(0, gridWrap.scrollWidth - gridWrap.clientWidth);
+      topScrollbar.style.display = gridOverflow > 0 ? "" : "none";
+      inner.style.width = `${topScrollbar.clientWidth + gridOverflow}px`;
+      if (topScrollbar.scrollLeft !== gridWrap.scrollLeft) {
+        topScrollbar.scrollLeft = gridWrap.scrollLeft;
+      }
+    };
+    const syncFromGrid = () => {
+      if (topScrollbar.scrollLeft !== gridWrap.scrollLeft) {
+        topScrollbar.scrollLeft = gridWrap.scrollLeft;
+      }
+    };
+    const syncFromTop = () => {
+      if (gridWrap.scrollLeft !== topScrollbar.scrollLeft) {
+        gridWrap.scrollLeft = topScrollbar.scrollLeft;
+      }
+    };
+    gridWrap.addEventListener("scroll", syncFromGrid, { passive: true });
+    topScrollbar.addEventListener("scroll", syncFromTop, { passive: true });
+    window.addEventListener("resize", updateWidth);
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateWidth) : null;
+    resizeObserver?.observe(gridWrap);
+    resizeObserver?.observe(topScrollbar);
+    const table = gridWrap.querySelector("table");
+    if (table) resizeObserver?.observe(table);
+    updateWidth();
+    return () => {
+      gridWrap.removeEventListener("scroll", syncFromGrid);
+      topScrollbar.removeEventListener("scroll", syncFromTop);
+      window.removeEventListener("resize", updateWidth);
+      resizeObserver?.disconnect();
+    };
+  }, [props.showTopScrollbar]);
   const startReorder = (kind, sourceId, event) => {
     if (event.pointerType === "mouse" && event.button !== 0 || kind === "row" && !props.canReorderRows) return;
     event.preventDefault();
@@ -31717,60 +31802,72 @@ function TableGrid(props) {
       );
     }
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-grid-wrap", tabIndex: 0, "aria-label": "Table data grid", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
-      "table",
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-grid-area", children: [
+    props.showTopScrollbar && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      "div",
       {
-        className: `tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`,
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tr", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-num sticky-col", children: "#" }),
-            fields.map((field, fi) => {
-              const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
-              const dropClass = dragState?.kind === "field" && dragState.targetId === field.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
-              return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-                "th",
-                {
-                  "data-reorder-kind": "field",
-                  "data-reorder-id": field.id,
-                  className: [
-                    fi === 0 && frozen ? "sticky-primary" : "",
-                    isDragSource ? "is-dragging" : "",
-                    dropClass
-                  ].filter(Boolean).join(" ") || void 0,
-                  style: {
-                    width: widths[field.id] ?? 160,
-                    minWidth: widths[field.id] ?? 160
-                  },
-                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-                    FieldHeader,
-                    {
-                      field,
-                      onRename: props.onRenameField,
-                      onDelete: props.onDeleteField,
-                      onManageOptions: props.onManageOptions,
-                      onSort: props.onSortField,
-                      onHide: props.onHideField,
-                      onInsert: props.onInsertField,
-                      onResize: props.onResizeColumn,
-                      onBeginReorder: (event) => startReorder("field", field.id, event),
-                      width: widths[field.id] ?? 160
-                    }
-                  )
-                },
-                field.id
-              );
-            }),
-            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-actions" })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tbody", { children: [
-            body,
-            totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
-          ] })
-        ]
+        className: "tabula-top-scrollbar",
+        ref: topScrollbarRef,
+        tabIndex: 0,
+        "aria-label": "Synchronized horizontal scrollbar for table",
+        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: "tabula-top-scrollbar-inner", ref: topScrollbarInnerRef })
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: "+ New row" })
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-grid-wrap", ref: gridWrapRef, tabIndex: 0, "aria-label": "Table data grid", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+        "table",
+        {
+          className: `tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`,
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tr", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-num sticky-col", children: "#" }),
+              fields.map((field, fi) => {
+                const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
+                const dropClass = dragState?.kind === "field" && dragState.targetId === field.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
+                return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                  "th",
+                  {
+                    "data-reorder-kind": "field",
+                    "data-reorder-id": field.id,
+                    className: [
+                      fi === 0 && frozen ? "sticky-primary" : "",
+                      isDragSource ? "is-dragging" : "",
+                      dropClass
+                    ].filter(Boolean).join(" ") || void 0,
+                    style: {
+                      width: widths[field.id] ?? 160,
+                      minWidth: widths[field.id] ?? 160
+                    },
+                    children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                      FieldHeader,
+                      {
+                        field,
+                        onRename: props.onRenameField,
+                        onDelete: props.onDeleteField,
+                        onManageOptions: props.onManageOptions,
+                        onSort: props.onSortField,
+                        onHide: props.onHideField,
+                        onInsert: props.onInsertField,
+                        onResize: props.onResizeColumn,
+                        onBeginReorder: (event) => startReorder("field", field.id, event),
+                        width: widths[field.id] ?? 160
+                      }
+                    )
+                  },
+                  field.id
+                );
+              }),
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-actions" })
+            ] }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tbody", { children: [
+              body,
+              totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
+            ] })
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: "+ New row" })
+    ] })
   ] });
 }
 function FieldHeader({
@@ -32315,7 +32412,8 @@ function TableApp({
   onChange,
   onCreateTableFromPaste,
   onRegisterClipboardPaste,
-  airtableToken = ""
+  airtableToken = "",
+  showTopScrollbar = false
 }) {
   const [showFilters, setShowFilters] = (0, import_react10.useState)(
     doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
@@ -32645,6 +32743,7 @@ function TableApp({
       {
         doc,
         groups,
+        showTopScrollbar,
         selectedRowId,
         canReorderRows: doc.view.sorts.length === 0,
         onSelectRow: setSelectedRowId,
@@ -32705,24 +32804,138 @@ function isSpreadsheetFile(file) {
   return name.endsWith(".csv") || name.endsWith(".xlsx") || file.type === "text/csv" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 }
 
+// src/ui/TableFileApp.tsx
+var import_jsx_runtime15 = __toESM(require_jsx_runtime());
+function TableFileApp({
+  file,
+  onTableChange,
+  onAddTable,
+  onRemoveTable,
+  onCreateTableFromPaste,
+  onRegisterClipboardPaste,
+  airtableToken = "",
+  showTopScrollbar
+}) {
+  const [activeTableId, setActiveTableId] = (0, import_react11.useState)(file.tables[0]?.id ?? "");
+  const activeTableIdRef = (0, import_react11.useRef)(activeTableId);
+  const clipboardHandlers = (0, import_react11.useRef)(/* @__PURE__ */ new Map());
+  activeTableIdRef.current = activeTableId;
+  (0, import_react11.useEffect)(() => {
+    if (!file.tables.some((entry) => entry.id === activeTableId)) {
+      const nextId = file.tables[0]?.id ?? "";
+      activeTableIdRef.current = nextId;
+      setActiveTableId(nextId);
+    }
+  }, [activeTableId, file.tables]);
+  const dispatchClipboardPaste = (0, import_react11.useCallback)(() => {
+    const handler = clipboardHandlers.current.get(activeTableIdRef.current);
+    if (handler) handler();
+    else new import_obsidian3.Notice("Click inside a table before pasting from the ribbon");
+  }, []);
+  (0, import_react11.useEffect)(() => {
+    onRegisterClipboardPaste(dispatchClipboardPaste);
+    return () => onRegisterClipboardPaste(null);
+  }, [dispatchClipboardPaste, onRegisterClipboardPaste]);
+  const registerTableClipboardPaste = (0, import_react11.useCallback)(
+    (tableId, handler) => {
+      if (handler) clipboardHandlers.current.set(tableId, handler);
+      else clipboardHandlers.current.delete(tableId);
+    },
+    []
+  );
+  const addTable = () => {
+    const tableId = onAddTable();
+    activeTableIdRef.current = tableId;
+    setActiveTableId(tableId);
+  };
+  const removeTable = (tableId, tableName, nextId) => {
+    if (file.tables.length <= 1) return;
+    if (!window.confirm(`Remove \u201C${tableName || "Untitled"}\u201D from this file? This cannot be undone.`)) return;
+    if (activeTableIdRef.current === tableId) {
+      activeTableIdRef.current = nextId;
+      setActiveTableId(nextId);
+    }
+    clipboardHandlers.current.delete(tableId);
+    onRemoveTable(tableId);
+    new import_obsidian3.Notice(`Removed ${tableName || "table"}`);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-file-count", children: [
+        file.tables.length,
+        " ",
+        file.tables.length === 1 ? "table" : "tables",
+        " in this file"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: addTable, children: "+ Add table" })
+    ] }),
+    file.tables.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+      "section",
+      {
+        className: "tabula-file-table",
+        onPointerDownCapture: () => setActiveTableId(entry.id),
+        onFocusCapture: () => setActiveTableId(entry.id),
+        children: [
+          file.tables.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-header", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-title", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-table-section-index", children: [
+                "Table ",
+                index + 1
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "tabula-table-section-name", children: entry.table.name })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+              "button",
+              {
+                className: "tabula-btn tabula-btn-danger",
+                type: "button",
+                title: `Remove ${entry.table.name || "table"}`,
+                "aria-label": `Remove table ${index + 1}: ${entry.table.name || "Untitled"}`,
+                onClick: () => removeTable(
+                  entry.id,
+                  entry.table.name,
+                  file.tables[index === 0 ? 1 : index - 1]?.id ?? ""
+                ),
+                children: "Remove table"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+            TableApp,
+            {
+              doc: entry.table,
+              onChange: (doc) => onTableChange(entry.id, doc),
+              onCreateTableFromPaste,
+              onRegisterClipboardPaste: (handler) => registerTableClipboardPaste(entry.id, handler),
+              airtableToken,
+              showTopScrollbar
+            }
+          )
+        ]
+      },
+      entry.id
+    ))
+  ] });
+}
+
 // src/ui/mount.tsx
-function mountTableApp(container, props) {
+function mountTableFileApp(container, props) {
   const root = (0, import_client.createRoot)(container);
-  root.render((0, import_react11.createElement)(TableApp, props));
+  root.render((0, import_react12.createElement)(TableFileApp, props));
   return root;
 }
-function updateTableApp(root, props) {
-  root.render((0, import_react11.createElement)(TableApp, props));
+function updateTableFileApp(root, props) {
+  root.render((0, import_react12.createElement)(TableFileApp, props));
 }
 
 // src/views/TableView.ts
 var VIEW_TYPE_TABULA = "airtable-tabula-view";
 var TABULA_EXTENSION = "tabula";
-var TableView = class extends import_obsidian3.TextFileView {
+var TableView = class extends import_obsidian4.TextFileView {
   constructor(leaf, plugin) {
     super(leaf);
     this.reactRoot = null;
-    this.doc = null;
+    this.fileDoc = null;
     this.mountEl = null;
     this.saveTimer = null;
     this.applyingExternal = false;
@@ -32741,19 +32954,19 @@ var TableView = class extends import_obsidian3.TextFileView {
     return VIEW_TYPE_TABULA;
   }
   getDisplayText() {
-    return this.doc?.name ?? this.file?.basename ?? "Table";
+    return this.fileDoc?.tables[0]?.table.name ?? this.file?.basename ?? "Table";
   }
   getViewData() {
-    if (!this.doc) return this.data ?? "";
-    return serializeTableDocument(this.doc);
+    if (!this.fileDoc) return this.data ?? "";
+    return serializeTableFileDocument(this.fileDoc);
   }
   setViewData(data, clear) {
     this.data = data;
     try {
-      this.doc = parseTableDocument(data);
+      this.fileDoc = parseTableFileDocument(data);
     } catch (e) {
       console.error("Failed to parse .tabula file", e);
-      this.doc = parseTableDocument("");
+      this.fileDoc = createTableFileDocument(createDefaultTable());
     }
     if (clear) {
       this.remount();
@@ -32762,7 +32975,7 @@ var TableView = class extends import_obsidian3.TextFileView {
     }
   }
   clear() {
-    this.doc = null;
+    this.fileDoc = null;
     this.data = "";
     this.unmount();
   }
@@ -32780,31 +32993,57 @@ var TableView = class extends import_obsidian3.TextFileView {
     }
     this.unmount();
   }
+  refreshSettings() {
+    this.render();
+  }
   appProps() {
     return {
-      doc: this.doc,
-      onChange: (doc) => this.handleChange(doc),
+      file: this.fileDoc,
+      onTableChange: (tableId, doc) => this.handleTableChange(tableId, doc),
+      onAddTable: () => this.addTable(),
+      onRemoveTable: (tableId) => this.removeTable(tableId),
       onCreateTableFromPaste: (doc) => this.plugin.createTableFromPaste(doc),
       onRegisterClipboardPaste: this.registerClipboardPaste,
-      airtableToken: this.plugin.settings.airtableToken
+      airtableToken: this.plugin.settings.airtableToken,
+      showTopScrollbar: this.plugin.settings.showTopScrollbar
     };
   }
   remount() {
     this.unmount();
-    if (!this.mountEl || !this.doc) return;
-    this.reactRoot = mountTableApp(this.mountEl, this.appProps());
+    if (!this.mountEl || !this.fileDoc) return;
+    this.reactRoot = mountTableFileApp(this.mountEl, this.appProps());
   }
   render() {
-    if (!this.reactRoot || !this.doc) {
+    if (!this.reactRoot || !this.fileDoc) {
       this.remount();
       return;
     }
-    updateTableApp(this.reactRoot, this.appProps());
+    updateTableFileApp(this.reactRoot, this.appProps());
   }
-  handleChange(doc) {
-    if (this.applyingExternal) return;
-    this.doc = doc;
-    this.data = serializeTableDocument(doc);
+  handleTableChange(tableId, doc) {
+    if (this.applyingExternal || !this.fileDoc) return;
+    const tables = this.fileDoc.tables.map(
+      (entry) => entry.id === tableId ? { ...entry, table: doc } : entry
+    );
+    if (tables.every((entry, index) => entry === this.fileDoc.tables[index])) return;
+    this.commitFileChange({ ...this.fileDoc, tables });
+  }
+  addTable() {
+    if (!this.fileDoc) return "";
+    const name = `Untitled Table ${this.fileDoc.tables.length + 1}`;
+    const entry = createTableEntry(createDefaultTable(name));
+    this.commitFileChange({ ...this.fileDoc, tables: [...this.fileDoc.tables, entry] });
+    return entry.id;
+  }
+  removeTable(tableId) {
+    if (!this.fileDoc || this.fileDoc.tables.length <= 1) return;
+    const tables = this.fileDoc.tables.filter((entry) => entry.id !== tableId);
+    if (tables.length === this.fileDoc.tables.length) return;
+    this.commitFileChange({ ...this.fileDoc, tables });
+  }
+  commitFileChange(next) {
+    this.fileDoc = next;
+    this.data = serializeTableFileDocument(next);
     this.app.workspace.requestSaveLayout();
     this.debounceSave();
     this.render();
@@ -32831,12 +33070,13 @@ var TableView = class extends import_obsidian3.TextFileView {
 
 // src/settings.ts
 var DEFAULT_SETTINGS = {
-  airtableToken: ""
+  airtableToken: "",
+  showTopScrollbar: false
 };
 
 // src/ui/SettingsTab.ts
-var import_obsidian4 = require("obsidian");
-var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
+var import_obsidian5 = require("obsidian");
+var TabulaSettingTab = class extends import_obsidian5.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -32844,11 +33084,11 @@ var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian4.Setting(containerEl).setName("Airtable sync").setHeading();
-    new import_obsidian4.Setting(containerEl).setDesc(
+    new import_obsidian5.Setting(containerEl).setName("Airtable sync").setHeading();
+    new import_obsidian5.Setting(containerEl).setDesc(
       "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
     );
-    new import_obsidian4.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
+    new import_obsidian5.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
       text.inputEl.type = "password";
       text.inputEl.autocomplete = "off";
       text.setPlaceholder("pat\u2026");
@@ -32858,11 +33098,21 @@ var TabulaSettingTab = class extends import_obsidian4.PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
+    new import_obsidian5.Setting(containerEl).setName("Table display").setHeading();
+    new import_obsidian5.Setting(containerEl).setName("Top horizontal scrollbar").setDesc(
+      "Show a synchronized scrollbar above wide tables. This setting applies to all tables and is off by default."
+    ).addToggle((toggle) => {
+      toggle.setValue(this.plugin.settings.showTopScrollbar).onChange(async (value) => {
+        this.plugin.settings.showTopScrollbar = value;
+        await this.plugin.saveSettings();
+        this.plugin.refreshOpenViews();
+      });
+    });
   }
 };
 
 // src/main.ts
-var TabulaPlugin = class extends import_obsidian5.Plugin {
+var TabulaPlugin = class extends import_obsidian6.Plugin {
   constructor() {
     super(...arguments);
     this.settings = { ...DEFAULT_SETTINGS };
@@ -32891,7 +33141,7 @@ var TabulaPlugin = class extends import_obsidian5.Plugin {
       callback: () => this.requestClipboardPaste()
     });
     const ribbonIcon = this.addRibbonIcon("table", "Airtable Tabula actions", (event) => {
-      const menu = new import_obsidian5.Menu();
+      const menu = new import_obsidian6.Menu();
       menu.addItem(
         (item) => item.setTitle("Create new table").onClick(() => void this.createNewTable())
       );
@@ -32904,20 +33154,29 @@ var TabulaPlugin = class extends import_obsidian5.Plugin {
       menu.showAtMouseEvent(event);
     });
     ribbonIcon.addClass("tabula-ribbon-action");
-    ribbonIcon.style.color = "var(--interactive-accent)";
+    ribbonIcon.style.color = "#8B5CF6";
+    ribbonIcon.style.setProperty("--icon-color", "#8B5CF6");
     ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
   }
   async loadSettings() {
     const data = await this.loadData();
     let token = DEFAULT_SETTINGS.airtableToken;
-    if (typeof data === "object" && data !== null && "airtableToken" in data) {
-      const raw = Reflect.get(data, "airtableToken");
-      if (typeof raw === "string") token = raw;
+    let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
+    if (typeof data === "object" && data !== null) {
+      const rawToken = Reflect.get(data, "airtableToken");
+      const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
+      if (typeof rawToken === "string") token = rawToken;
+      if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
     }
-    this.settings = { airtableToken: token };
+    this.settings = { airtableToken: token, showTopScrollbar };
   }
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+  refreshOpenViews() {
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_TABULA)) {
+      if (leaf.view instanceof TableView) leaf.view.refreshSettings();
+    }
   }
   async importSpreadsheet() {
     const file = await pickSpreadsheetFile();
@@ -32926,32 +33185,32 @@ var TabulaPlugin = class extends import_obsidian5.Plugin {
       const doc = await spreadsheetToTable(file);
       const created = await this.writeTableFile(doc.name, serializeTableDocument(doc));
       await this.app.workspace.getLeaf(true).openFile(created);
-      new import_obsidian5.Notice(`Imported ${doc.rows.length} rows from ${file.name}`);
+      new import_obsidian6.Notice(`Imported ${doc.rows.length} rows from ${file.name}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian5.Notice(e instanceof Error ? e.message : "Import failed");
+      new import_obsidian6.Notice(e instanceof Error ? e.message : "Import failed");
     }
   }
   requestClipboardPaste() {
     const tableView = this.app.workspace.getActiveViewOfType(TableView);
     if (!tableView?.requestClipboardPaste()) {
-      new import_obsidian5.Notice("Open a Tabula table before pasting spreadsheet data from the ribbon");
+      new import_obsidian6.Notice("Open a Tabula table before pasting spreadsheet data from the ribbon");
     }
   }
   async createTableFromPaste(doc) {
     const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
     await this.app.workspace.getLeaf(true).openFile(file);
-    new import_obsidian5.Notice(`Created ${file.basename} from pasted data`);
+    new import_obsidian6.Notice(`Created ${file.basename} from pasted data`);
   }
   async createNewTable() {
     const doc = createDefaultTable("Untitled Table");
     try {
       const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
       await this.app.workspace.getLeaf(true).openFile(file);
-      new import_obsidian5.Notice(`Created ${file.basename}`);
+      new import_obsidian6.Notice(`Created ${file.basename}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian5.Notice("Failed to create table");
+      new import_obsidian6.Notice("Failed to create table");
     }
   }
   async writeTableFile(baseName, content) {

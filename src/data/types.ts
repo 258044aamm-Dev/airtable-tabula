@@ -194,6 +194,17 @@ export interface TableDocument {
 	sync?: SyncConfig | null;
 }
 
+/** One independently editable table inside a multi-table .tabula file. */
+export interface TableEntry {
+	id: string;
+	table: TableDocument;
+}
+
+/** In-memory representation of a .tabula file, whether legacy or multi-table. */
+export interface TableFileDocument {
+	tables: TableEntry[];
+}
+
 export interface SyncConfig {
 	baseId: string;
 	baseName?: string;

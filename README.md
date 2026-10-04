@@ -2,10 +2,12 @@
 
 Local Airtable-like tables inside Obsidian — structured grids next to your notes, with optional Airtable.com sync.
 
-Each table is a `.tabula` file (JSON) opened in a spreadsheet-style grid.
+A `.tabula` file stores one or more independent tables, shown stacked vertically in the spreadsheet-style view. Existing single-table files continue to open unchanged.
 
 ## Features
 
+- **Multiple tables per file** — add independent starter tables to one `.tabula` file, or remove a table when it is no longer needed
+- **Optional top horizontal scrollbar** — enable a synchronized scrollbar above each grid from Settings → Airtable Tabula; disabled by default
 - **Import and paste spreadsheets** — import `.csv` / `.xlsx` files, or paste spreadsheet cells/files directly into an open table and choose Replace, Create new, or Append
 - **Reorder rows and columns** — drag row and column handles on desktop or touch devices
 - **Field types** — text, long text, number, currency, percent, duration, rating, checkbox, date, date & time, URL, email, phone, single/multi select, attachments, auto number, created / last modified

@@ -68,22 +68,32 @@ export default class TabulaPlugin extends Plugin {
 			menu.showAtMouseEvent(event);
 		});
 		ribbonIcon.addClass("tabula-ribbon-action");
-		ribbonIcon.style.color = "var(--interactive-accent)";
+		ribbonIcon.style.color = "#8B5CF6";
+		ribbonIcon.style.setProperty("--icon-color", "#8B5CF6");
 		ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
 	}
 
 	async loadSettings(): Promise<void> {
 		const data: unknown = await this.loadData();
 		let token = DEFAULT_SETTINGS.airtableToken;
-		if (typeof data === "object" && data !== null && "airtableToken" in data) {
-			const raw = Reflect.get(data, "airtableToken");
-			if (typeof raw === "string") token = raw;
+		let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
+		if (typeof data === "object" && data !== null) {
+			const rawToken = Reflect.get(data, "airtableToken");
+			const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
+			if (typeof rawToken === "string") token = rawToken;
+			if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
 		}
-		this.settings = { airtableToken: token };
+		this.settings = { airtableToken: token, showTopScrollbar };
 	}
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
+	}
+
+	refreshOpenViews(): void {
+		for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_TABULA)) {
+			if (leaf.view instanceof TableView) leaf.view.refreshSettings();
+		}
 	}
 
 	private async importSpreadsheet(): Promise<void> {

@@ -11,6 +11,8 @@ import {
 	SelectOption,
 	SyncConfig,
 	TableDocument,
+	TableEntry,
+	TableFileDocument,
 	ViewState,
 	emptyCellValue,
 	isSelectField,
@@ -267,6 +269,65 @@ export function parseTableDocument(raw: string): TableDocument {
 
 export function serializeTableDocument(doc: TableDocument): string {
 	return JSON.stringify(doc, null, "\t");
+}
+
+export function createTableEntry(table: TableDocument): TableEntry {
+	return { id: createId("t"), table };
+}
+
+export function createTableFileDocument(table: TableDocument): TableFileDocument {
+	return { tables: [createTableEntry(table)] };
+}
+
+/**
+ * Read both legacy single-table files and the version-2 multi-table envelope.
+ * Legacy documents are wrapped in memory and remain serialized in their old
+ * shape until a second table is added.
+ */
+export function parseTableFileDocument(raw: string): TableFileDocument {
+	if (!raw.trim()) return createTableFileDocument(createDefaultTable());
+
+	const parsed: unknown = JSON.parse(raw);
+	if (
+		typeof parsed === "object" &&
+		parsed !== null &&
+		Reflect.get(parsed, "version") === 2 &&
+		Array.isArray(Reflect.get(parsed, "tables"))
+	) {
+		const seenIds = new Set<string>();
+		const tables = (Reflect.get(parsed, "tables") as unknown[]).map((entry): TableEntry => {
+			const candidate =
+				typeof entry === "object" && entry !== null ? Reflect.get(entry, "table") : undefined;
+			const rawTable =
+				typeof candidate === "object" && candidate !== null ? candidate : {};
+			const table = parseTableDocument(JSON.stringify(rawTable));
+			const candidateId =
+				typeof entry === "object" && entry !== null ? Reflect.get(entry, "id") : undefined;
+			let id = typeof candidateId === "string" && candidateId ? candidateId : createId("t");
+			if (seenIds.has(id)) id = createId("t");
+			seenIds.add(id);
+			return { id, table };
+		});
+		return tables.length > 0
+			? { tables }
+			: createTableFileDocument(createDefaultTable());
+	}
+
+	return createTableFileDocument(parseTableDocument(raw));
+}
+
+export function serializeTableFileDocument(file: TableFileDocument): string {
+	if (file.tables.length === 1) {
+		return serializeTableDocument(file.tables[0].table);
+	}
+	return JSON.stringify(
+		{
+			version: 2,
+			tables: file.tables.map(({ id, table }) => ({ id, table })),
+		},
+		null,
+		"\t"
+	);
 }
 
 function normalizeField(field: Partial<Field>): Field {

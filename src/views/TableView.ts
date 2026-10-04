@@ -1,11 +1,15 @@
 import { TextFileView, WorkspaceLeaf } from "obsidian";
 import type { Root } from "react-dom/client";
-import { TableDocument } from "../data/types";
+import type { TableDocument, TableFileDocument } from "../data/types";
 import {
-	parseTableDocument,
-	serializeTableDocument,
+	createDefaultTable,
+	createTableEntry,
+	createTableFileDocument,
+	parseTableFileDocument,
+	serializeTableFileDocument,
 } from "../data/store";
-import { mountTableApp, updateTableApp } from "../ui/mount";
+import { mountTableFileApp, updateTableFileApp } from "../ui/mount";
+import type { TableFileAppProps } from "../ui/mount";
 import type TabulaPlugin from "../main";
 
 export const VIEW_TYPE_TABULA = "airtable-tabula-view";
@@ -14,7 +18,7 @@ export const TABULA_EXTENSION = "tabula";
 export class TableView extends TextFileView {
 	plugin: TabulaPlugin;
 	private reactRoot: Root | null = null;
-	private doc: TableDocument | null = null;
+	private fileDoc: TableFileDocument | null = null;
 	private mountEl: HTMLElement | null = null;
 	private saveTimer: number | null = null;
 	private applyingExternal = false;
@@ -40,21 +44,21 @@ export class TableView extends TextFileView {
 	}
 
 	getDisplayText(): string {
-		return this.doc?.name ?? this.file?.basename ?? "Table";
+		return this.fileDoc?.tables[0]?.table.name ?? this.file?.basename ?? "Table";
 	}
 
 	getViewData(): string {
-		if (!this.doc) return this.data ?? "";
-		return serializeTableDocument(this.doc);
+		if (!this.fileDoc) return this.data ?? "";
+		return serializeTableFileDocument(this.fileDoc);
 	}
 
 	setViewData(data: string, clear: boolean): void {
 		this.data = data;
 		try {
-			this.doc = parseTableDocument(data);
+			this.fileDoc = parseTableFileDocument(data);
 		} catch (e) {
 			console.error("Failed to parse .tabula file", e);
-			this.doc = parseTableDocument("");
+			this.fileDoc = createTableFileDocument(createDefaultTable());
 		}
 		if (clear) {
 			this.remount();
@@ -64,7 +68,7 @@ export class TableView extends TextFileView {
 	}
 
 	clear(): void {
-		this.doc = null;
+		this.fileDoc = null;
 		this.data = "";
 		this.unmount();
 	}
@@ -85,34 +89,64 @@ export class TableView extends TextFileView {
 		this.unmount();
 	}
 
-	private appProps() {
+	refreshSettings(): void {
+		this.render();
+	}
+
+	private appProps(): TableFileAppProps {
 		return {
-			doc: this.doc!,
-			onChange: (doc: TableDocument) => this.handleChange(doc),
+			file: this.fileDoc!,
+			onTableChange: (tableId, doc) => this.handleTableChange(tableId, doc),
+			onAddTable: () => this.addTable(),
+			onRemoveTable: (tableId) => this.removeTable(tableId),
 			onCreateTableFromPaste: (doc: TableDocument) => this.plugin.createTableFromPaste(doc),
 			onRegisterClipboardPaste: this.registerClipboardPaste,
 			airtableToken: this.plugin.settings.airtableToken,
+			showTopScrollbar: this.plugin.settings.showTopScrollbar,
 		};
 	}
 
 	private remount(): void {
 		this.unmount();
-		if (!this.mountEl || !this.doc) return;
-		this.reactRoot = mountTableApp(this.mountEl, this.appProps());
+		if (!this.mountEl || !this.fileDoc) return;
+		this.reactRoot = mountTableFileApp(this.mountEl, this.appProps());
 	}
 
 	private render(): void {
-		if (!this.reactRoot || !this.doc) {
+		if (!this.reactRoot || !this.fileDoc) {
 			this.remount();
 			return;
 		}
-		updateTableApp(this.reactRoot, this.appProps());
+		updateTableFileApp(this.reactRoot, this.appProps());
 	}
 
-	private handleChange(doc: TableDocument): void {
-		if (this.applyingExternal) return;
-		this.doc = doc;
-		this.data = serializeTableDocument(doc);
+	private handleTableChange(tableId: string, doc: TableDocument): void {
+		if (this.applyingExternal || !this.fileDoc) return;
+		const tables = this.fileDoc.tables.map((entry) =>
+			entry.id === tableId ? { ...entry, table: doc } : entry
+		);
+		if (tables.every((entry, index) => entry === this.fileDoc!.tables[index])) return;
+		this.commitFileChange({ ...this.fileDoc, tables });
+	}
+
+	private addTable(): string {
+		if (!this.fileDoc) return "";
+		const name = `Untitled Table ${this.fileDoc.tables.length + 1}`;
+		const entry = createTableEntry(createDefaultTable(name));
+		this.commitFileChange({ ...this.fileDoc, tables: [...this.fileDoc.tables, entry] });
+		return entry.id;
+	}
+
+	private removeTable(tableId: string): void {
+		if (!this.fileDoc || this.fileDoc.tables.length <= 1) return;
+		const tables = this.fileDoc.tables.filter((entry) => entry.id !== tableId);
+		if (tables.length === this.fileDoc.tables.length) return;
+		this.commitFileChange({ ...this.fileDoc, tables });
+	}
+
+	private commitFileChange(next: TableFileDocument): void {
+		this.fileDoc = next;
+		this.data = serializeTableFileDocument(next);
 		this.app.workspace.requestSaveLayout();
 		this.debounceSave();
 		this.render();
