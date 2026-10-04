@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	SELECT_COLORS,
 	SelectColor,
@@ -19,6 +19,14 @@ interface Props {
 
 export function OptionManager({ field, onClose, onChange, onRemoveOption }: Props) {
 	const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") onClose();
+		};
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [onClose]);
 
 	const updateOption = (optionId: string, patch: Partial<SelectOption>) => {
 		onChange({

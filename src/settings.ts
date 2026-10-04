@@ -1,8 +1,11 @@
+export type TabulaTheme = "native" | "warm";
+
 export interface PluginSettings {
 	airtableToken: string;
 	showTopScrollbar: boolean;
 	stackedTableGap: number;
 	newTableFolder: string;
+	appearanceTheme: TabulaTheme;
 }
 
 export const MIN_STACKED_TABLE_GAP = 0;
@@ -18,4 +21,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	showTopScrollbar: false,
 	stackedTableGap: DEFAULT_STACKED_TABLE_GAP,
 	newTableFolder: "",
+	appearanceTheme: "native",
 };

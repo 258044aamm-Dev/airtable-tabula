@@ -151,13 +151,24 @@ export function TableApp({
 		const text = transfer.getData("text/plain");
 		const structuredClipboard =
 			text.includes("\t") || types.includes("text/csv") || types.includes("text/tab-separated-values");
-		// Keep ordinary multiline text editing in long-text cells intact. A copied
-		// spreadsheet range will normally carry tabs or an HTML table payload.
-		if (event.target instanceof HTMLElement && event.target.tagName === "TEXTAREA" && !htmlMatrix && !structuredClipboard) {
+		const isFormInput =
+			event.target instanceof HTMLElement &&
+			(event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA");
+
+		// Keep ordinary text editing in active inputs intact
+		if (isFormInput && !htmlMatrix && !structuredClipboard) {
 			return;
 		}
+
 		const matrix = htmlMatrix ?? clipboardTextToMatrix(text, types);
 		if (!matrix) return;
+
+		// If it's a single cell, don't open the whole spreadsheet import modal
+		const isSingleCell = matrix.length <= 1 && (!matrix[0] || matrix[0].length <= 1);
+		if (isSingleCell) {
+			return;
+		}
+
 		event.preventDefault();
 		event.stopPropagation();
 		setPasteCandidate({ matrix, sourceName: "Clipboard Data" });

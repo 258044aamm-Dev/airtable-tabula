@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { CellValue, Field, isReadOnlyField } from "../data/types";
+import { CellValue, Field, RatingField, isReadOnlyField } from "../data/types";
 import {
 	formatDuration,
 	parseDuration,
@@ -30,26 +30,7 @@ export function CellEditor(props: Props) {
 	}
 
 	if (field.type === "rating") {
-		const max = field.max ?? 5;
-		const current = typeof value === "number" ? value : 0;
-		return (
-			<div className="tabula-rating">
-				{Array.from({ length: max }, (_, i) => {
-					const n = i + 1;
-					return (
-						<button
-							key={n}
-							type="button"
-							className={`tabula-star ${n <= current ? "is-on" : ""}`}
-							onClick={() => onChange(current === n ? null : n)}
-							aria-label={`${n} star`}
-						>
-							★
-						</button>
-					);
-				})}
-			</div>
-		);
+		return <RatingCell field={field} value={value} onChange={onChange} />;
 	}
 
 	if (field.type === "singleSelect" || field.type === "multiSelect") {
@@ -97,13 +78,12 @@ export function CellEditor(props: Props) {
 					<span className="tabula-affix">{field.symbol ?? "$"}</span>
 				)}
 				<input
-					className="tabula-cell-input"
+					className="tabula-cell-input tabula-number-input"
 					type="number"
 					value={typeof value === "number" ? value : ""}
 					onChange={(e) =>
 						onChange(e.target.value === "" ? null : Number(e.target.value))
 					}
-					onKeyDown={navKeys}
 				/>
 				{field.type === "percent" && <span className="tabula-affix">%</span>}
 			</div>
@@ -119,10 +99,6 @@ export function CellEditor(props: Props) {
 				defaultValue={formatDuration(typeof value === "number" ? value : null)}
 				key={String(value)}
 				onBlur={(e) => onChange(parseDuration(e.target.value))}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-					navKeys(e);
-				}}
 			/>
 		);
 	}
@@ -134,7 +110,6 @@ export function CellEditor(props: Props) {
 				type="date"
 				value={typeof value === "string" ? value.slice(0, 10) : ""}
 				onChange={(e) => onChange(e.target.value)}
-				onKeyDown={navKeys}
 			/>
 		);
 	}
@@ -149,10 +124,16 @@ export function CellEditor(props: Props) {
 				className="tabula-cell-input"
 				type="datetime-local"
 				value={local}
-				onChange={(e) =>
-					onChange(e.target.value ? new Date(e.target.value).toISOString() : "")
-				}
-				onKeyDown={navKeys}
+				onChange={(e) => {
+					if (!e.target.value) {
+						onChange("");
+						return;
+					}
+					const parsed = new Date(e.target.value);
+					if (!Number.isNaN(parsed.getTime())) {
+						onChange(parsed.toISOString());
+					}
+				}}
 			/>
 		);
 	}
@@ -167,11 +148,60 @@ export function CellEditor(props: Props) {
 		);
 	}
 
+	if (field.type === "phone") {
+		return (
+			<input
+				className="tabula-cell-input"
+				type="tel"
+				placeholder="(555) 000-0000"
+				value={typeof value === "string" ? value : ""}
+				onChange={(e) => onChange(e.target.value)}
+			/>
+		);
+	}
+
 	return (
 		<TextCell
 			value={typeof value === "string" ? value : ""}
 			onChange={onChange}
 		/>
+	);
+}
+
+function RatingCell({
+	field,
+	value,
+	onChange,
+}: {
+	field: RatingField;
+	value: CellValue;
+	onChange: (value: CellValue) => void;
+}) {
+	const max = field.max ?? 5;
+	const current = typeof value === "number" ? value : 0;
+	const [hoverRating, setHoverRating] = useState<number | null>(null);
+
+	const activeStars = hoverRating ?? current;
+
+	return (
+		<div className="tabula-rating" onMouseLeave={() => setHoverRating(null)}>
+			{Array.from({ length: max }, (_, i) => {
+				const n = i + 1;
+				return (
+					<button
+						key={n}
+						type="button"
+						tabIndex={-1}
+						className={`tabula-star ${n <= activeStars ? "is-on" : ""}`}
+						onMouseEnter={() => setHoverRating(n)}
+						onClick={() => onChange(current === n ? null : n)}
+						aria-label={`${n} star`}
+					>
+						★
+					</button>
+				);
+			})}
+		</div>
 	);
 }
 
@@ -194,12 +224,6 @@ function toDatetimeLocal(iso: string): string {
 	if (Number.isNaN(d.getTime())) return "";
 	const pad = (n: number) => String(n).padStart(2, "0");
 	return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function navKeys(e: KeyboardEvent) {
-	if (e.key === "Enter" && !(e.target as HTMLElement).closest("textarea")) {
-		(e.target as HTMLInputElement).blur();
-	}
 }
 
 function TextCell({
@@ -232,9 +256,7 @@ function TextCell({
 				if (e.key === "Escape") {
 					setDraft(value);
 					(e.target as HTMLInputElement).blur();
-					return;
 				}
-				if (e.key === "Enter") (e.target as HTMLInputElement).blur();
 			}}
 		/>
 	);
@@ -249,37 +271,77 @@ function LongTextCell({
 }) {
 	const [draft, setDraft] = useState(value);
 	const [expanded, setExpanded] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+
 	useEffect(() => setDraft(value), [value]);
 
-	if (!expanded) {
-		return (
+	useEffect(() => {
+		if (!expanded) return;
+		const onDoc = (e: MouseEvent) => {
+			if (!containerRef.current?.contains(e.target as Node)) {
+				onChange(draft);
+				setExpanded(false);
+			}
+		};
+		activeDocument.addEventListener("mousedown", onDoc);
+		return () => activeDocument.removeEventListener("mousedown", onDoc);
+	}, [expanded, draft, onChange]);
+
+	const commitAndClose = () => {
+		onChange(draft);
+		setExpanded(false);
+	};
+
+	return (
+		<div className="tabula-longtext-wrapper" ref={containerRef}>
 			<button
 				type="button"
-				className="tabula-longtext-preview"
+				className={`tabula-longtext-preview ${expanded ? "is-active" : ""}`}
 				onClick={() => setExpanded(true)}
 			>
 				{value || <span className="tabula-placeholder">Add text…</span>}
 			</button>
-		);
-	}
-
-	return (
-		<textarea
-			className="tabula-longtext"
-			autoFocus
-			value={draft}
-			onChange={(e) => setDraft(e.target.value)}
-			onBlur={() => {
-				onChange(draft);
-				setExpanded(false);
-			}}
-			onKeyDown={(e) => {
-				if (e.key === "Escape") {
-					setDraft(value);
-					setExpanded(false);
-				}
-			}}
-		/>
+			{expanded && (
+				<div className="tabula-longtext-popover" role="dialog" aria-label="Edit text">
+					<textarea
+						ref={textareaRef}
+						className="tabula-longtext-input"
+						autoFocus
+						value={draft}
+						placeholder="Type multiline text…"
+						onChange={(e) => setDraft(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Escape") {
+								e.preventDefault();
+								e.stopPropagation();
+								setDraft(value);
+								setExpanded(false);
+							}
+							if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+								e.preventDefault();
+								commitAndClose();
+							}
+						}}
+					/>
+					<div className="tabula-longtext-popover-footer">
+						<span className="tabula-muted tabula-longtext-count">
+							{draft.length} chars · {draft.trim() ? draft.trim().split(/\s+/).length : 0} words
+						</span>
+						<div className="tabula-longtext-actions">
+							<span className="tabula-muted tabula-shortcut-hint">Ctrl+Enter to save</span>
+							<button
+								type="button"
+								className="tabula-btn tabula-btn-primary"
+								onClick={commitAndClose}
+							>
+								Done
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
 	);
 }
 
@@ -297,13 +359,18 @@ function LinkTextCell({
 	useEffect(() => setDraft(value), [value]);
 
 	if (!editing && value) {
-		const href = kind === "email" ? `mailto:${value}` : value;
+		const href = kind === "email" ? `mailto:${value}` : value.startsWith("http://") || value.startsWith("https://") ? value : `https://${value}`;
 		return (
-			<div className="tabula-link-cell">
+			<div className="tabula-link-cell" onDoubleClick={() => setEditing(true)}>
 				<a href={href} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
 					{value}
 				</a>
-				<button type="button" className="tabula-btn tabula-icon-btn" onClick={() => setEditing(true)}>
+				<button
+					type="button"
+					className="tabula-btn tabula-icon-btn"
+					onClick={() => setEditing(true)}
+					title="Edit link"
+				>
 					✎
 				</button>
 			</div>
@@ -362,6 +429,7 @@ function AttachmentCell({
 						type="button"
 						className="tabula-pill-x"
 						onClick={() => onChange(value.filter((p) => p !== path))}
+						title="Remove attachment"
 					>
 						×
 					</button>

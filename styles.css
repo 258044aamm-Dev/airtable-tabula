@@ -1,1234 +1,20 @@
-/* Fixed Anthropic-inspired warmth: ivory surfaces, charcoal text, terracotta accents. */
+/* Airtable Tabula for Obsidian */
 
 .tabula-view,
-.tabula-mount,
-.tabula-root {
+.tabula-mount {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
 }
 
-.tabula-root {
-	--at-radius: 6px;
-	--at-radius-sm: 4px;
-	--at-border: color-mix(in srgb, var(--text-muted) 22%, transparent);
-	--at-border-strong: color-mix(in srgb, var(--text-muted) 38%, transparent);
-	--at-surface: var(--background-primary);
-	--at-surface-2: var(--background-secondary);
-	--at-hover: color-mix(in srgb, var(--text-normal) 6%, transparent);
-	--at-fg: var(--text-normal);
-	--at-muted: var(--text-muted);
-	--at-faint: var(--text-faint);
-	--at-invert-bg: var(--text-normal);
-	--at-invert-fg: var(--background-primary);
-	--at-focus: color-mix(in srgb, var(--text-normal) 55%, transparent);
-	--at-shadow: 0 0 0 1px var(--at-border), 0 8px 24px rgba(0, 0, 0, 0.28);
-
-	padding: 12px 14px 14px;
-	gap: 10px;
-	background: var(--at-surface);
-	color: var(--at-fg);
-	font-size: 13px;
-	line-height: 1.4;
-	letter-spacing: -0.011em;
-	-webkit-font-smoothing: antialiased;
-}
-
-.tabula-toolbar {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
-	gap: 10px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid var(--at-border);
-}
-
-.tabula-root .tabula-title {
-	font-size: 18px;
-	font-weight: 600;
-	letter-spacing: -0.035em;
-	border: none;
-	background: transparent;
-	box-shadow: none;
-	padding: 4px 6px;
-	min-width: 140px;
-	flex: 1 1 auto;
-	border-radius: var(--at-radius-sm);
-	color: var(--at-fg);
-}
-
-.tabula-root .tabula-title:hover {
-	background: var(--at-hover);
-}
-
-.tabula-root .tabula-title:focus {
-	background: var(--at-hover);
-	outline: 1px solid var(--at-border-strong);
-}
-
-.tabula-toolbar-actions {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 6px;
-}
-
-.tabula-search,
-.tabula-query-input,
-.tabula-select-search,
-.tabula-condition input,
-.tabula-condition select,
-.tabula-filter-controls select,
-.tabula-option-row input,
-.tabula-option-row select,
-.tabula-panel select {
-	background: var(--at-surface);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius-sm);
-	padding: 5px 9px;
-	color: var(--at-fg);
-	height: 30px;
-	box-shadow: none;
-	transition: border-color 0.12s ease, background 0.12s ease;
-}
-
-.tabula-search:hover,
-.tabula-query-input:hover,
-.tabula-condition input:hover,
-.tabula-condition select:hover {
-	border-color: var(--at-border-strong);
-}
-
-.tabula-search:focus,
-.tabula-query-input:focus,
-.tabula-select-search:focus,
-.tabula-condition input:focus,
-.tabula-condition select:focus {
-	outline: none;
-	border-color: var(--at-fg);
-	box-shadow: 0 0 0 1px var(--at-fg);
-}
-
-.tabula-search {
-	min-width: 168px;
-}
-
-.tabula-btn {
-	appearance: none;
-	border: 1px solid var(--at-border);
-	background: var(--at-surface);
-	color: var(--at-fg);
-	border-radius: var(--at-radius-sm);
-	padding: 0 10px;
-	height: 30px;
-	cursor: pointer;
-	font-size: 13px;
-	font-weight: 500;
-	letter-spacing: -0.01em;
-	line-height: 1;
-	white-space: nowrap;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-}
-
-.tabula-btn:hover {
-	background: var(--at-hover);
-	border-color: var(--at-border-strong);
-}
-
-.tabula-btn.is-active {
-	border-color: var(--at-fg);
-	color: var(--at-fg);
-	background: var(--at-hover);
-	box-shadow: none;
-	font-weight: 600;
-}
-
-.tabula-btn.is-active::before {
-	content: none;
-}
-
-.tabula-btn-primary {
-	background: var(--at-invert-bg);
-	border-color: var(--at-invert-bg);
-	color: var(--at-invert-fg);
-	font-weight: 600;
-}
-
-.tabula-btn-primary:hover {
-	filter: none;
-	opacity: 0.88;
-}
-
-.tabula-toolbar-sep {
-	width: 1px;
-	align-self: stretch;
-	min-height: 18px;
-	background: var(--at-border);
-	margin: 0 4px;
-}
-
-.tabula-inline-control {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	color: var(--at-muted);
-	font-size: 12px;
-	background: var(--at-surface);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius-sm);
-	padding: 0 8px;
-	height: 30px;
-}
-
-.tabula-inline-control:hover {
-	border-color: var(--at-border-strong);
-}
-
-.tabula-inline-control span {
-	flex-shrink: 0;
-	font-weight: 500;
-	letter-spacing: -0.01em;
-}
-
-.tabula-menu-select {
-	position: relative;
-	display: inline-flex;
-}
-
-.tabula-menu-trigger {
-	cursor: pointer;
-	font: inherit;
-	appearance: none;
-	gap: 6px;
-}
-
-.tabula-menu-label {
-	color: var(--at-muted);
-}
-
-.tabula-menu-value {
-	color: var(--at-fg);
-	font-weight: 500;
-	max-width: 110px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.tabula-menu-chevron {
-	color: var(--at-muted);
-	font-size: 10px;
-	line-height: 1;
-	margin-left: 2px;
-}
-
-.tabula-menu-btn .tabula-menu-chevron {
-	margin-left: 6px;
-}
-
-.tabula-menu-popover {
-	position: absolute;
-	top: calc(100% + 4px);
-	left: 0;
-	z-index: 80;
-	min-width: 160px;
-	max-width: 260px;
-	max-height: 280px;
-	overflow: auto;
-	padding: 4px;
-	background: var(--at-surface);
-	color: var(--at-fg);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius);
-	box-shadow: var(--at-shadow);
-}
-
-.tabula-menu-popover.align-right {
-	left: auto;
-	right: 0;
-}
-
-.tabula-menu-option {
-	appearance: none;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 10px;
-	width: 100%;
-	border: none;
-	background: transparent;
-	color: var(--at-fg);
-	text-align: left;
-	padding: 7px 10px;
-	border-radius: var(--at-radius-sm);
-	cursor: pointer;
-	font-size: 13px;
-	font-weight: 450;
-	letter-spacing: -0.01em;
-	line-height: 1.3;
-}
-
-.tabula-menu-option:hover:not(:disabled) {
-	background: var(--at-hover);
-}
-
-.tabula-menu-option.is-selected {
-	background: var(--at-hover);
-	font-weight: 600;
-}
-
-.tabula-menu-option:disabled {
-	opacity: 0.4;
-	cursor: default;
-}
-
-.tabula-menu-check {
-	color: var(--at-muted);
-	font-size: 11px;
-}
-
-.tabula-icon-btn {
-	padding: 0 6px;
-	height: 24px;
-	min-width: 24px;
-	opacity: 0.55;
-	border-color: transparent;
-	background: transparent;
-}
-
-.tabula-icon-btn:hover {
-	opacity: 1;
-	background: var(--at-hover);
-	border-color: transparent;
-}
-
-.tabula-add-field {
-	position: relative;
-	overflow: hidden;
-}
-
-.tabula-add-field select {
-	position: absolute;
-	inset: 0;
-	opacity: 0;
-	cursor: pointer;
-}
-
-.tabula-count,
-.tabula-muted {
-	color: var(--at-muted);
-	font-size: 12px;
-	font-variant-numeric: tabular-nums;
-}
-
-.tabula-panel,
-.tabula-filter-bar {
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius);
-	padding: 10px 12px;
-	background: var(--at-surface-2);
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
-.tabula-panel-header {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.tabula-panel-header strong {
-	font-weight: 600;
-	letter-spacing: -0.02em;
-}
-
-.tabula-panel-empty {
-	color: var(--at-muted);
-	font-size: 12px;
-}
-
-.tabula-hide-list {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	max-height: 200px;
-	overflow: auto;
-}
-
-.tabula-query-row {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 8px;
-}
-
-.tabula-query-label {
-	color: var(--at-muted);
-	font-weight: 600;
-	font-size: 12px;
-	letter-spacing: -0.01em;
-}
-
-.tabula-query-input {
-	flex: 1 1 240px;
-	font-family: var(--font-monospace);
-	font-size: 12px;
-}
-
-.tabula-query-input.has-error {
-	border-color: var(--text-error);
-	box-shadow: 0 0 0 1px var(--text-error);
-}
-
-.tabula-query-error {
-	color: var(--text-error);
-	font-size: 12px;
-}
-
-.tabula-filter-controls,
-.tabula-conditions,
-.tabula-condition,
-.tabula-multi-filter {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	align-items: center;
-}
-
-.tabula-condition {
-	width: 100%;
-	padding: 8px 0 0;
-	border-top: 1px solid var(--at-border);
-}
-
-.tabula-check-label {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	margin-right: 6px;
-	font-size: 12px;
-}
-
-.tabula-grid-area {
-	flex: 1 1 auto;
-	display: flex;
-	flex-direction: column;
-	min-width: 0;
-	min-height: 0;
-	gap: 3px;
-}
-
-.tabula-top-scrollbar {
-	flex: 0 0 auto;
-	min-height: 16px;
-	overflow-x: scroll;
-	overflow-y: hidden;
-	border: 1px solid var(--at-border);
-	border-bottom: 0;
-	border-radius: var(--at-radius) var(--at-radius) 0 0;
-	background: var(--at-surface-2);
-	scrollbar-width: auto;
-}
-
-.tabula-top-scrollbar-inner {
-	height: 1px;
-	pointer-events: none;
-}
-
-.tabula-top-scrollbar + .tabula-grid-wrap {
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-}
-
-.tabula-grid-wrap {
-	flex: 1 1 auto;
-	min-width: 0;
-	min-height: 0;
-	overflow: auto;
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius);
-	background: var(--at-surface);
-	display: flex;
-	flex-direction: column;
-}
-
-.tabula-grid {
-	border-collapse: separate;
-	border-spacing: 0;
-	width: max-content;
-	min-width: 100%;
-}
-
-.tabula-grid th,
-.tabula-grid td {
-	border-bottom: 1px solid var(--at-border);
-	border-right: 1px solid var(--at-border);
-	padding: 0;
-	vertical-align: middle;
-	background: var(--at-surface);
-}
-
-.tabula-grid th:last-child,
-.tabula-grid td:last-child {
-	border-right: none;
-}
-
-.tabula-grid tbody tr:hover td {
-	background: var(--at-hover);
-}
-
-.tabula-grid tbody tr.is-selected td {
-	background: color-mix(in srgb, var(--text-normal) 8%, transparent);
-}
-
-.tabula-grid th {
-	position: sticky;
-	top: 0;
-	z-index: 3;
-	background: var(--at-surface-2);
-	box-shadow: inset 0 -1px 0 var(--at-border);
-}
-
-.tabula-grid.is-frozen .sticky-col,
-.tabula-grid.is-frozen .sticky-primary {
-	position: sticky;
-	left: 0;
-	z-index: 2;
-	background: var(--at-surface-2);
-}
-
-.tabula-grid.is-frozen thead .sticky-col,
-.tabula-grid.is-frozen thead .sticky-primary {
-	z-index: 4;
-}
-
-.tabula-grid.is-frozen .sticky-primary {
-	left: 56px;
-}
-
-.tabula-th {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	padding: 8px 10px;
-	position: relative;
-	user-select: none;
-}
-
-.tabula-root .tabula-th-name {
-	border: none;
-	background: transparent;
-	box-shadow: none;
-	font-weight: 600;
-	font-size: 12px;
-	letter-spacing: -0.02em;
-	padding: 0;
-	min-width: 0;
-	flex: 1;
-	color: var(--at-fg);
-}
-
-.tabula-th-type {
-	color: var(--at-faint);
-	font-size: 10px;
-	font-weight: 500;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-}
-
-.tabula-col-resize {
-	position: absolute;
-	top: 0;
-	right: -2px;
-	width: 5px;
-	height: 100%;
-	cursor: col-resize;
-	z-index: 5;
-}
-
-.tabula-col-resize:hover {
-	background: var(--at-fg);
-	opacity: 0.2;
-}
-
-.tabula-field-menu {
-	position: absolute;
-	top: calc(100% + 4px);
-	right: 4px;
-	z-index: 30;
-	min-width: 168px;
-	background: var(--at-surface);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius);
-	box-shadow: var(--at-shadow);
-	padding: 4px;
-	display: flex;
-	flex-direction: column;
-}
-
-.tabula-field-menu button {
-	appearance: none;
-	border: none;
-	background: transparent;
-	text-align: left;
-	padding: 7px 10px;
-	border-radius: var(--at-radius-sm);
-	cursor: pointer;
-	color: inherit;
-	font-size: 13px;
-	font-weight: 450;
-	letter-spacing: -0.01em;
-}
-
-.tabula-field-menu button:hover {
-	background: var(--at-hover);
-}
-
-.tabula-field-menu button.is-danger {
-	color: var(--text-error);
-}
-
-.tabula-root .tabula-grid .tabula-row-num {
-	min-width: 44px;
-	width: 44px;
-	text-align: center;
-	color: var(--at-muted);
-	background: var(--at-surface-2);
-	font-variant-numeric: tabular-nums;
-	font-size: 12px;
-}
-
-.tabula-root .tabula-grid .tabula-row-num {
-	min-width: 56px;
-	width: 56px;
-}
-
-.tabula-row-num-content {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 3px;
-	padding: 0 4px;
-}
-
-.tabula-row-drag-handle,
-.tabula-col-drag-handle {
-	appearance: none;
-	border: 0;
-	background: transparent;
-	color: var(--at-muted);
-	font: inherit;
-	font-size: 14px;
-	line-height: 1;
-	padding: 2px;
-	margin: 0;
-	cursor: grab;
-	touch-action: none;
-	user-select: none;
-	-webkit-user-select: none;
-	opacity: 0.55;
-	transition: opacity 0.12s ease, color 0.12s ease;
-}
-
-.tabula-row-drag-handle:hover,
-.tabula-col-drag-handle:hover,
-.tabula-row-drag-handle:focus-visible,
-.tabula-col-drag-handle:focus-visible {
-	color: var(--interactive-accent);
-	opacity: 1;
-}
-
-.tabula-row-drag-handle:active,
-.tabula-col-drag-handle:active {
-	cursor: grabbing;
-}
-
-.tabula-row-drag-handle:disabled {
-	cursor: not-allowed;
-	opacity: 0.2;
-}
-
-.tabula-col-drag-handle {
-	flex: 0 0 auto;
-	margin-left: -4px;
-}
-
-.tabula-grid .is-dragging {
-	opacity: 0.48;
-}
-
-.tabula-grid tbody tr.is-drop-before td {
-	box-shadow: inset 0 2px var(--interactive-accent);
-}
-
-.tabula-grid tbody tr.is-drop-after td {
-	box-shadow: inset 0 -2px var(--interactive-accent);
-}
-
-.tabula-grid th.is-drop-before {
-	box-shadow: inset 3px 0 var(--interactive-accent), inset 0 -1px var(--at-border);
-}
-
-.tabula-grid th.is-drop-after {
-	box-shadow: inset -3px 0 var(--interactive-accent), inset 0 -1px var(--at-border);
-}
-
-.tabula-grid.height-short td,
-.tabula-grid.height-short .tabula-cell-input,
-.tabula-grid.height-short .tabula-select-trigger {
-	min-height: 32px;
-}
-
-.tabula-grid.height-medium td,
-.tabula-grid.height-medium .tabula-cell-input,
-.tabula-grid.height-medium .tabula-select-trigger {
-	min-height: 38px;
-}
-
-.tabula-grid.height-tall td,
-.tabula-grid.height-tall .tabula-cell-input,
-.tabula-grid.height-tall .tabula-select-trigger {
-	min-height: 56px;
-}
-
-.tabula-root .tabula-cell-input {
-	width: 100%;
-	border: none;
-	border-radius: 0;
-	background: transparent;
-	box-shadow: none;
-	padding: 8px 10px;
-	height: auto;
-	font-size: 13px;
-	letter-spacing: -0.011em;
-}
-
-.tabula-root .tabula-cell-input:focus {
-	outline: none;
-	box-shadow: inset 0 0 0 1px var(--at-fg);
-}
-
-.tabula-checkbox-cell {
-	display: flex;
-	justify-content: center;
-	padding: 8px;
-}
-
-.tabula-readonly {
-	display: block;
-	padding: 8px 10px;
-	color: var(--at-muted);
-	font-variant-numeric: tabular-nums;
-	font-size: 12px;
-}
-
-.tabula-affix-cell {
-	display: flex;
-	align-items: center;
-}
-
-.tabula-affix {
-	padding: 0 8px;
-	color: var(--at-muted);
-	font-size: 12px;
-	font-weight: 500;
-}
-
-.tabula-rating {
-	display: flex;
-	gap: 1px;
-	padding: 6px 8px;
-}
-
-.tabula-star {
-	appearance: none;
-	border: none;
-	background: transparent;
-	color: var(--at-faint);
-	cursor: pointer;
-	font-size: 13px;
-	padding: 0 1px;
-	line-height: 1;
-}
-
-.tabula-star.is-on {
-	color: #f5a623;
-}
-
-.tabula-longtext-preview {
-	display: block;
-	width: 100%;
-	text-align: left;
-	border: none;
-	background: transparent;
-	color: inherit;
-	padding: 8px 10px;
-	cursor: text;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 280px;
-	font-size: 13px;
-}
-
-.tabula-longtext {
-	width: 100%;
-	min-height: 88px;
-	resize: vertical;
-	border: 1px solid var(--at-fg);
-	border-radius: var(--at-radius-sm);
-	padding: 8px 10px;
-	background: var(--at-surface);
-	color: inherit;
-	font-size: 13px;
-	line-height: 1.45;
-}
-
-.tabula-link-cell {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	padding: 4px 8px;
-}
-
-.tabula-link-cell a {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	color: var(--at-fg);
-	text-decoration: none;
-	border-bottom: 1px solid var(--at-border-strong);
-}
-
-.tabula-link-cell a:hover {
-	border-bottom-color: var(--at-fg);
-}
-
-.tabula-attachments {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
-	padding: 4px 8px;
-	align-items: center;
-}
-
-.tabula-attach-chip {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	background: var(--at-surface-2);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius-sm);
-	padding: 1px 6px;
-	font-size: 11px;
-	font-weight: 500;
-	max-width: 120px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.tabula-attach-input {
-	min-width: 100px;
-	flex: 1;
-}
-
-.tabula-root .tabula-grid td.tabula-empty {
-	padding: 40px 16px;
-	text-align: center;
-	color: var(--at-muted);
-	font-size: 13px;
-	letter-spacing: -0.01em;
-}
-
-.tabula-root .tabula-grid .tabula-group-row td {
-	background: var(--at-surface-2);
-	padding: 8px 12px;
-	font-weight: 600;
-	font-size: 12px;
-	letter-spacing: -0.02em;
-	border-right: none;
-}
-
-.tabula-group-label {
-	color: var(--at-fg);
-}
-
-.tabula-add-row-footer {
-	appearance: none;
-	border: none;
-	border-top: 1px solid var(--at-border);
-	background: transparent;
-	color: var(--at-muted);
-	text-align: left;
-	padding: 10px 12px;
-	cursor: pointer;
-	width: 100%;
-	font-size: 13px;
-	font-weight: 500;
-	letter-spacing: -0.01em;
-}
-
-.tabula-add-row-footer:hover {
-	background: var(--at-hover);
-	color: var(--at-fg);
-}
-
-.tabula-select {
-	position: relative;
-	min-height: 38px;
-}
-
-.tabula-select-trigger {
-	width: 100%;
-	min-height: 38px;
-	border: none;
-	background: transparent;
-	text-align: left;
-	padding: 6px 10px;
-	cursor: pointer;
-	color: inherit;
-}
-
-.tabula-placeholder {
-	color: var(--at-faint);
-	font-size: 13px;
-}
-
-.tabula-pills {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
-}
-
-.tabula-pill {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	border-radius: var(--at-radius-sm);
-	padding: 1px 7px;
-	font-size: 11px;
-	font-weight: 500;
-	letter-spacing: -0.01em;
-	line-height: 1.55;
-	max-width: 160px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	border: 1px solid transparent;
-}
-
-.tabula-pill-x {
-	opacity: 0.65;
-	cursor: pointer;
-	font-weight: 600;
-}
-
-.tabula-pill-x:hover {
-	opacity: 1;
-}
-
-/* Select colors — muted, sharper tags */
-.tabula-color-gray { background: #ececec; color: #171717; border-color: #d4d4d4; }
-.tabula-color-blue { background: #e8f1ff; color: #0b3b8c; border-color: #c9ddff; }
-.tabula-color-green { background: #e7f6eb; color: #14532d; border-color: #c6e8cf; }
-.tabula-color-yellow { background: #fff8db; color: #713f12; border-color: #f1e2a0; }
-.tabula-color-orange { background: #fff1e4; color: #9a3412; border-color: #ffd5b0; }
-.tabula-color-red { background: #ffe8e8; color: #991b1b; border-color: #ffc9c9; }
-.tabula-color-pink { background: #ffe8f3; color: #9d174d; border-color: #ffc2df; }
-.tabula-color-purple { background: #f1e8ff; color: #5b21b6; border-color: #dbc7ff; }
-.tabula-color-cyan { background: #e5f8f9; color: #155e75; border-color: #b9e8ec; }
-
-.theme-dark .tabula-color-gray { background: #2a2a2a; color: #e5e5e5; border-color: #3f3f3f; }
-.theme-dark .tabula-color-blue { background: #152238; color: #bfdbfe; border-color: #243b5c; }
-.theme-dark .tabula-color-green { background: #14261a; color: #bbf7d0; border-color: #1f3b28; }
-.theme-dark .tabula-color-yellow { background: #2a2410; color: #fde68a; border-color: #3f3518; }
-.theme-dark .tabula-color-orange { background: #2a1a10; color: #fdba74; border-color: #3f2818; }
-.theme-dark .tabula-color-red { background: #2a1414; color: #fecaca; border-color: #3f1f1f; }
-.theme-dark .tabula-color-pink { background: #2a1420; color: #fbcfe8; border-color: #3f1f30; }
-.theme-dark .tabula-color-purple { background: #1e1530; color: #ddd6fe; border-color: #2f2248; }
-.theme-dark .tabula-color-cyan { background: #102428; color: #a5f3fc; border-color: #1a383d; }
-
-.tabula-select-menu {
-	position: absolute;
-	z-index: 40;
-	top: calc(100% + 4px);
-	left: 0;
-	min-width: 220px;
-	max-width: 280px;
-	background: var(--at-surface);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius);
-	box-shadow: var(--at-shadow);
-	padding: 6px;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-
-.tabula-select-options {
-	max-height: 200px;
-	overflow: auto;
-	display: flex;
-	flex-direction: column;
-	gap: 1px;
-}
-
-.tabula-select-option,
-.tabula-select-manage {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	width: 100%;
-	border: none;
-	background: transparent;
-	color: inherit;
-	padding: 7px 8px;
-	border-radius: var(--at-radius-sm);
-	cursor: pointer;
-	text-align: left;
-	font-size: 13px;
-}
-
-.tabula-select-option:hover,
-.tabula-select-manage:hover,
-.tabula-select-option.is-active {
-	background: var(--at-hover);
-}
-
-.tabula-create-option {
-	color: var(--at-fg);
-	font-weight: 600;
-}
-
-.tabula-select-manage {
-	border-top: 1px solid var(--at-border);
-	border-radius: 0;
-	color: var(--at-muted);
-	margin-top: 2px;
-	padding-top: 8px;
-}
-
-.tabula-modal-backdrop {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.55);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 100;
-	backdrop-filter: blur(2px);
-}
-
-.tabula-modal {
-	width: min(560px, calc(100vw - 32px));
-	max-height: calc(100vh - 48px);
-	overflow: auto;
-	background: var(--at-surface);
-	border: 1px solid var(--at-border);
-	border-radius: 8px;
-	box-shadow: var(--at-shadow);
-	padding: 16px;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.tabula-modal-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-}
-
-.tabula-modal-header h3 {
-	margin: 0;
-	font-size: 15px;
-	font-weight: 600;
-	letter-spacing: -0.03em;
-}
-
-.tabula-option-list {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
-.tabula-option-row {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 6px;
-}
-
-.tabula-menu-hint {
-	padding: 8px 10px;
-	font-size: 12px;
-	color: var(--at-muted);
-	line-height: 1.4;
-	border-top: 1px solid var(--at-border);
-	margin-top: 2px;
-}
-
-.tabula-menu-option.is-danger {
-	color: var(--text-error);
-}
-
-.tabula-btn.is-busy {
-	opacity: 0.7;
-	cursor: wait;
-}
-
-.tabula-sync-form {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.tabula-sync-field {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	font-size: 12px;
-	font-weight: 500;
-	color: var(--at-muted);
-}
-
-.tabula-sync-field select {
-	height: 32px;
-	background: var(--at-surface);
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius-sm);
-	color: var(--at-fg);
-	padding: 0 8px;
-}
-
-
-.tabula-paste-modal {
-	width: min(720px, calc(100vw - 32px));
-}
-
-.tabula-paste-source {
-	margin-top: 3px;
-	max-width: min(520px, 70vw);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.tabula-paste-header-toggle {
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-	font-size: 12px;
-	color: var(--at-muted);
-}
-
-.tabula-paste-header-toggle input {
-	margin: 0;
-}
-
-.tabula-paste-preview-wrap {
-	max-width: 100%;
-	max-height: 250px;
-	overflow: auto;
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius-sm);
-}
-
-.tabula-paste-preview {
-	width: max-content;
-	min-width: 100%;
-	border-collapse: separate;
-	border-spacing: 0;
-	font-size: 12px;
-}
-
-.tabula-paste-preview th,
-.tabula-paste-preview td {
-	max-width: 240px;
-	min-width: 90px;
-	padding: 6px 8px;
-	border-right: 1px solid var(--at-border);
-	border-bottom: 1px solid var(--at-border);
-	text-align: left;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.tabula-paste-preview th {
-	background: var(--at-surface-2);
-	font-weight: 600;
-}
-
-.tabula-paste-preview tr:last-child td,
-.tabula-paste-preview tr:last-child th {
-	border-bottom: 0;
-}
-
-.tabula-paste-preview th:last-child,
-.tabula-paste-preview td:last-child {
-	border-right: 0;
-}
-
-.tabula-paste-warning,
-.tabula-paste-confirm {
-	padding: 10px 12px;
-	border: 1px solid var(--at-border);
-	border-radius: var(--at-radius-sm);
-	background: var(--at-surface-2);
-	font-size: 12px;
-	line-height: 1.45;
-}
-
-.tabula-paste-warning {
-	color: var(--at-muted);
-}
-
-.tabula-paste-confirm {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
-.tabula-paste-confirm > span {
-	color: var(--at-muted);
-}
-
-.tabula-paste-actions {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-end;
-	gap: 8px;
-}
-
-.tabula-paste-actions .tabula-btn {
-	min-height: 32px;
-}
-
-.tabula-paste-error {
-	color: var(--text-error);
-	font-size: 12px;
-}
-
-.tabula-grid-wrap:focus-visible {
-	outline: 2px solid var(--interactive-accent);
-	outline-offset: 2px;
-}
+/* ==========================================================================
+   Root Layout & Theme Variables
+   Default: Obsidian Native Theme (inherits vault styling)
+   ========================================================================== */
 
 .tabula-file-root {
 	box-sizing: border-box;
-	--at-border: color-mix(in srgb, var(--text-muted) 22%, transparent);
-	--at-fg: var(--text-normal);
-	--at-muted: var(--text-muted);
 	height: 100%;
 	min-height: 0;
 	overflow-y: auto;
@@ -1236,192 +22,29 @@
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
-	padding: 12px 14px 14px;
-	background: var(--background-primary);
-	color: var(--text-normal);
-}
+	padding: 14px 18px 18px;
 
-.tabula-file-root:not(.is-single-table) {
-	gap: 0;
-	padding-bottom: var(--tabula-stacked-table-gap, 120px);
-}
-
-/* Preserve the controls-to-first-table spacing; customize only table-to-table spacing. */
-.tabula-file-root:not(.is-single-table) > .tabula-file-controls {
-	margin-bottom: 20px;
-}
-
-.tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table {
-	position: relative;
-	margin-top: var(--tabula-stacked-table-gap, 120px);
-}
-
-.tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table::before {
-	content: "";
-	position: absolute;
-	top: var(--tabula-stacked-table-divider-offset, -60px);
-	left: 2px;
-	right: 2px;
-	height: 1px;
-	background: var(--tabula-border-strong, var(--at-border-strong));
-	pointer-events: none;
-}
-
-.tabula-file-controls {
-	flex: 0 0 auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 10px;
-	padding: 0 2px 10px;
-	border-bottom: 1px solid var(--at-border);
-}
-
-.tabula-file-count {
-	color: var(--at-muted);
-	font-size: 12px;
-	font-weight: 500;
-}
-
-.tabula-file-table {
-	box-sizing: border-box;
-	flex: 0 0 auto;
-	min-height: 0;
-	padding-bottom: 0;
-}
-
-.tabula-file-table:last-child {
-	border-bottom: 0;
-}
-
-.tabula-file-root.is-single-table .tabula-file-table {
-	flex: 1 1 auto;
-	padding-bottom: 0;
-	display: flex;
-	flex-direction: column;
-}
-
-.tabula-file-root.is-single-table .tabula-file-table > .tabula-root {
-	height: 100%;
-	flex: 1 1 auto;
-	min-height: 0;
-}
-
-.tabula-file-root.is-single-table .tabula-grid-area {
-	flex: 1 1 auto;
-	min-height: 0;
-}
-
-.tabula-file-root.is-single-table .tabula-grid-wrap {
-	flex: 1 1 auto;
-	min-height: 0;
-	max-height: none;
-}
-
-.tabula-table-section-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 10px;
-	margin: 0 0 8px;
-}
-
-.tabula-table-section-title {
-	min-width: 0;
-	display: flex;
-	align-items: baseline;
-	gap: 10px;
-}
-
-.tabula-table-section-index {
-	color: var(--at-muted);
-	font-size: 11px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	white-space: nowrap;
-}
-
-.tabula-table-section-name {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	font-size: 13px;
-	font-weight: 600;
-}
-
-.tabula-btn-danger {
-	color: var(--text-error);
-}
-
-.tabula-file-table > .tabula-root {
-	height: auto;
-	min-height: 0;
-	flex: 0 0 auto;
-	padding: 0;
-}
-
-.tabula-file-table .tabula-grid-area {
-	flex: 0 0 auto;
-}
-
-.tabula-file-table .tabula-grid-wrap {
-	flex: 0 1 auto;
-	min-height: 180px;
-	max-height: 55vh;
-}
-
-.tabula-ribbon-action,
-.tabula-ribbon-action svg,
-.tabula-ribbon-action svg * {
-	color: #8B5CF6 !important;
-}
-
-.tabula-ribbon-action svg,
-.tabula-ribbon-action svg * {
-	stroke: #8B5CF6 !important;
-}
-
-@media (max-width: 640px) {
-	.tabula-paste-modal {
-		width: calc(100vw - 20px);
-		max-height: calc(100vh - 24px);
-		padding: 12px;
-	}
-
-	.tabula-paste-actions {
-		justify-content: stretch;
-	}
-
-	.tabula-paste-actions .tabula-btn {
-		flex: 1 1 100%;
-	}
-}
-
-/*
- * Fixed visual redesign — no user-facing appearance settings.
- * Keep every existing view/data control; only restyle the plugin surface.
- */
-.tabula-file-root {
-	--tabula-page: #f5f1eb;
-	--tabula-surface: #fffdf9;
-	--tabula-surface-2: #faf7f2;
-	--tabula-ink: #29231f;
-	--tabula-ink-muted: #625a52;
-	--tabula-ink-faint: #91877d;
-	--tabula-border: #ebe4db;
-	--tabula-border-strong: #ded5ca;
-	--tabula-accent: #c66d52;
-	--tabula-accent-strong: #a95035;
-	--tabula-accent-soft: #f7e9e1;
-	--tabula-row-hover: #f8f4ef;
-	--tabula-row-selected: #f3e5dc;
-	--tabula-primary-bg: #342a25;
-	--tabula-primary-fg: #fffdf9;
-	--tabula-card-shadow: 0 10px 30px rgba(61, 44, 31, 0.055);
-	--tabula-row-number-width: 56px;
-	--at-radius: 12px;
-	--at-radius-sm: 8px;
+	/* Default Native Obsidian Theme Variables */
+	--tabula-page: var(--background-primary);
+	--tabula-surface: var(--background-primary);
+	--tabula-surface-2: var(--background-secondary);
+	--tabula-ink: var(--text-normal);
+	--tabula-ink-muted: var(--text-muted);
+	--tabula-ink-faint: var(--text-faint);
+	--tabula-border: var(--background-modifier-border);
+	--tabula-border-strong: var(--background-modifier-border-focus, var(--background-modifier-border));
+	--tabula-accent: var(--interactive-accent);
+	--tabula-accent-strong: var(--interactive-accent-hover, var(--interactive-accent));
+	--tabula-accent-soft: color-mix(in srgb, var(--interactive-accent) 15%, transparent);
+	--tabula-row-hover: var(--background-modifier-hover);
+	--tabula-row-selected: color-mix(in srgb, var(--interactive-accent) 16%, var(--background-primary));
+	--tabula-primary-bg: var(--interactive-accent);
+	--tabula-primary-fg: var(--text-on-accent, #ffffff);
+	--tabula-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	--tabula-row-number-width: 48px;
+	--tabula-title-font: inherit;
+	--at-radius: 8px;
+	--at-radius-sm: 4px;
 	--at-border: var(--tabula-border);
 	--at-border-strong: var(--tabula-border-strong);
 	--at-surface: var(--tabula-surface);
@@ -1432,15 +55,43 @@
 	--at-faint: var(--tabula-ink-faint);
 	--at-invert-bg: var(--tabula-primary-bg);
 	--at-invert-fg: var(--tabula-primary-fg);
-	--at-focus: var(--tabula-accent-strong);
-	--at-shadow: 0 0 0 1px var(--at-border), 0 12px 30px rgba(41, 35, 31, 0.13);
+	--at-focus: var(--interactive-accent);
+	--at-shadow: 0 0 0 1px var(--at-border), 0 8px 24px rgba(0, 0, 0, 0.15);
+
 	background: var(--tabula-page);
 	color: var(--tabula-ink);
-	padding: 14px 18px 18px;
+	font-family: var(--font-interface);
+	font-size: 13px;
+	line-height: 1.4;
+	-webkit-font-smoothing: antialiased;
 }
 
-/* Retain theme compatibility without adding theme controls to the plugin UI. */
-.theme-dark .tabula-file-root {
+/* ==========================================================================
+   Opt-in Warm Paper Theme (Anthropic-inspired ivory & terracotta)
+   ========================================================================== */
+
+.tabula-file-root.tabula-theme-warm {
+	--tabula-page: #f5f1eb;
+	--tabula-surface: #fffdf9;
+	--tabula-surface-2: #faf7f2;
+	--tabula-ink: #29231f;
+	--tabula-ink-muted: #5e554d; /* WCAG AA: 5.5:1 against #fffdf9 */
+	--tabula-ink-faint: #786d62; /* WCAG AA: 4.5:1 against #fffdf9 */
+	--tabula-border: #ebe4db;
+	--tabula-border-strong: #ded5ca;
+	--tabula-accent: #c66d52;
+	--tabula-accent-strong: #a95035;
+	--tabula-accent-soft: #f7e9e1;
+	--tabula-row-hover: #f8f4ef;
+	--tabula-row-selected: #f3e5dc;
+	--tabula-primary-bg: #342a25;
+	--tabula-primary-fg: #fffdf9;
+	--tabula-card-shadow: 0 8px 24px rgba(61, 44, 31, 0.06);
+	--tabula-title-font: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	--at-shadow: 0 0 0 1px var(--tabula-border), 0 12px 30px rgba(41, 35, 31, 0.13);
+}
+
+.theme-dark .tabula-file-root.tabula-theme-warm {
 	--tabula-page: #1f1b18;
 	--tabula-surface: #292320;
 	--tabula-surface-2: #302925;
@@ -1456,685 +107,1543 @@
 	--tabula-row-selected: #453128;
 	--tabula-primary-bg: #e2a087;
 	--tabula-primary-fg: #2d211c;
-	--tabula-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+	--tabula-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+	--at-shadow: 0 0 0 1px var(--tabula-border), 0 12px 30px rgba(0, 0, 0, 0.28);
 }
 
-.tabula-file-root .tabula-root {
-	--at-radius: 12px;
-	--at-radius-sm: 8px;
-	--at-border: var(--tabula-border);
-	--at-border-strong: var(--tabula-border-strong);
-	--at-surface: var(--tabula-surface);
-	--at-surface-2: var(--tabula-surface-2);
-	--at-hover: var(--tabula-row-hover);
-	--at-fg: var(--tabula-ink);
-	--at-muted: var(--tabula-ink-muted);
-	--at-faint: var(--tabula-ink-faint);
-	--at-invert-bg: var(--tabula-primary-bg);
-	--at-invert-fg: var(--tabula-primary-fg);
-	--at-focus: var(--tabula-accent-strong);
-	--at-shadow: 0 0 0 1px var(--at-border), 0 12px 30px rgba(41, 35, 31, 0.13);
+/* ==========================================================================
+   Multi-Table Stacked Controls
+   ========================================================================== */
+
+.tabula-file-root:not(.is-single-table) {
+	gap: 0;
+	padding-bottom: var(--tabula-stacked-table-gap, 120px);
+}
+
+.tabula-file-controls {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 0 2px 12px;
+	border-bottom: 1px solid var(--tabula-border);
+}
+
+.tabula-file-count {
+	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.tabula-file-table {
+	box-sizing: border-box;
+	flex: 0 0 auto;
+	min-height: 0;
+	width: 100%;
+}
+
+.tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table {
+	position: relative;
+	margin-top: var(--tabula-stacked-table-gap, 120px);
+}
+
+.tabula-file-root:not(.is-single-table) > .tabula-file-table + .tabula-file-table::before {
+	content: "";
+	position: absolute;
+	top: var(--tabula-stacked-table-divider-offset, -60px);
+	left: 2px;
+	right: 2px;
+	height: 1px;
+	background: var(--tabula-border-strong);
+	pointer-events: none;
+}
+
+.tabula-table-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 0 2px 8px;
+}
+
+.tabula-table-section-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.tabula-table-section-index {
+	color: var(--tabula-accent);
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.tabula-file-root.is-single-table .tabula-file-table {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.tabula-file-root.is-single-table .tabula-file-table > .tabula-root {
+	height: 100%;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+/* ==========================================================================
+   Table Root & Card Surface
+   ========================================================================== */
+
+.tabula-root {
 	box-sizing: border-box;
 	width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
 	border: 1px solid var(--tabula-border);
-	border-radius: 14px;
+	border-radius: var(--at-radius);
 	background: var(--tabula-surface);
 	color: var(--tabula-ink);
 	box-shadow: var(--tabula-card-shadow);
-	letter-spacing: normal;
 }
 
-.theme-dark .tabula-file-root .tabula-root {
-	--at-shadow: 0 0 0 1px var(--at-border), 0 12px 30px rgba(0, 0, 0, 0.28);
-}
+/* ==========================================================================
+   Toolbar
+   ========================================================================== */
 
-.tabula-file-root .tabula-file-controls {
-	padding: 0 2px 12px;
-	border-color: var(--tabula-border);
-}
-
-.tabula-file-root .tabula-file-count,
-.tabula-file-root .tabula-table-section-index {
-	color: var(--tabula-ink-muted);
-}
-
-.tabula-file-root .tabula-toolbar {
+.tabula-toolbar {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
-	justify-content: flex-start;
 	gap: 0;
-	padding: 17px 16px 0;
-	border: 0;
+	padding: 14px 14px 0;
+	border-bottom: 0;
 }
 
-.tabula-file-root .tabula-root .tabula-title {
+.tabula-title {
 	box-sizing: border-box;
 	width: 100%;
 	min-width: 0;
 	min-height: 36px;
-	flex: 0 0 auto;
 	margin: 0;
-	padding: 0 2px;
-	border-radius: 4px;
-	color: var(--tabula-ink);
-	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
-	font-size: 23px;
-	font-weight: 600;
-	letter-spacing: -0.035em;
-	line-height: 1.25;
-}
-
-.tabula-file-root .tabula-root .tabula-title:hover {
+	padding: 2px 4px;
+	border: none;
 	background: transparent;
+	border-radius: var(--at-radius-sm);
+	color: var(--tabula-ink);
+	font-family: var(--tabula-title-font);
+	font-size: 20px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	box-shadow: none;
+	outline: none;
+	transition: background 0.12s ease;
 }
 
-.tabula-file-root .tabula-root .tabula-title:focus {
+.tabula-title:hover {
+	background: var(--tabula-row-hover);
+}
+
+.tabula-title:focus {
 	background: var(--tabula-row-hover);
 	outline: 2px solid var(--tabula-accent);
-	outline-offset: 2px;
+	outline-offset: 1px;
 }
 
-.tabula-file-root .tabula-toolbar-actions {
+.tabula-toolbar-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
 	width: 100%;
-	gap: 7px;
-	margin-top: 12px;
-	padding: 10px 0 12px;
+	margin-top: 10px;
+	padding: 8px 0 10px;
 	border-top: 1px solid var(--tabula-border);
 }
 
-.tabula-file-root .tabula-search,
-.tabula-file-root .tabula-query-input,
-.tabula-file-root .tabula-select-search,
-.tabula-file-root .tabula-condition input,
-.tabula-file-root .tabula-condition select,
-.tabula-file-root .tabula-filter-controls select,
-.tabula-file-root .tabula-option-row input,
-.tabula-file-root .tabula-option-row select,
-.tabula-file-root .tabula-panel select {
-	border-color: var(--tabula-border-strong);
-	border-radius: 8px;
-	background: var(--tabula-surface);
-	color: var(--tabula-ink);
+.tabula-toolbar-tools-desktop {
+	display: contents;
 }
 
-.tabula-file-root .tabula-search:focus,
-.tabula-file-root .tabula-query-input:focus,
-.tabula-file-root .tabula-select-search:focus,
-.tabula-file-root .tabula-condition input:focus,
-.tabula-file-root .tabula-condition select:focus {
+.tabula-search,
+.tabula-query-input,
+.tabula-select-search {
+	background: var(--tabula-surface);
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius-sm);
+	padding: 5px 9px;
+	color: var(--tabula-ink);
+	height: 32px;
+	font-size: 13px;
+	box-shadow: none;
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.tabula-search {
+	width: 170px;
+}
+
+.tabula-search:focus,
+.tabula-query-input:focus,
+.tabula-select-search:focus {
 	border-color: var(--tabula-accent-strong);
+	outline: none;
 	box-shadow: 0 0 0 2px color-mix(in srgb, var(--tabula-accent) 24%, transparent);
 }
 
-.tabula-file-root .tabula-btn {
-	min-height: 34px;
-	height: 34px;
-	border-color: var(--tabula-border-strong);
-	border-radius: 8px;
+.tabula-btn {
+	appearance: none;
+	border: 1px solid var(--tabula-border-strong);
 	background: var(--tabula-surface);
 	color: var(--tabula-ink-muted);
+	border-radius: var(--at-radius-sm);
+	padding: 0 10px;
+	height: 32px;
 	font-size: 12px;
-	font-weight: 600;
+	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	white-space: nowrap;
+	box-shadow: none;
+	transition: all 0.12s ease;
 }
 
-.tabula-file-root .tabula-btn:hover {
+.tabula-btn:hover {
 	border-color: var(--tabula-accent);
 	background: var(--tabula-row-hover);
 	color: var(--tabula-ink);
 }
 
-.tabula-file-root .tabula-btn.is-active {
-	border-color: color-mix(in srgb, var(--tabula-accent) 38%, var(--tabula-border));
+.tabula-btn.is-active {
+	border-color: var(--tabula-accent);
 	background: var(--tabula-accent-soft);
 	color: var(--tabula-accent-strong);
+	font-weight: 600;
 }
 
-.tabula-file-root .tabula-btn-primary,
-.tabula-file-root .tabula-btn-primary:hover {
+.tabula-btn-primary {
 	border-color: var(--tabula-primary-bg);
 	background: var(--tabula-primary-bg);
 	color: var(--tabula-primary-fg);
+	font-weight: 600;
 }
 
-.tabula-file-root .tabula-inline-control {
-	min-height: 34px;
-	height: 34px;
-	border-color: var(--tabula-border-strong);
-	border-radius: 8px;
+.tabula-btn-primary:hover {
+	border-color: var(--tabula-accent-strong);
+	background: var(--tabula-accent-strong);
+	color: var(--tabula-primary-fg);
+}
+
+.tabula-btn-danger,
+.tabula-btn.is-danger {
+	color: var(--text-error, #ef4444);
+}
+
+.tabula-btn-danger:hover,
+.tabula-btn.is-danger:hover {
+	border-color: var(--text-error, #ef4444);
+	background: color-mix(in srgb, var(--text-error, #ef4444) 12%, transparent);
+	color: var(--text-error, #ef4444);
+}
+
+.tabula-icon-btn {
+	padding: 0 7px;
+	min-width: 28px;
+}
+
+.tabula-count {
+	margin-left: auto;
+	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.tabula-toolbar-sep {
+	width: 1px;
+	height: 18px;
+	background: var(--tabula-border);
+	margin: 0 2px;
+}
+
+/* ==========================================================================
+   Menu Select Popovers
+   ========================================================================== */
+
+.tabula-menu-select {
+	position: relative;
+	display: inline-block;
+}
+
+.tabula-inline-control {
+	appearance: none;
+	border: 1px solid var(--tabula-border-strong);
 	background: var(--tabula-surface);
+	color: var(--tabula-ink-muted);
+	border-radius: var(--at-radius-sm);
+	padding: 0 8px;
+	height: 32px;
+	font-size: 12px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+	box-shadow: none;
+	transition: all 0.12s ease;
+}
+
+.tabula-inline-control:hover {
+	border-color: var(--tabula-accent);
+	background: var(--tabula-row-hover);
+	color: var(--tabula-ink);
+}
+
+.tabula-menu-label {
 	color: var(--tabula-ink-muted);
 	font-size: 11px;
 }
 
-.tabula-file-root .tabula-menu-value {
+.tabula-menu-value {
 	color: var(--tabula-ink);
+	font-weight: 500;
 }
 
-.tabula-file-root .tabula-menu-label,
-.tabula-file-root .tabula-menu-chevron,
-.tabula-file-root .tabula-count,
-.tabula-file-root .tabula-muted {
+.tabula-menu-chevron {
+	color: var(--tabula-ink-muted);
+	font-size: 10px;
+}
+
+.tabula-menu-popover {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	z-index: 80;
+	min-width: 160px;
+	max-width: 280px;
+	max-height: 280px;
+	overflow-y: auto;
+	padding: 4px;
+	background: var(--tabula-surface);
+	color: var(--tabula-ink);
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius);
+	box-shadow: var(--at-shadow);
+}
+
+.tabula-menu-popover.align-right {
+	left: auto;
+	right: 0;
+}
+
+.tabula-menu-option {
+	appearance: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 6px 8px;
+	border: none;
+	background: transparent;
+	color: var(--tabula-ink);
+	border-radius: var(--at-radius-sm);
+	font-size: 12px;
+	cursor: pointer;
+	text-align: left;
+}
+
+.tabula-menu-option:hover:not(:disabled) {
+	background: var(--tabula-row-hover);
+}
+
+.tabula-menu-option.is-selected {
+	font-weight: 600;
+	color: var(--tabula-accent);
+}
+
+.tabula-menu-check {
+	color: var(--tabula-accent);
+	font-size: 12px;
+}
+
+.tabula-menu-hint {
+	padding: 6px 8px;
+	font-size: 11px;
 	color: var(--tabula-ink-muted);
 }
 
-.tabula-file-root .tabula-toolbar-sep {
-	background: var(--tabula-border);
-}
+/* ==========================================================================
+   Filter Bar & Query Syntax
+   ========================================================================== */
 
-.tabula-file-root .tabula-grid-area {
-	gap: 0;
-	padding: 0 12px 12px;
-}
-
-.tabula-file-root .tabula-top-scrollbar {
-	min-height: 20px;
-	border-color: var(--tabula-border);
+.tabula-filter-bar {
+	margin: 0 14px 10px;
+	padding: 10px 12px;
 	background: var(--tabula-surface-2);
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }
 
-.tabula-file-root .tabula-grid-wrap {
-	border-color: var(--tabula-border);
-	border-radius: 10px;
+.tabula-filter-mode-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--tabula-border);
+	padding-bottom: 6px;
+}
+
+.tabula-filter-tabs {
+	display: flex;
+	gap: 4px;
+}
+
+.tabula-filter-tab {
+	appearance: none;
+	border: 1px solid transparent;
+	background: transparent;
+	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	font-weight: 500;
+	padding: 3px 8px;
+	border-radius: var(--at-radius-sm);
+	cursor: pointer;
+	transition: all 0.12s ease;
+}
+
+.tabula-filter-tab:hover {
+	color: var(--tabula-ink);
+	background: var(--tabula-row-hover);
+}
+
+.tabula-filter-tab.is-active {
+	background: var(--tabula-surface);
+	border-color: var(--tabula-border-strong);
+	color: var(--tabula-ink);
+	font-weight: 600;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tabula-query-section {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.tabula-query-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+}
+
+.tabula-query-input {
+	flex: 1 1 auto;
+	font-family: var(--font-monospace);
+	font-size: 12px;
+}
+
+.tabula-query-input.has-error {
+	border-color: var(--text-error, #ef4444);
+}
+
+.tabula-query-error {
+	color: var(--text-error, #ef4444);
+	font-size: 11px;
+}
+
+.tabula-query-tips {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+	color: var(--tabula-ink-muted);
+}
+
+.tabula-query-tips code {
+	background: var(--tabula-surface);
+	border: 1px solid var(--tabula-border);
+	border-radius: 3px;
+	padding: 1px 5px;
+	font-size: 11px;
+}
+
+.tabula-builder-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.tabula-filter-controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.tabula-filter-empty {
+	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	padding: 4px 2px;
+}
+
+.tabula-conditions {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.tabula-condition {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.tabula-condition input,
+.tabula-condition select {
+	background: var(--tabula-surface);
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius-sm);
+	padding: 4px 8px;
+	color: var(--tabula-ink);
+	height: 30px;
+	font-size: 12px;
+}
+
+.tabula-multi-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.tabula-check-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 12px;
+	color: var(--tabula-ink);
+	cursor: pointer;
+}
+
+/* ==========================================================================
+   Sort & Hide Panels
+   ========================================================================== */
+
+.tabula-panel {
+	margin: 0 14px 10px;
+	padding: 10px 12px;
+	background: var(--tabula-surface-2);
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.tabula-panel-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+}
+
+.tabula-panel-empty {
+	color: var(--tabula-ink-muted);
+	font-size: 12px;
+}
+
+.tabula-hide-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 14px;
+	padding-top: 4px;
+}
+
+/* ==========================================================================
+   Table Grid Container & Area
+   ========================================================================== */
+
+.tabula-grid-area {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	padding: 0 14px 14px;
+}
+
+.tabula-file-root.is-single-table .tabula-grid-area {
+	flex: 1 1 auto;
+}
+
+.tabula-top-scrollbar {
+	height: 14px;
+	min-height: 14px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	background: var(--tabula-surface-2);
+	border: 1px solid var(--tabula-border);
+	border-bottom: 0;
+	border-top-left-radius: var(--at-radius-sm);
+	border-top-right-radius: var(--at-radius-sm);
+}
+
+.tabula-top-scrollbar-inner {
+	height: 1px;
+}
+
+.tabula-grid-wrap {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+	overflow-x: auto;
+	overflow-y: auto;
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
 	background: var(--tabula-surface);
 	-webkit-overflow-scrolling: touch;
+	overscroll-behavior-x: contain;
 }
 
-.tabula-file-root .tabula-grid-wrap:focus-visible {
+.tabula-file-root.is-single-table .tabula-grid-wrap {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.tabula-file-table .tabula-grid-wrap {
+	flex: 0 1 auto;
+	min-height: 160px;
+}
+
+.tabula-grid-wrap:focus-visible {
 	outline: 2px solid var(--tabula-accent);
-	outline-offset: 2px;
+	outline-offset: 1px;
 }
 
-.tabula-file-root .tabula-grid th,
-.tabula-file-root .tabula-grid td {
-	border-color: var(--tabula-border);
+/* ==========================================================================
+   Table & Cells
+   ========================================================================== */
+
+.tabula-grid {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: max-content;
+	min-width: 100%;
+	font-size: 13px;
+}
+
+.tabula-grid th,
+.tabula-grid td {
+	box-sizing: border-box;
+	border-bottom: 1px solid var(--tabula-border);
+	border-right: 1px solid var(--tabula-border);
+	padding: 0;
+	margin: 0;
 	background: var(--tabula-surface);
+	vertical-align: middle;
 }
 
-.tabula-file-root .tabula-grid th {
+.tabula-grid th:last-child,
+.tabula-grid td:last-child {
+	border-right: 0;
+}
+
+.tabula-grid th {
+	position: sticky;
+	top: 0;
+	z-index: 3;
 	background: var(--tabula-surface-2);
 	color: var(--tabula-ink-muted);
 	box-shadow: inset 0 -1px 0 var(--tabula-border);
 }
 
-.tabula-file-root .tabula-root .tabula-th-name {
-	color: var(--tabula-ink-muted);
-	font-size: 11px;
-	font-weight: 700;
-	letter-spacing: 0.045em;
-	text-transform: uppercase;
-}
-
-.tabula-file-root .tabula-th-type {
-	color: var(--tabula-ink-faint);
-}
-
-.tabula-file-root .tabula-grid tbody tr:hover td {
+.tabula-grid tbody tr:hover td {
 	background: var(--tabula-row-hover);
 }
 
-.tabula-file-root .tabula-grid tbody tr.is-selected td {
+.tabula-grid tbody tr.is-selected td {
 	background: var(--tabula-row-selected);
 }
 
-.tabula-file-root .tabula-root .tabula-grid .tabula-row-num {
-	min-width: var(--tabula-row-number-width, 56px);
-	width: var(--tabula-row-number-width, 56px);
-	background: var(--tabula-surface-2);
+/* Sticky row numbers & primary column */
+.tabula-row-num {
+	min-width: var(--tabula-row-number-width, 48px);
+	width: var(--tabula-row-number-width, 48px);
+	text-align: center;
 	color: var(--tabula-ink-faint);
+	background: var(--tabula-surface-2) !important;
+	font-variant-numeric: tabular-nums;
+	font-size: 12px;
+	user-select: none;
 }
 
-.tabula-file-root .tabula-grid.is-frozen .sticky-col,
-.tabula-file-root .tabula-grid.is-frozen .sticky-primary {
-	background: var(--tabula-surface-2);
+.tabula-grid.is-frozen .sticky-col,
+.tabula-grid.is-frozen .sticky-primary {
+	position: sticky;
+	left: 0;
+	z-index: 2;
+	background: var(--tabula-surface-2) !important;
 }
 
-.tabula-file-root .tabula-grid.is-frozen .sticky-primary {
-	left: var(--tabula-row-number-width, 56px);
+.tabula-grid.is-frozen thead .sticky-col,
+.tabula-grid.is-frozen thead .sticky-primary {
+	z-index: 4;
 }
 
-.tabula-file-root .tabula-grid.height-short td,
-.tabula-file-root .tabula-grid.height-short .tabula-cell-input,
-.tabula-file-root .tabula-grid.height-short .tabula-select-trigger {
-	min-height: 38px;
+.tabula-grid.is-frozen .sticky-primary {
+	left: var(--tabula-row-number-width, 48px);
+	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
-.tabula-file-root .tabula-grid.height-medium td,
-.tabula-file-root .tabula-grid.height-medium .tabula-cell-input,
-.tabula-file-root .tabula-grid.height-medium .tabula-select-trigger {
-	min-height: 46px;
+.tabula-row-num-content {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 4px;
+	gap: 2px;
 }
 
-.tabula-file-root .tabula-grid.height-tall td,
-.tabula-file-root .tabula-grid.height-tall .tabula-cell-input,
-.tabula-file-root .tabula-grid.height-tall .tabula-select-trigger {
-	min-height: 58px;
+.tabula-row-drag-handle,
+.tabula-col-drag-handle {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: var(--tabula-ink-faint);
+	font-size: 13px;
+	line-height: 1;
+	padding: 2px;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+	opacity: 0.55;
+	transition: opacity 0.12s ease, color 0.12s ease;
 }
 
-.tabula-file-root .tabula-root .tabula-cell-input {
-	border-radius: 0;
+.tabula-row-drag-handle:hover,
+.tabula-col-drag-handle:hover {
+	opacity: 1;
+	color: var(--tabula-accent-strong);
+}
+
+.tabula-row-drag-handle:active,
+.tabula-col-drag-handle:active {
+	cursor: grabbing;
+}
+
+.tabula-row-drag-handle:disabled {
+	opacity: 0.2;
+	cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Field Headers
+   ========================================================================== */
+
+.tabula-th {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 8px;
+	position: relative;
+	user-select: none;
+	min-height: 36px;
+}
+
+.tabula-th-name {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--tabula-ink-muted);
+	cursor: pointer;
+	padding: 2px 4px;
+	border-radius: var(--at-radius-sm);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.tabula-th-name:hover {
+	background: var(--tabula-row-hover);
+	color: var(--tabula-ink);
+}
+
+.tabula-th-name-editing {
+	border: 1px solid var(--tabula-accent);
+	background: var(--tabula-surface);
+	color: var(--tabula-ink);
+	font-size: 11px;
+	font-weight: 700;
+	padding: 2px 4px;
+	border-radius: var(--at-radius-sm);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--tabula-accent) 24%, transparent);
+	outline: none;
+}
+
+.tabula-th-type {
+	font-size: 10px;
+	color: var(--tabula-ink-faint);
+	text-transform: uppercase;
+}
+
+.tabula-col-resize {
+	position: absolute;
+	right: -4px;
+	top: 0;
+	bottom: 0;
+	width: 8px;
+	cursor: col-resize;
+	z-index: 5;
+}
+
+.tabula-col-resize:hover {
+	background: color-mix(in srgb, var(--tabula-accent) 40%, transparent);
+}
+
+.tabula-field-menu {
+	position: absolute;
+	top: calc(100% + 4px);
+	right: 4px;
+	z-index: 60;
+	min-width: 170px;
+	background: var(--tabula-surface);
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius);
+	box-shadow: var(--at-shadow);
+	padding: 4px;
+	display: flex;
+	flex-direction: column;
+}
+
+.tabula-field-menu button {
+	appearance: none;
+	border: none;
+	background: transparent;
+	text-align: left;
+	padding: 7px 10px;
+	border-radius: var(--at-radius-sm);
+	cursor: pointer;
+	color: var(--tabula-ink);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.tabula-field-menu button:hover {
+	background: var(--tabula-row-hover);
+}
+
+.tabula-field-menu button.is-danger {
+	color: var(--text-error, #ef4444);
+}
+
+/* ==========================================================================
+   Row Heights
+   ========================================================================== */
+
+.tabula-grid.height-short td,
+.tabula-grid.height-short .tabula-cell-input,
+.tabula-grid.height-short .tabula-select-trigger {
+	min-height: 36px;
+	height: 36px;
+}
+
+.tabula-grid.height-medium td,
+.tabula-grid.height-medium .tabula-cell-input,
+.tabula-grid.height-medium .tabula-select-trigger {
+	min-height: 44px;
+	height: 44px;
+}
+
+.tabula-grid.height-tall td,
+.tabula-grid.height-tall .tabula-cell-input,
+.tabula-grid.height-tall .tabula-select-trigger {
+	min-height: 56px;
+	height: 56px;
+}
+
+/* ==========================================================================
+   Cell Editors & Inputs
+   ========================================================================== */
+
+.tabula-cell-input {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	border: none;
+	background: transparent;
+	padding: 6px 8px;
 	color: var(--tabula-ink);
 	font-size: 13px;
+	outline: none;
+	box-shadow: none;
 }
 
-.tabula-file-root .tabula-root .tabula-cell-input:focus {
+.tabula-cell-input:focus {
 	box-shadow: inset 0 0 0 2px var(--tabula-accent);
 }
 
-.tabula-file-root .tabula-readonly {
+/* Numeric & Currency: Right-aligned */
+.tabula-affix-cell {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	width: 100%;
+	height: 100%;
+}
+
+.tabula-affix-cell .tabula-cell-input,
+.tabula-number-input {
+	text-align: right;
+}
+
+.tabula-number-input::-webkit-inner-spin-button,
+.tabula-number-input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.tabula-number-input {
+	-moz-appearance: textfield;
+}
+
+.tabula-affix {
+	padding: 0 6px;
 	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	font-weight: 500;
 }
 
-.tabula-file-root .tabula-root .tabula-grid .tabula-empty {
+.tabula-readonly {
+	display: block;
+	padding: 6px 8px;
 	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
 }
 
-.tabula-file-root .tabula-root .tabula-grid .tabula-group-row td {
-	border-color: var(--tabula-border);
-	background: var(--tabula-surface-2);
-}
-
-.tabula-file-root .tabula-add-row-footer {
-	border-color: var(--tabula-border);
+.tabula-empty {
+	padding: 24px;
+	text-align: center;
 	color: var(--tabula-ink-muted);
+	font-style: italic;
 }
 
-.tabula-file-root .tabula-add-row-footer:hover {
-	background: var(--tabula-row-hover);
-	color: var(--tabula-accent-strong);
+/* ==========================================================================
+   Checkbox & Rating Cells
+   ========================================================================== */
+
+.tabula-checkbox-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
 }
 
-.tabula-file-root .tabula-field-menu,
-.tabula-file-root .tabula-menu-popover,
-.tabula-file-root .tabula-select-popover,
-.tabula-file-root .tabula-paste-modal {
-	border-color: var(--tabula-border-strong);
-	border-radius: 12px;
+.tabula-checkbox-cell input {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+}
+
+.tabula-rating {
+	display: flex;
+	align-items: center;
+	gap: 1px;
+	padding: 6px 8px;
+}
+
+.tabula-star {
+	appearance: none;
+	border: none;
+	background: transparent;
+	color: var(--tabula-border-strong);
+	cursor: pointer;
+	font-size: 15px;
+	padding: 0 1px;
+	line-height: 1;
+	transition: color 0.1s ease;
+}
+
+.tabula-star.is-on {
+	color: #f59e0b;
+}
+
+/* ==========================================================================
+   Select Editor (Tags & Combobox)
+   ========================================================================== */
+
+.tabula-select {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.tabula-select-trigger {
+	appearance: none;
+	border: none;
+	background: transparent;
+	width: 100%;
+	height: 100%;
+	text-align: left;
+	padding: 6px 8px;
+	cursor: pointer;
+	color: inherit;
+	display: flex;
+	align-items: center;
+}
+
+.tabula-placeholder {
+	color: var(--tabula-ink-faint);
+	font-size: 12px;
+}
+
+.tabula-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	align-items: center;
+}
+
+.tabula-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	border-radius: var(--at-radius-sm);
+	padding: 1px 7px;
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 1.5;
+	max-width: 180px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	border: 1px solid transparent;
+}
+
+.tabula-pill-x {
+	opacity: 0.6;
+	cursor: pointer;
+	font-weight: 600;
+	margin-left: 2px;
+}
+
+.tabula-pill-x:hover {
+	opacity: 1;
+}
+
+.tabula-select-menu {
+	position: absolute;
+	z-index: 50;
+	top: calc(100% + 2px);
+	left: 0;
+	min-width: 220px;
+	max-width: 280px;
 	background: var(--tabula-surface);
-	color: var(--tabula-ink);
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius);
 	box-shadow: var(--at-shadow);
+	padding: 6px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
 
-.tabula-file-root .tabula-menu-option:hover:not(:disabled),
-.tabula-file-root .tabula-field-menu button:hover,
-.tabula-file-root .tabula-select-option:hover,
-.tabula-file-root .tabula-select-manage:hover,
-.tabula-file-root .tabula-select-option.is-active {
+.tabula-select-options {
+	max-height: 200px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+}
+
+.tabula-select-option,
+.tabula-select-manage {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	border: none;
+	background: transparent;
+	color: var(--tabula-ink);
+	padding: 6px 8px;
+	border-radius: var(--at-radius-sm);
+	cursor: pointer;
+	text-align: left;
+	font-size: 12px;
+}
+
+.tabula-select-option:hover,
+.tabula-select-option.is-highlighted,
+.tabula-select-manage:hover {
 	background: var(--tabula-row-hover);
 }
 
-.tabula-file-root .tabula-row-drag-handle:hover,
-.tabula-file-root .tabula-col-drag-handle:hover,
-.tabula-file-root .tabula-row-drag-handle:focus-visible,
-.tabula-file-root .tabula-col-drag-handle:focus-visible {
+.tabula-select-option.is-active {
+	font-weight: 600;
+}
+
+.tabula-create-option {
+	color: var(--tabula-accent);
+	font-weight: 500;
+}
+
+.tabula-select-manage {
+	border-top: 1px solid var(--tabula-border);
+	margin-top: 4px;
+	padding-top: 6px;
+	color: var(--tabula-ink-muted);
+}
+
+/* ==========================================================================
+   LongText Cell (Floating Popover)
+   ========================================================================== */
+
+.tabula-longtext-wrapper {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.tabula-longtext-preview {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	height: 100%;
+	text-align: left;
+	border: none;
+	background: transparent;
+	color: inherit;
+	padding: 6px 8px;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 13px;
+}
+
+.tabula-longtext-preview:hover,
+.tabula-longtext-preview.is-active {
+	background: var(--tabula-row-hover);
+}
+
+.tabula-longtext-popover {
+	position: absolute;
+	top: -4px;
+	left: -4px;
+	z-index: 60;
+	min-width: 320px;
+	max-width: 440px;
+	background: var(--tabula-surface);
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.tabula-longtext-input {
+	width: 100%;
+	min-height: 120px;
+	max-height: 280px;
+	resize: vertical;
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
+	padding: 8px 10px;
+	background: var(--tabula-surface-2);
+	color: var(--tabula-ink);
+	font-family: var(--font-text);
+	font-size: 13px;
+	line-height: 1.5;
+	outline: none;
+}
+
+.tabula-longtext-input:focus {
+	border-color: var(--tabula-accent);
+}
+
+.tabula-longtext-popover-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 11px;
+}
+
+.tabula-longtext-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.tabula-shortcut-hint {
+	font-size: 11px;
+}
+
+/* ==========================================================================
+   Links & Attachments
+   ========================================================================== */
+
+.tabula-link-cell {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
+	padding: 4px 8px;
+	width: 100%;
+	height: 100%;
+}
+
+.tabula-link-cell a {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--tabula-accent);
+	text-decoration: underline;
+}
+
+.tabula-attachments {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	align-items: center;
+	padding: 4px 6px;
+}
+
+.tabula-attach-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: var(--tabula-surface-2);
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
+	padding: 2px 6px;
+	font-size: 11px;
+	color: var(--tabula-ink);
+}
+
+.tabula-attach-input {
+	min-width: 100px;
+	flex: 1 1 auto;
+	font-size: 11px;
+	padding: 2px 4px;
+}
+
+/* ==========================================================================
+   Collapsible Groups & Add Row Footer
+   ========================================================================== */
+
+.tabula-group-row td {
+	background: var(--tabula-surface-2) !important;
+	padding: 8px 12px;
+	font-weight: 600;
+	font-size: 12px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.tabula-group-chevron {
+	display: inline-block;
+	margin-right: 6px;
+	color: var(--tabula-ink-muted);
+	font-size: 10px;
+}
+
+.tabula-add-row-footer {
+	appearance: none;
+	width: 100%;
+	height: 38px;
+	border: none;
+	border-top: 1px solid var(--tabula-border);
+	background: transparent;
+	color: var(--tabula-ink-muted);
+	font-size: 12px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.12s ease;
+}
+
+.tabula-add-row-footer:hover {
+	background: var(--tabula-row-hover);
 	color: var(--tabula-accent-strong);
 }
 
-.tabula-file-root .tabula-grid tbody tr.is-drop-before td {
+/* Drag drop highlights */
+.tabula-grid .is-dragging {
+	opacity: 0.45;
+}
+
+.tabula-grid tbody tr.is-drop-before td {
 	box-shadow: inset 0 2px var(--tabula-accent);
 }
 
-.tabula-file-root .tabula-grid tbody tr.is-drop-after td {
+.tabula-grid tbody tr.is-drop-after td {
 	box-shadow: inset 0 -2px var(--tabula-accent);
 }
 
-.tabula-file-root .tabula-grid th.is-drop-before {
+.tabula-grid th.is-drop-before {
 	box-shadow: inset 3px 0 var(--tabula-accent), inset 0 -1px var(--tabula-border);
 }
 
-.tabula-file-root .tabula-grid th.is-drop-after {
+.tabula-grid th.is-drop-after {
 	box-shadow: inset -3px 0 var(--tabula-accent), inset 0 -1px var(--tabula-border);
 }
 
-.tabula-file-root .tabula-star.is-on {
-	color: var(--tabula-accent-strong);
+/* ==========================================================================
+   Modals & Dialogs
+   ========================================================================== */
+
+.tabula-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+	backdrop-filter: blur(2px);
 }
 
-.tabula-file-root .tabula-file-table > .tabula-root {
-	border-color: var(--tabula-border);
-	border-radius: 14px;
+.tabula-modal {
+	width: min(580px, calc(100vw - 32px));
+	max-height: calc(100vh - 48px);
+	overflow-y: auto;
 	background: var(--tabula-surface);
-	box-shadow: var(--tabula-card-shadow);
-}
-
-.tabula-file-root .tabula-file-table .tabula-grid-wrap {
-	border-radius: 10px;
-}
-
-.tabula-file-root .tabula-table-section-header {
-	margin: 0 2px 10px;
-}
-
-.tabula-file-root .tabula-table-section-title {
-	gap: 10px;
-}
-
-.tabula-file-root .tabula-table-section-index {
-	color: var(--tabula-accent-strong);
-}
-
-.tabula-file-root .tabula-table-section-name {
 	color: var(--tabula-ink);
-	font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	border: 1px solid var(--tabula-border-strong);
+	border-radius: var(--at-radius);
+	box-shadow: var(--at-shadow);
+	padding: 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.tabula-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.tabula-modal-header h3 {
+	margin: 0;
 	font-size: 16px;
 	font-weight: 600;
-	letter-spacing: -0.02em;
 }
 
-.tabula-file-root .tabula-file-controls .tabula-btn,
-.tabula-file-root .tabula-table-section-header .tabula-btn {
-	border-radius: 9px;
+.tabula-option-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 }
+
+.tabula-option-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.tabula-option-row input,
+.tabula-option-row select {
+	background: var(--tabula-surface-2);
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
+	padding: 4px 8px;
+	color: var(--tabula-ink);
+	height: 30px;
+}
+
+.tabula-paste-preview-wrap {
+	max-height: 200px;
+	overflow: auto;
+	border: 1px solid var(--tabula-border);
+	border-radius: var(--at-radius-sm);
+}
+
+.tabula-paste-preview {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 11px;
+}
+
+.tabula-paste-preview th,
+.tabula-paste-preview td {
+	padding: 5px 8px;
+	border: 1px solid var(--tabula-border);
+}
+
+.tabula-paste-preview th {
+	background: var(--tabula-surface-2);
+	font-weight: 600;
+}
+
+.tabula-paste-warning {
+	padding: 8px 10px;
+	background: color-mix(in srgb, #f59e0b 12%, transparent);
+	border-left: 3px solid #f59e0b;
+	font-size: 12px;
+	color: var(--tabula-ink);
+}
+
+.tabula-paste-confirm {
+	padding: 10px 12px;
+	background: color-mix(in srgb, var(--text-error, #ef4444) 10%, transparent);
+	border: 1px solid var(--text-error, #ef4444);
+	border-radius: var(--at-radius-sm);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	font-size: 12px;
+}
+
+.tabula-paste-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.tabula-paste-error {
+	color: var(--text-error, #ef4444);
+	font-size: 12px;
+}
+
+/* ==========================================================================
+   Select Tag Colors
+   ========================================================================== */
+
+.tabula-color-gray { background: #f0f0f0; color: #4a4a4a; border-color: #dcdcdc; }
+.tabula-color-blue { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+.tabula-color-green { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+.tabula-color-yellow { background: #fef9c3; color: #a16207; border-color: #fef08a; }
+.tabula-color-orange { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
+.tabula-color-red { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.tabula-color-pink { background: #fce7f3; color: #be185d; border-color: #fbcfe8; }
+.tabula-color-purple { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+.tabula-color-cyan { background: #cffafe; color: #0e7490; border-color: #a5f3fc; }
+
+.theme-dark .tabula-color-gray { background: #262626; color: #d4d4d4; border-color: #404040; }
+.theme-dark .tabula-color-blue { background: #082f49; color: #7dd3fc; border-color: #0c4a6e; }
+.theme-dark .tabula-color-green { background: #14261a; color: #bbf7d0; border-color: #1f3b28; }
+.theme-dark .tabula-color-yellow { background: #2a2410; color: #fde68a; border-color: #3f3518; }
+.theme-dark .tabula-color-orange { background: #2a1a10; color: #fdba74; border-color: #3f2818; }
+.theme-dark .tabula-color-red { background: #2a1414; color: #fecaca; border-color: #3f1f1f; }
+.theme-dark .tabula-color-pink { background: #2a1420; color: #fbcfe8; border-color: #3f1f30; }
+.theme-dark .tabula-color-purple { background: #1e1530; color: #ddd6fe; border-color: #2f2248; }
+.theme-dark .tabula-color-cyan { background: #102428; color: #a5f3fc; border-color: #1a383d; }
+
+/* ==========================================================================
+   Mobile & Responsive (max-width: 720px)
+   ========================================================================== */
 
 @media (max-width: 720px) {
 	.tabula-file-root {
-		padding: 8px 10px 12px;
-		gap: 10px;
-	}
-
-	.tabula-file-root:not(.is-single-table) > .tabula-file-controls {
-		margin-bottom: 14px;
-	}
-
-	.tabula-file-root .tabula-file-controls {
+		padding: 8px 8px 12px;
 		gap: 8px;
-		padding: 0 0 9px;
+		--tabula-row-number-width: 42px;
 	}
 
-	.tabula-file-root .tabula-file-controls .tabula-btn,
-	.tabula-file-root .tabula-table-section-header .tabula-btn {
-		min-height: 44px;
-		height: 44px;
-	}
-
-	.tabula-file-root .tabula-root {
-		--tabula-row-number-width: 68px;
-	}
-
-	.tabula-file-root .tabula-toolbar {
-		align-items: stretch;
-		gap: 0;
-		padding: 13px 12px 0;
-	}
-
-	.tabula-file-root .tabula-root .tabula-title {
-		min-height: 44px;
-		font-size: 21px;
-	}
-
-	.tabula-file-root .tabula-toolbar-actions {
-		align-items: stretch;
-		gap: 8px;
-		padding: 10px 0 12px;
-	}
-
-	.tabula-file-root .tabula-mobile-primary-row .tabula-search {
-		box-sizing: border-box;
-		width: auto;
-		min-width: 0;
-		min-height: 44px;
-		height: 44px;
-		flex: 1 1 0;
-		font-size: 16px;
-	}
-
-	.tabula-file-root .tabula-toolbar-actions .tabula-btn,
-	.tabula-file-root .tabula-toolbar-actions .tabula-inline-control {
-		box-sizing: border-box;
-		min-height: 44px;
-		height: 44px;
-		flex-shrink: 0;
-	}
-
-	.tabula-file-root .tabula-mobile-count {
-		min-height: 20px;
-		display: inline-flex;
-		align-items: center;
-		align-self: flex-end;
-		white-space: nowrap;
-	}
-
-	.tabula-file-root .tabula-toolbar-sep {
-		display: none;
-	}
-
-	.tabula-file-root .tabula-menu-value {
-		max-width: 94px;
-	}
-
-	.tabula-file-root .tabula-grid-area {
-		padding: 0 8px 8px;
-	}
-
-	.tabula-file-root .tabula-grid-wrap {
-		touch-action: pan-x pan-y;
-		-webkit-overflow-scrolling: touch;
-		overscroll-behavior: contain;
-	}
-
-	.tabula-file-root .tabula-top-scrollbar {
-		min-height: 25px;
-	}
-
-	.tabula-file-root .tabula-root .tabula-grid .tabula-row-num {
-		min-width: var(--tabula-row-number-width, 68px);
-		width: var(--tabula-row-number-width, 68px);
-	}
-
-	.tabula-file-root .tabula-grid.is-frozen .sticky-primary {
-		left: var(--tabula-row-number-width, 68px);
-	}
-
-	.tabula-file-root .tabula-row-drag-handle,
-	.tabula-file-root .tabula-col-drag-handle {
-		box-sizing: border-box;
-		width: 40px;
-		height: 40px;
-		min-width: 40px;
+	.tabula-file-controls .tabula-btn,
+	.tabula-table-section-header .tabula-btn {
 		min-height: 40px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0;
-		opacity: 0.86;
+		height: 40px;
 	}
 
-	.tabula-file-root .tabula-th {
-		min-height: 52px;
-		padding: 4px 8px;
-		gap: 4px;
+	.tabula-toolbar {
+		padding: 10px 10px 0;
 	}
 
-	.tabula-file-root .tabula-th .tabula-icon-btn {
-		min-width: 36px;
-		height: 36px;
-		padding: 0;
-	}
-
-	.tabula-file-root .tabula-col-resize {
-		right: -7px;
-		width: 14px;
-	}
-
-	.tabula-file-root .tabula-grid.height-short td,
-	.tabula-file-root .tabula-grid.height-short .tabula-cell-input,
-	.tabula-file-root .tabula-grid.height-short .tabula-select-trigger {
-		min-height: 44px;
-	}
-
-	.tabula-file-root .tabula-grid.height-medium td,
-	.tabula-file-root .tabula-grid.height-medium .tabula-cell-input,
-	.tabula-file-root .tabula-grid.height-medium .tabula-select-trigger {
-		min-height: 49px;
-	}
-
-	.tabula-file-root .tabula-grid.height-tall td,
-	.tabula-file-root .tabula-grid.height-tall .tabula-cell-input,
-	.tabula-file-root .tabula-grid.height-tall .tabula-select-trigger {
-		min-height: 62px;
-	}
-
-	.tabula-file-root .tabula-root .tabula-cell-input,
-	.tabula-file-root .tabula-root .tabula-th-name,
-	.tabula-file-root .tabula-root .tabula-longtext {
-		font-size: 16px;
-	}
-
-	.tabula-file-root .tabula-grid .tabula-longtext-preview {
-		box-sizing: border-box;
-		min-height: 44px;
-	}
-
-	.tabula-file-root .tabula-grid .tabula-select {
-		min-height: 44px;
-	}
-
-	.tabula-file-root .tabula-checkbox-cell {
-		min-height: 44px;
-		align-items: center;
-	}
-
-	.tabula-file-root .tabula-checkbox-cell input {
-		width: 20px;
-		height: 20px;
-	}
-
-	.tabula-file-root .tabula-star {
-		min-width: 36px;
-		min-height: 36px;
-	}
-
-	.tabula-file-root .tabula-add-row-footer {
-		min-height: 44px;
-	}
-
-	.tabula-file-root .tabula-file-table .tabula-grid-wrap {
-		max-height: 65vh;
-	}
-}
-
-/* Desktop keeps the original flat toolbar order; mobile renders the tool group on demand. */
-.tabula-toolbar-tools-desktop {
-	display: contents;
-}
-
-.tabula-mobile-more .tabula-menu-chevron {
-	transition: transform 0.15s ease;
-}
-
-.tabula-mobile-more[aria-expanded="true"] .tabula-menu-chevron {
-	transform: rotate(180deg);
-}
-
-@media (max-width: 720px) {
 	.tabula-toolbar-actions-mobile {
-		box-sizing: border-box;
 		width: 100%;
 		display: flex;
 		flex-direction: column;
-		flex-wrap: nowrap;
-		align-items: stretch;
-	}
-
-	.tabula-mobile-primary-row {
-		box-sizing: border-box;
-		width: 100%;
-		min-width: 0;
-		display: flex;
-		flex-wrap: nowrap;
-		align-items: stretch;
 		gap: 6px;
 	}
 
+	.tabula-mobile-primary-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		width: 100%;
+	}
+
 	.tabula-mobile-primary-row .tabula-search {
-		box-sizing: border-box;
-		width: auto;
+		flex: 1 1 auto;
 		min-width: 0;
-		min-height: 44px;
-		height: 44px;
-		flex: 1 1 0;
-		font-size: 16px;
+		height: 38px;
+		font-size: 14px;
 	}
 
-	.tabula-mobile-primary-row .tabula-add-row-btn,
-	.tabula-mobile-primary-row .tabula-mobile-more,
-	.tabula-mobile-primary-row .tabula-add-field-control .tabula-menu-btn {
-		box-sizing: border-box;
-		min-height: 44px;
-		height: 44px;
-		flex: 0 0 auto;
-		padding-right: 8px;
-		padding-left: 8px;
-	}
-
-	.tabula-mobile-primary-row .tabula-add-field-control {
-		min-width: 0;
-		flex: 0 0 auto;
+	.tabula-mobile-primary-row .tabula-btn {
+		height: 38px;
+		flex-shrink: 0;
 	}
 
 	.tabula-mobile-tools {
-		position: relative;
-		z-index: 10;
-		box-sizing: border-box;
-		width: 100%;
-		min-width: 0;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 8px;
-		padding: 10px 0 0;
-		border-top: 1px solid var(--at-border);
-		overflow: visible;
+		gap: 6px;
+		padding-top: 6px;
+		border-top: 1px solid var(--tabula-border);
 	}
 
 	.tabula-mobile-tools .tabula-btn,
-	.tabula-mobile-tools .tabula-inline-control,
-	.tabula-mobile-tools .tabula-menu-btn {
-		box-sizing: border-box;
-		min-height: 44px;
-		height: 44px;
-		flex: 0 0 auto;
+	.tabula-mobile-tools .tabula-inline-control {
+		height: 36px;
 	}
 
-	.tabula-mobile-tools .tabula-menu-select {
-		flex: 0 0 auto;
+	.tabula-grid-area {
+		padding: 0 6px 6px;
 	}
 
-	.tabula-mobile-tools .tabula-toolbar-sep {
-		display: none;
+	.tabula-grid.height-short td,
+	.tabula-grid.height-short .tabula-cell-input,
+	.tabula-grid.height-short .tabula-select-trigger {
+		min-height: 42px;
 	}
 
-	.tabula-mobile-count {
-		box-sizing: border-box;
-		min-height: 20px;
-		align-self: flex-end;
-		white-space: nowrap;
+	.tabula-grid.height-medium td,
+	.tabula-grid.height-medium .tabula-cell-input,
+	.tabula-grid.height-medium .tabula-select-trigger {
+		min-height: 48px;
 	}
 
-	/* Keep the scroller viewport-bounded and the table at its intrinsic column width. */
-	.tabula-root .tabula-grid-area,
-	.tabula-root .tabula-grid-wrap {
-		box-sizing: border-box;
-		width: 100%;
-		max-width: 100%;
-		min-width: 0;
+	.tabula-grid.height-tall td,
+	.tabula-grid.height-tall .tabula-cell-input,
+	.tabula-grid.height-tall .tabula-select-trigger {
+		min-height: 60px;
 	}
 
-	.tabula-root .tabula-grid-wrap {
-		overflow-x: auto;
-		overflow-y: auto;
-		touch-action: pan-x pan-y;
-		-webkit-overflow-scrolling: touch;
-		overscroll-behavior-x: contain;
+	.tabula-row-drag-handle,
+	.tabula-col-drag-handle {
+		width: 32px;
+		height: 32px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 	}
 
-	.tabula-root .tabula-grid {
-		flex-shrink: 0;
-		width: max-content;
-		min-width: 100%;
-	}
-
-	.tabula-root .tabula-add-row-footer {
-		display: none;
+	/* Bottom + New row footer MUST be visible and comfortable on mobile */
+	.tabula-add-row-footer {
+		display: flex;
+		min-height: 42px;
+		height: 42px;
 	}
 }

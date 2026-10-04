@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TableDocument } from "../data/types";
 import { matrixToTable } from "../import/spreadsheet";
 
@@ -31,6 +31,14 @@ export function PasteSpreadsheetModal(props: Props) {
 	const [replaceCandidate, setReplaceCandidate] = useState<TableDocument | null>(null);
 	const [error, setError] = useState("");
 
+	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") onClose();
+		};
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [onClose]);
+
 	const columnCount = useMemo(
 		() => matrix.reduce((max, row) => Math.max(max, row.length), 0),
 		[matrix]
@@ -53,7 +61,7 @@ export function PasteSpreadsheetModal(props: Props) {
 		setError("");
 		try {
 			const incoming = buildIncoming();
-			if (props.currentDoc.sync) {
+			if (props.currentDoc.sync || props.currentDoc.rows.length > 0) {
 				setReplaceCandidate(incoming);
 				setConfirmReplace(true);
 				return;
@@ -160,6 +168,12 @@ export function PasteSpreadsheetModal(props: Props) {
 					</table>
 				</div>
 
+				{(columnCount > 6 || rowCount > 6) && (
+					<div className="tabula-muted" style={{ fontSize: "11px", textAlign: "right" }}>
+						Showing preview of first {Math.min(rowCount, 6)} rows and {Math.min(columnCount, 6)} columns (total: {Math.max(0, rowCount)} rows, {columnCount} columns)
+					</div>
+				)}
+
 				{props.mode !== "stacked" && props.currentDoc.sync && (
 					<div className="tabula-paste-warning">
 						This table is linked to Airtable. Replacing it will unlink the table. Appended
@@ -180,17 +194,16 @@ export function PasteSpreadsheetModal(props: Props) {
 					</div>
 				) : confirmReplace ? (
 					<div className="tabula-paste-confirm">
-						<strong>Replace this table and unlink Airtable?</strong>
+						<strong>{props.currentDoc.sync ? "Replace this table and unlink Airtable?" : "Replace all rows and columns in this table?"}</strong>
 						<span>
-							The imported columns and rows will replace the current data. This cannot be
-							undone from this dialog.
+							The imported columns and rows will replace the current data ({props.currentDoc.rows.length} existing rows will be overwritten). This cannot be undone from this dialog.
 						</span>
 						<div className="tabula-paste-actions">
 							<button className="tabula-btn" type="button" onClick={() => setConfirmReplace(false)}>
 								Cancel
 							</button>
 							<button
-								className="tabula-btn tabula-btn-primary"
+								className="tabula-btn tabula-btn-danger"
 								type="button"
 								onClick={confirmReplacement}
 							>

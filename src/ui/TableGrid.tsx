@@ -5,6 +5,7 @@ import {
 	type JSX,
 	type MouseEvent as ReactMouseEvent,
 	type PointerEvent as ReactPointerEvent,
+	type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { Menu } from "obsidian";
 import {
@@ -64,10 +65,20 @@ export function TableGrid(props: Props) {
 	const widths = props.doc.view.columnWidths;
 	const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
 	const [dragState, setDragState] = useState<ReorderDragState | null>(null);
+	const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 	const dragCleanup = useRef<(() => void) | null>(null);
 	const gridWrapRef = useRef<HTMLDivElement | null>(null);
 	const topScrollbarRef = useRef<HTMLDivElement | null>(null);
 	const topScrollbarInnerRef = useRef<HTMLDivElement | null>(null);
+
+	const toggleGroup = (key: string) => {
+		setCollapsedGroups((prev) => {
+			const next = new Set(prev);
+			if (next.has(key)) next.delete(key);
+			else next.add(key);
+			return next;
+		});
+	};
 
 	useEffect(() => {
 		if (!props.showTopScrollbar) return;
@@ -271,19 +282,113 @@ export function TableGrid(props: Props) {
 		[]
 	);
 
+	const handleGridKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+		const target = e.target;
+		if (!(target instanceof HTMLElement)) return;
+
+		// Don't hijack keystrokes inside full modals or expanded text popovers
+		if (target.closest(".tabula-modal-backdrop") || target.closest(".tabula-longtext-popover")) {
+			return;
+		}
+
+		if (e.key === "Escape") {
+			props.onSelectRow(null);
+			if (target instanceof HTMLInputElement) target.blur();
+			return;
+		}
+
+		const currentTd = target.closest<HTMLTableCellElement>("td[data-cell-row]");
+		if (!currentTd) return;
+
+		const currentRow = Number(currentTd.dataset.cellRow);
+		const currentCol = Number(currentTd.dataset.cellCol);
+		if (Number.isNaN(currentRow) || Number.isNaN(currentCol)) return;
+
+		const focusCell = (r: number, c: number) => {
+			const cellTd = gridWrapRef.current?.querySelector<HTMLTableCellElement>(
+				`td[data-cell-row="${r}"][data-cell-col="${c}"]`
+			);
+			if (!cellTd) return false;
+			const focusable = cellTd.querySelector<HTMLElement>(
+				"input:not([type=hidden]), button, select, [tabindex='0']"
+			);
+			if (focusable) {
+				focusable.focus();
+				if (focusable instanceof HTMLInputElement && (focusable.type === "text" || focusable.type === "number")) {
+					focusable.select();
+				}
+				return true;
+			}
+			return false;
+		};
+
+		if (e.key === "Enter" && !e.shiftKey) {
+			if (target.closest(".tabula-select-menu")) return;
+			e.preventDefault();
+			const nextRow = currentRow + 1;
+			if (nextRow < totalRows) {
+				focusCell(nextRow, currentCol);
+			} else {
+				props.onAddRow();
+				window.setTimeout(() => focusCell(nextRow, currentCol), 60);
+			}
+		} else if (e.key === "Tab") {
+			if (target.closest(".tabula-select-menu")) return;
+			e.preventDefault();
+			if (e.shiftKey) {
+				if (currentCol > 0) {
+					focusCell(currentRow, currentCol - 1);
+				} else if (currentRow > 0) {
+					focusCell(currentRow - 1, fields.length - 1);
+				}
+			} else {
+				if (currentCol < fields.length - 1) {
+					focusCell(currentRow, currentCol + 1);
+				} else if (currentRow + 1 < totalRows) {
+					focusCell(currentRow + 1, 0);
+				} else {
+					props.onAddRow();
+					window.setTimeout(() => focusCell(currentRow + 1, 0), 60);
+				}
+			}
+		} else if (e.key === "ArrowDown") {
+			if (target.closest(".tabula-select-menu")) return;
+			if (currentRow + 1 < totalRows) {
+				e.preventDefault();
+				focusCell(currentRow + 1, currentCol);
+			}
+		} else if (e.key === "ArrowUp") {
+			if (target.closest(".tabula-select-menu")) return;
+			if (currentRow > 0) {
+				e.preventDefault();
+				focusCell(currentRow - 1, currentCol);
+			}
+		}
+	};
+
 	let rowIndex = 0;
 	const body: JSX.Element[] = [];
 
 	for (const group of props.groups) {
 		if (group.label !== "") {
+			const isCollapsed = collapsedGroups.has(group.key);
 			body.push(
-				<tr key={`g-${group.key}`} className="tabula-group-row">
+				<tr
+					key={`g-${group.key}`}
+					className="tabula-group-row"
+					onClick={() => toggleGroup(group.key)}
+					title="Click to collapse / expand group"
+				>
 					<td colSpan={fields.length + 1}>
+						<span className="tabula-group-chevron" aria-hidden="true">
+							{isCollapsed ? "▸" : "▾"}
+						</span>
 						<span className="tabula-group-label">{group.label}</span>
-						<span className="tabula-muted"> {group.rows.length}</span>
+						<span className="tabula-muted"> ({group.rows.length})</span>
 					</td>
 				</tr>
 			);
+			if (isCollapsed) continue;
 		}
 		for (const row of group.rows) {
 			rowIndex += 1;
@@ -319,6 +424,7 @@ export function TableGrid(props: Props) {
 							<button
 								className="tabula-row-drag-handle"
 								type="button"
+								tabIndex={-1}
 								aria-label={`Drag row ${index} to reorder`}
 								title={
 									props.canReorderRows
@@ -336,6 +442,8 @@ export function TableGrid(props: Props) {
 					{fields.map((field, fi) => (
 						<td
 							key={field.id}
+							data-cell-row={index - 1}
+							data-cell-col={fi}
 							className={fi === 0 && frozen ? "sticky-primary" : undefined}
 							onContextMenu={(event) => showCellContextMenu(event, row.id, field)}
 							style={{
@@ -369,7 +477,13 @@ export function TableGrid(props: Props) {
 					<div className="tabula-top-scrollbar-inner" ref={topScrollbarInnerRef} />
 				</div>
 			)}
-			<div className="tabula-grid-wrap" ref={gridWrapRef} tabIndex={0} aria-label="Table data grid">
+			<div
+				className="tabula-grid-wrap"
+				ref={gridWrapRef}
+				tabIndex={0}
+				aria-label="Table data grid"
+				onKeyDownCapture={handleGridKeyDown}
+			>
 				<table
 					className={`tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`}
 				>
@@ -461,21 +575,39 @@ function FieldHeader({
 	width: number;
 }) {
 	const [menuOpen, setMenuOpen] = useState(false);
+	const [isEditingName, setIsEditingName] = useState(false);
+	const [nameDraft, setNameDraft] = useState(field.name);
 	const startX = useRef(0);
 	const startW = useRef(width);
 	const nameInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		setNameDraft(field.name);
+	}, [field.name]);
+
+	const startRenaming = () => {
+		setNameDraft(field.name);
+		setIsEditingName(true);
+		window.setTimeout(() => {
+			nameInputRef.current?.focus();
+			nameInputRef.current?.select();
+		}, 10);
+	};
+
+	const commitRename = () => {
+		const trimmed = nameDraft.trim();
+		if (trimmed && trimmed !== field.name) {
+			onRename(field.id, trimmed);
+		}
+		setIsEditingName(false);
+	};
 
 	const showFieldContextMenu = (event: ReactMouseEvent<HTMLDivElement>) => {
 		event.preventDefault();
 		event.stopPropagation();
 		const menu = new Menu();
 		menu.addItem((item) =>
-			item.setTitle("Rename column").onClick(() => {
-				window.setTimeout(() => {
-					nameInputRef.current?.focus();
-					nameInputRef.current?.select();
-				}, 0);
-			})
+			item.setTitle("Rename column").onClick(startRenaming)
 		);
 		menu.addItem((item) => item.setTitle("Insert column left").onClick(() => onInsert(field.id, "left")));
 		menu.addItem((item) => item.setTitle("Insert column right").onClick(() => onInsert(field.id, "right")));
@@ -505,6 +637,7 @@ function FieldHeader({
 			<button
 				className="tabula-col-drag-handle"
 				type="button"
+				tabIndex={-1}
 				aria-label={`Drag ${field.name} column to reorder`}
 				title="Drag to move column left or right"
 				onPointerDown={onBeginReorder}
@@ -512,16 +645,36 @@ function FieldHeader({
 			>
 				⠿
 			</button>
-			<input
-				ref={nameInputRef}
-				className="tabula-th-name"
-				value={field.name}
-				onChange={(e) => onRename(field.id, e.target.value)}
-			/>
+			{isEditingName ? (
+				<input
+					ref={nameInputRef}
+					className="tabula-th-name tabula-th-name-editing"
+					value={nameDraft}
+					autoFocus
+					onChange={(e) => setNameDraft(e.target.value)}
+					onBlur={commitRename}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") commitRename();
+						if (e.key === "Escape") {
+							setNameDraft(field.name);
+							setIsEditingName(false);
+						}
+					}}
+				/>
+			) : (
+				<span
+					className="tabula-th-name"
+					onDoubleClick={startRenaming}
+					title="Double-click to rename column"
+				>
+					{field.name}
+				</span>
+			)}
 			<span className="tabula-th-type">{fieldTypeLabel(field)}</span>
 			<button
 				className="tabula-btn tabula-icon-btn"
 				type="button"
+				tabIndex={-1}
 				onClick={() => setMenuOpen((v) => !v)}
 				aria-label="Field menu"
 			>
@@ -531,6 +684,7 @@ function FieldHeader({
 				<FieldHeaderMenu
 					field={field}
 					onClose={() => setMenuOpen(false)}
+					onRename={startRenaming}
 					onSortAsc={() => {
 						onSort(field.id, "asc");
 						setMenuOpen(false);
@@ -563,22 +717,22 @@ function FieldHeader({
 			)}
 			<div
 				className="tabula-col-resize"
-				onMouseDown={(e) => {
+				onPointerDown={(e) => {
 					if (e.button !== 0) return;
 					e.preventDefault();
 					e.stopPropagation();
 					startX.current = e.clientX;
 					startW.current = width;
-					const onMove = (ev: MouseEvent) => {
+					const onMove = (ev: PointerEvent) => {
 						const next = Math.max(80, startW.current + (ev.clientX - startX.current));
 						onResize(field.id, next);
 					};
 					const onUp = () => {
-						window.removeEventListener("mousemove", onMove);
-						window.removeEventListener("mouseup", onUp);
+						window.removeEventListener("pointermove", onMove);
+						window.removeEventListener("pointerup", onUp);
 					};
-					window.addEventListener("mousemove", onMove);
-					window.addEventListener("mouseup", onUp);
+					window.addEventListener("pointermove", onMove);
+					window.addEventListener("pointerup", onUp);
 				}}
 			/>
 		</div>

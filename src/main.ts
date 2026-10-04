@@ -73,21 +73,6 @@ export default class TabulaPlugin extends Plugin {
 		});
 		ribbonIcon.addClass("tabula-ribbon-action");
 		ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
-		const applyRibbonPurple = () => {
-			const setPurple = (element: HTMLElement | SVGElement) => {
-				element.style.setProperty("color", "#8B5CF6", "important");
-				element.style.setProperty("--icon-color", "#8B5CF6", "important");
-			};
-			setPurple(ribbonIcon);
-			for (const svgElement of Array.from(ribbonIcon.querySelectorAll<SVGElement>("svg, svg *"))) {
-				setPurple(svgElement);
-				svgElement.style.setProperty("stroke", "#8B5CF6", "important");
-			}
-		};
-		applyRibbonPurple();
-		const ribbonColorObserver = new MutationObserver(applyRibbonPurple);
-		ribbonColorObserver.observe(ribbonIcon, { childList: true, subtree: true });
-		this.register(() => ribbonColorObserver.disconnect());
 	}
 
 	async loadSettings(): Promise<void> {
@@ -96,19 +81,22 @@ export default class TabulaPlugin extends Plugin {
 		let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
 		let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
 		let newTableFolder = DEFAULT_SETTINGS.newTableFolder;
+		let appearanceTheme = DEFAULT_SETTINGS.appearanceTheme;
 		if (typeof data === "object" && data !== null) {
 			const rawToken = Reflect.get(data, "airtableToken");
 			const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
 			const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
 			const rawNewTableFolder = Reflect.get(data, "newTableFolder");
+			const rawTheme = Reflect.get(data, "appearanceTheme");
 			if (typeof rawToken === "string") token = rawToken;
 			if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
 			if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
 				stackedTableGap = clampStackedTableGap(rawStackedTableGap);
 			}
 			if (typeof rawNewTableFolder === "string") newTableFolder = rawNewTableFolder.trim();
+			if (rawTheme === "warm" || rawTheme === "native") appearanceTheme = rawTheme;
 		}
-		this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap, newTableFolder };
+		this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap, newTableFolder, appearanceTheme };
 	}
 
 	async saveSettings(): Promise<void> {

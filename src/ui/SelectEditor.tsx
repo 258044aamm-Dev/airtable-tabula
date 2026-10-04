@@ -23,6 +23,7 @@ export function SelectEditor({
 }: Props) {
 	const [open, setOpen] = useState(false);
 	const [q, setQ] = useState("");
+	const [highlightIndex, setHighlightIndex] = useState(0);
 	const rootRef = useRef<HTMLDivElement>(null);
 
 	const selectedIds: string[] =
@@ -39,6 +40,16 @@ export function SelectEditor({
 		if (!needle) return field.options;
 		return field.options.filter((o) => o.name.toLowerCase().includes(needle));
 	}, [field.options, q]);
+
+	const canCreate = Boolean(
+		q.trim() &&
+			!field.options.some((o) => o.name.toLowerCase() === q.trim().toLowerCase())
+	);
+	const totalItems = filtered.length + (canCreate ? 1 : 0);
+
+	useEffect(() => {
+		setHighlightIndex(0);
+	}, [q, open]);
 
 	useEffect(() => {
 		const onDoc = (e: MouseEvent) => {
@@ -90,6 +101,8 @@ export function SelectEditor({
 				type="button"
 				className="tabula-select-trigger"
 				onClick={() => setOpen((v) => !v)}
+				aria-expanded={open}
+				aria-haspopup="listbox"
 			>
 				{selectedIds.length === 0 ? (
 					<span className="tabula-placeholder">Select…</span>
@@ -107,6 +120,7 @@ export function SelectEditor({
 									{field.type === "multiSelect" && (
 										<span
 											className="tabula-pill-x"
+											title="Remove tag"
 											onClick={(e) => {
 												e.stopPropagation();
 												toggle(id);
@@ -122,7 +136,7 @@ export function SelectEditor({
 				)}
 			</button>
 			{open && (
-				<div className="tabula-select-menu">
+				<div className="tabula-select-menu" role="listbox">
 					<input
 						className="tabula-select-search"
 						autoFocus
@@ -130,26 +144,45 @@ export function SelectEditor({
 						value={q}
 						onChange={(e) => setQ(e.target.value)}
 						onKeyDown={(e) => {
-							if (e.key === "Enter") {
+							if (e.key === "ArrowDown") {
 								e.preventDefault();
-								if (filtered.length === 1) toggle(filtered[0].id);
-								else createAndSelect();
-							}
-							if (e.key === "Escape") {
+								if (totalItems > 0) {
+									setHighlightIndex((prev) => (prev + 1) % totalItems);
+								}
+							} else if (e.key === "ArrowUp") {
+								e.preventDefault();
+								if (totalItems > 0) {
+									setHighlightIndex((prev) => (prev - 1 + totalItems) % totalItems);
+								}
+							} else if (e.key === "Enter") {
+								e.preventDefault();
+								if (filtered.length > 0 && highlightIndex < filtered.length) {
+									toggle(filtered[highlightIndex].id);
+								} else if (canCreate && highlightIndex === filtered.length) {
+									createAndSelect();
+								} else if (filtered.length === 1) {
+									toggle(filtered[0].id);
+								} else if (canCreate) {
+									createAndSelect();
+								}
+							} else if (e.key === "Escape") {
+								e.preventDefault();
 								setOpen(false);
 								setQ("");
 							}
 						}}
 					/>
 					<div className="tabula-select-options">
-						{filtered.map((opt) => {
+						{filtered.map((opt, index) => {
 							const active = selectedIds.includes(opt.id);
+							const isHighlighted = highlightIndex === index;
 							return (
 								<button
 									key={opt.id}
 									type="button"
-									className={`tabula-select-option ${active ? "is-active" : ""}`}
+									className={`tabula-select-option ${active ? "is-active" : ""} ${isHighlighted ? "is-highlighted" : ""}`}
 									onClick={() => toggle(opt.id)}
+									onMouseEnter={() => setHighlightIndex(index)}
 								>
 									<span className={`tabula-pill tabula-color-${opt.color}`}>
 										{opt.name}
@@ -158,18 +191,19 @@ export function SelectEditor({
 								</button>
 							);
 						})}
-						{q.trim() &&
-							!field.options.some(
-								(o) => o.name.toLowerCase() === q.trim().toLowerCase()
-							) && (
-								<button
-									type="button"
-									className="tabula-select-option tabula-create-option"
-									onClick={createAndSelect}
-								>
-									Create “{q.trim()}”
-								</button>
-							)}
+						{canCreate && (
+							<button
+								type="button"
+								className={`tabula-select-option tabula-create-option ${highlightIndex === filtered.length ? "is-highlighted" : ""}`}
+								onClick={createAndSelect}
+								onMouseEnter={() => setHighlightIndex(filtered.length)}
+							>
+								Create “{q.trim()}”
+							</button>
+						)}
+						{filtered.length === 0 && !canCreate && (
+							<div className="tabula-menu-hint">No matching options</div>
+						)}
 					</div>
 					<button
 						type="button"

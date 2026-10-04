@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Menu, Notice } from "obsidian";
 import { TableDocument, TableFileDocument } from "../data/types";
+import type { TabulaTheme } from "../settings";
 import {
 	pickSpreadsheetFile,
 	readSpreadsheetClipboard,
@@ -27,6 +28,7 @@ interface Props {
 	airtableToken?: string;
 	showTopScrollbar: boolean;
 	stackedTableGap: number;
+	appearanceTheme: TabulaTheme;
 }
 
 export function TableFileApp({
@@ -40,6 +42,7 @@ export function TableFileApp({
 	airtableToken = "",
 	showTopScrollbar,
 	stackedTableGap,
+	appearanceTheme = "native",
 }: Props) {
 	const [activeTableId, setActiveTableId] = useState(file.tables[0]?.id ?? "");
 	const [stackedImportCandidate, setStackedImportCandidate] = useState<{
@@ -151,7 +154,7 @@ export function TableFileApp({
 
 	return (
 		<div
-			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`}
+			className={`tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""} tabula-theme-${appearanceTheme}`}
 			style={{
 				"--tabula-stacked-table-gap": `${stackedTableGap}px`,
 				"--tabula-stacked-table-divider-offset": `${-stackedTableGap / 2}px`,
@@ -176,7 +179,6 @@ export function TableFileApp({
 						<div className="tabula-table-section-header">
 							<div className="tabula-table-section-title">
 								<span className="tabula-table-section-index">Table {index + 1}</span>
-								<span className="tabula-table-section-name">{entry.table.name}</span>
 							</div>
 							<button
 								className="tabula-btn tabula-btn-danger"

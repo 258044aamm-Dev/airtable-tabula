@@ -4,6 +4,7 @@ import { Field, isSelectField } from "../data/types";
 interface Props {
 	field: Field;
 	onClose: () => void;
+	onRename: () => void;
 	onSortAsc: () => void;
 	onSortDesc: () => void;
 	onHide: () => void;
@@ -21,12 +22,28 @@ export function FieldHeaderMenu(props: Props) {
 		const onDoc = (e: MouseEvent) => {
 			if (!ref.current?.contains(e.target as Node)) props.onClose();
 		};
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") props.onClose();
+		};
 		activeDocument.addEventListener("mousedown", onDoc);
-		return () => activeDocument.removeEventListener("mousedown", onDoc);
+		window.addEventListener("keydown", onKeyDown);
+		return () => {
+			activeDocument.removeEventListener("mousedown", onDoc);
+			window.removeEventListener("keydown", onKeyDown);
+		};
 	}, [props]);
 
 	return (
 		<div className="tabula-field-menu" ref={ref} role="menu">
+			<button
+				type="button"
+				onClick={() => {
+					props.onRename();
+					props.onClose();
+				}}
+			>
+				Rename column
+			</button>
 			<button type="button" onClick={props.onSortAsc}>
 				Sort A → Z
 			</button>
@@ -34,7 +51,7 @@ export function FieldHeaderMenu(props: Props) {
 				Sort Z → A
 			</button>
 			<button type="button" onClick={props.onHide}>
-				Hide field
+				Hide column
 			</button>
 			{isSelectField(props.field) && (
 				<button type="button" onClick={props.onManageOptions}>
@@ -42,10 +59,10 @@ export function FieldHeaderMenu(props: Props) {
 				</button>
 			)}
 			<button type="button" onClick={props.onInsertLeft}>
-				Insert left
+				Insert column left
 			</button>
 			<button type="button" onClick={props.onInsertRight}>
-				Insert right
+				Insert column right
 			</button>
 			{confirmDelete ? (
 				<>
@@ -66,7 +83,7 @@ export function FieldHeaderMenu(props: Props) {
 					className="is-danger"
 					onClick={() => setConfirmDelete(true)}
 				>
-					Delete field
+					Delete column
 				</button>
 			)}
 		</div>
