@@ -34,7 +34,6 @@ interface Props {
 	doc: TableDocument;
 	groups: RowGroup[];
 	showTopScrollbar: boolean;
-	defaultColumnWidth: number;
 	selectedRowId: string | null;
 	canReorderRows: boolean;
 	onSelectRow: (rowId: string | null) => void;
@@ -304,7 +303,6 @@ export function TableGrid(props: Props) {
 					onContextMenu={(event) => showRowContextMenu(event, row.id)}
 					className={[
 						props.selectedRowId === row.id ? "is-selected" : "",
-						index % 2 === 0 ? "is-alternate" : "",
 						isDragSource ? "is-dragging" : "",
 						dropClass,
 					]
@@ -341,8 +339,8 @@ export function TableGrid(props: Props) {
 							className={fi === 0 && frozen ? "sticky-primary" : undefined}
 							onContextMenu={(event) => showCellContextMenu(event, row.id, field)}
 							style={{
-								width: widths[field.id] ?? props.defaultColumnWidth,
-								minWidth: widths[field.id] ?? props.defaultColumnWidth,
+								width: widths[field.id] ?? 160,
+								minWidth: widths[field.id] ?? 160,
 							}}
 						>
 							<CellEditor
@@ -399,8 +397,8 @@ export function TableGrid(props: Props) {
 											.filter(Boolean)
 											.join(" ") || undefined}
 										style={{
-											width: widths[field.id] ?? props.defaultColumnWidth,
-											minWidth: widths[field.id] ?? props.defaultColumnWidth,
+											width: widths[field.id] ?? 160,
+											minWidth: widths[field.id] ?? 160,
 										}}
 									>
 										<FieldHeader
@@ -413,7 +411,7 @@ export function TableGrid(props: Props) {
 											onInsert={props.onInsertField}
 											onResize={props.onResizeColumn}
 											onBeginReorder={(event) => startReorder("field", field.id, event)}
-											width={widths[field.id] ?? props.defaultColumnWidth}
+											width={widths[field.id] ?? 160}
 										/>
 									</th>
 								);
@@ -565,33 +563,22 @@ function FieldHeader({
 			)}
 			<div
 				className="tabula-col-resize"
-				onPointerDown={(event) => {
-					if (event.pointerType === "mouse" && event.button !== 0) return;
-					event.preventDefault();
-					event.stopPropagation();
-					startX.current = event.clientX;
+				onMouseDown={(e) => {
+					if (e.button !== 0) return;
+					e.preventDefault();
+					e.stopPropagation();
+					startX.current = e.clientX;
 					startW.current = width;
-					const pointerId = event.pointerId;
-					const cleanup = () => {
-						window.removeEventListener("pointermove", onMove);
-						window.removeEventListener("pointerup", onUp);
-						window.removeEventListener("pointercancel", onCancel);
-						window.removeEventListener("blur", onCancel);
-					};
-					const onMove = (pointerEvent: PointerEvent) => {
-						if (pointerEvent.pointerId !== pointerId) return;
-						pointerEvent.preventDefault();
-						const next = Math.max(80, startW.current + (pointerEvent.clientX - startX.current));
+					const onMove = (ev: MouseEvent) => {
+						const next = Math.max(80, startW.current + (ev.clientX - startX.current));
 						onResize(field.id, next);
 					};
-					const onUp = (pointerEvent: PointerEvent) => {
-						if (pointerEvent.pointerId === pointerId) cleanup();
+					const onUp = () => {
+						window.removeEventListener("mousemove", onMove);
+						window.removeEventListener("mouseup", onUp);
 					};
-					const onCancel = () => cleanup();
-					window.addEventListener("pointermove", onMove, { passive: false });
-					window.addEventListener("pointerup", onUp);
-					window.addEventListener("pointercancel", onCancel);
-					window.addEventListener("blur", onCancel);
+					window.addEventListener("mousemove", onMove);
+					window.addEventListener("mouseup", onUp);
 				}}
 			/>
 		</div>

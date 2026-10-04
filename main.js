@@ -31907,7 +31907,6 @@ function TableGrid(props) {
             onContextMenu: (event) => showRowContextMenu(event, row.id),
             className: [
               props.selectedRowId === row.id ? "is-selected" : "",
-              index % 2 === 0 ? "is-alternate" : "",
               isDragSource ? "is-dragging" : "",
               dropClass
             ].filter(Boolean).join(" ") || void 0,
@@ -31942,8 +31941,8 @@ function TableGrid(props) {
                   className: fi === 0 && frozen ? "sticky-primary" : void 0,
                   onContextMenu: (event) => showCellContextMenu(event, row.id, field),
                   style: {
-                    width: widths[field.id] ?? props.defaultColumnWidth,
-                    minWidth: widths[field.id] ?? props.defaultColumnWidth
+                    width: widths[field.id] ?? 160,
+                    minWidth: widths[field.id] ?? 160
                   },
                   children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                     CellEditor,
@@ -31998,8 +31997,8 @@ function TableGrid(props) {
                       dropClass
                     ].filter(Boolean).join(" ") || void 0,
                     style: {
-                      width: widths[field.id] ?? props.defaultColumnWidth,
-                      minWidth: widths[field.id] ?? props.defaultColumnWidth
+                      width: widths[field.id] ?? 160,
+                      minWidth: widths[field.id] ?? 160
                     },
                     children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                       FieldHeader,
@@ -32013,7 +32012,7 @@ function TableGrid(props) {
                         onInsert: props.onInsertField,
                         onResize: props.onResizeColumn,
                         onBeginReorder: (event) => startReorder("field", field.id, event),
-                        width: widths[field.id] ?? props.defaultColumnWidth
+                        width: widths[field.id] ?? 160
                       }
                     )
                   },
@@ -32151,33 +32150,22 @@ function FieldHeader({
       "div",
       {
         className: "tabula-col-resize",
-        onPointerDown: (event) => {
-          if (event.pointerType === "mouse" && event.button !== 0) return;
-          event.preventDefault();
-          event.stopPropagation();
-          startX.current = event.clientX;
+        onMouseDown: (e) => {
+          if (e.button !== 0) return;
+          e.preventDefault();
+          e.stopPropagation();
+          startX.current = e.clientX;
           startW.current = width;
-          const pointerId = event.pointerId;
-          const cleanup = () => {
-            window.removeEventListener("pointermove", onMove);
-            window.removeEventListener("pointerup", onUp);
-            window.removeEventListener("pointercancel", onCancel);
-            window.removeEventListener("blur", onCancel);
-          };
-          const onMove = (pointerEvent) => {
-            if (pointerEvent.pointerId !== pointerId) return;
-            pointerEvent.preventDefault();
-            const next = Math.max(80, startW.current + (pointerEvent.clientX - startX.current));
+          const onMove = (ev) => {
+            const next = Math.max(80, startW.current + (ev.clientX - startX.current));
             onResize(field.id, next);
           };
-          const onUp = (pointerEvent) => {
-            if (pointerEvent.pointerId === pointerId) cleanup();
+          const onUp = () => {
+            window.removeEventListener("mousemove", onMove);
+            window.removeEventListener("mouseup", onUp);
           };
-          const onCancel = () => cleanup();
-          window.addEventListener("pointermove", onMove, { passive: false });
-          window.addEventListener("pointerup", onUp);
-          window.addEventListener("pointercancel", onCancel);
-          window.addEventListener("blur", onCancel);
+          window.addEventListener("mousemove", onMove);
+          window.addEventListener("mouseup", onUp);
         }
       }
     )
@@ -32620,8 +32608,7 @@ function TableApp({
   onCreateTableFromPaste,
   onRegisterClipboardPaste,
   airtableToken = "",
-  showTopScrollbar = false,
-  defaultColumnWidth = 160
+  showTopScrollbar = false
 }) {
   const [showFilters, setShowFilters] = (0, import_react10.useState)(
     doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
@@ -33030,7 +33017,6 @@ function TableApp({
         doc,
         groups,
         showTopScrollbar,
-        defaultColumnWidth,
         selectedRowId,
         canReorderRows: doc.view.sorts.length === 0,
         onSelectRow: setSelectedRowId,
@@ -33109,8 +33095,7 @@ function TableFileApp({
   onRegisterClipboardPaste,
   airtableToken = "",
   showTopScrollbar,
-  stackedTableGap,
-  appearance
+  stackedTableGap
 }) {
   const [activeTableId, setActiveTableId] = (0, import_react11.useState)(file.tables[0]?.id ?? "");
   const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react11.useState)(null);
@@ -33206,18 +33191,7 @@ function TableFileApp({
     "div",
     {
       className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`,
-      "data-palette": appearance.palette,
-      "data-density": appearance.density,
-      "data-row-stripes": appearance.rowStripes ? "true" : "false",
-      "data-horizontal-align": appearance.horizontalAlignment,
-      "data-vertical-align": appearance.verticalAlignment,
-      "data-text-color-mode": appearance.textColorMode,
-      style: {
-        "--tabula-stacked-table-gap": `${stackedTableGap}px`,
-        "--tabula-table-radius": `${appearance.tableRadius}px`,
-        "--tabula-control-radius": `${appearance.controlRadius}px`,
-        "--tabula-custom-text-color": appearance.customTextColor
-      },
+      style: { "--tabula-stacked-table-gap": `${stackedTableGap}px` },
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
           /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-file-count", children: [
@@ -33267,8 +33241,7 @@ function TableFileApp({
                   onCreateTableFromPaste,
                   onRegisterClipboardPaste: (handler) => registerTableClipboardPaste(entry.id, handler),
                   airtableToken,
-                  showTopScrollbar,
-                  defaultColumnWidth: appearance.defaultColumnWidth
+                  showTopScrollbar
                 }
               )
             ]
@@ -33379,8 +33352,7 @@ var TableView = class extends import_obsidian5.TextFileView {
       onRegisterClipboardPaste: this.registerClipboardPaste,
       airtableToken: this.plugin.settings.airtableToken,
       showTopScrollbar: this.plugin.settings.showTopScrollbar,
-      stackedTableGap: this.plugin.settings.stackedTableGap,
-      appearance: { ...this.plugin.settings.appearance }
+      stackedTableGap: this.plugin.settings.stackedTableGap
     };
   }
   remount() {
@@ -33448,76 +33420,13 @@ var TableView = class extends import_obsidian5.TextFileView {
 var MIN_STACKED_TABLE_GAP = 0;
 var MAX_STACKED_TABLE_GAP = 500;
 var DEFAULT_STACKED_TABLE_GAP = 100;
-var MIN_TABLE_RADIUS = 0;
-var MAX_TABLE_RADIUS = 24;
-var MIN_CONTROL_RADIUS = 0;
-var MAX_CONTROL_RADIUS = 16;
-var MIN_DEFAULT_COLUMN_WIDTH = 100;
-var MAX_DEFAULT_COLUMN_WIDTH = 360;
-var DEFAULT_APPEARANCE_SETTINGS = {
-  palette: "airtable",
-  density: "comfortable",
-  rowStripes: true,
-  tableRadius: 8,
-  controlRadius: 5,
-  defaultColumnWidth: 160,
-  horizontalAlignment: "auto",
-  verticalAlignment: "middle",
-  textColorMode: "theme",
-  customTextColor: "#202124"
-};
 function clampStackedTableGap(value) {
   return Math.min(MAX_STACKED_TABLE_GAP, Math.max(MIN_STACKED_TABLE_GAP, Math.round(value)));
-}
-function isOneOf(value, options) {
-  return typeof value === "string" && options.includes(value);
-}
-function clampInteger(value, fallback, min, max2) {
-  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
-  return Math.min(max2, Math.max(min, Math.round(value)));
-}
-function normalizeHexColor(value, fallback) {
-  if (typeof value !== "string" || !/^#(?:[\da-f]{3}|[\da-f]{6})$/i.test(value)) {
-    return fallback;
-  }
-  if (value.length === 4) {
-    return `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`.toLowerCase();
-  }
-  return value.toLowerCase();
-}
-function normalizeAppearanceSettings(value) {
-  const raw = typeof value === "object" && value !== null ? value : {};
-  const read = (key) => Reflect.get(raw, key);
-  const fallback = DEFAULT_APPEARANCE_SETTINGS;
-  const palette = read("palette");
-  const density = read("density");
-  const rowStripes = read("rowStripes");
-  const horizontalAlignment = read("horizontalAlignment");
-  const verticalAlignment = read("verticalAlignment");
-  const textColorMode = read("textColorMode");
-  return {
-    palette: isOneOf(palette, ["airtable", "teal", "violet", "green", "amber", "slate"]) ? palette : fallback.palette,
-    density: isOneOf(density, ["compact", "comfortable", "spacious"]) ? density : fallback.density,
-    rowStripes: typeof rowStripes === "boolean" ? rowStripes : fallback.rowStripes,
-    tableRadius: clampInteger(read("tableRadius"), fallback.tableRadius, MIN_TABLE_RADIUS, MAX_TABLE_RADIUS),
-    controlRadius: clampInteger(read("controlRadius"), fallback.controlRadius, MIN_CONTROL_RADIUS, MAX_CONTROL_RADIUS),
-    defaultColumnWidth: clampInteger(
-      read("defaultColumnWidth"),
-      fallback.defaultColumnWidth,
-      MIN_DEFAULT_COLUMN_WIDTH,
-      MAX_DEFAULT_COLUMN_WIDTH
-    ),
-    horizontalAlignment: isOneOf(horizontalAlignment, ["auto", "left", "center", "right"]) ? horizontalAlignment : fallback.horizontalAlignment,
-    verticalAlignment: isOneOf(verticalAlignment, ["top", "middle", "bottom"]) ? verticalAlignment : fallback.verticalAlignment,
-    textColorMode: isOneOf(textColorMode, ["theme", "custom"]) ? textColorMode : fallback.textColorMode,
-    customTextColor: normalizeHexColor(read("customTextColor"), fallback.customTextColor)
-  };
 }
 var DEFAULT_SETTINGS = {
   airtableToken: "",
   showTopScrollbar: false,
-  stackedTableGap: DEFAULT_STACKED_TABLE_GAP,
-  appearance: { ...DEFAULT_APPEARANCE_SETTINGS }
+  stackedTableGap: DEFAULT_STACKED_TABLE_GAP
 };
 
 // src/ui/SettingsTab.ts
@@ -33543,59 +33452,6 @@ var TabulaSettingTab = class extends import_obsidian6.PluginSettingTab {
         this.plugin.settings.airtableToken = value.trim();
         await this.plugin.saveSettings();
       });
-    });
-    new import_obsidian6.Setting(containerEl).setName("Table appearance").setHeading();
-    new import_obsidian6.Setting(containerEl).setDesc("These preferences are global across tables. Per-table row heights and saved column widths remain intact.");
-    const persistAppearance = async (patch) => {
-      this.plugin.settings.appearance = normalizeAppearanceSettings({
-        ...this.plugin.settings.appearance,
-        ...patch
-      });
-      await this.plugin.saveSettings();
-      this.plugin.refreshOpenViews();
-    };
-    new import_obsidian6.Setting(containerEl).setName("Table color palette").setDesc("Choose the accent and subtle header/selection tint used by every table.").addDropdown((dropdown) => {
-      dropdown.addOption("airtable", "Airtable blue").addOption("teal", "Teal").addOption("violet", "Violet").addOption("green", "Green").addOption("amber", "Amber").addOption("slate", "Slate").setValue(this.plugin.settings.appearance.palette).onChange((value) => void persistAppearance({
-        palette: value
-      }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Row striping").setDesc("Use a light alternating row tint to make wide tables easier to scan.").addToggle((toggle) => {
-      toggle.setValue(this.plugin.settings.appearance.rowStripes).onChange((value) => void persistAppearance({ rowStripes: value }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Table density").setDesc("Preset for row height and cell padding. It does not change each table\u2019s saved Short, Medium, or Tall choice.").addDropdown((dropdown) => {
-      dropdown.addOption("compact", "Compact").addOption("comfortable", "Comfortable").addOption("spacious", "Spacious").setValue(this.plugin.settings.appearance.density).onChange((value) => void persistAppearance({
-        density: value
-      }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Table corner radius").setDesc(`Round the outside edge of the grid (${MIN_TABLE_RADIUS}\u2013${MAX_TABLE_RADIUS} px).`).addSlider((slider) => {
-      slider.setLimits(MIN_TABLE_RADIUS, MAX_TABLE_RADIUS, 1).setValue(this.plugin.settings.appearance.tableRadius).setDynamicTooltip().setInstant(false).onChange((value) => void persistAppearance({ tableRadius: value }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Cell and control radius").setDesc(`Round cell editors, buttons, and menus (${MIN_CONTROL_RADIUS}\u2013${MAX_CONTROL_RADIUS} px).`).addSlider((slider) => {
-      slider.setLimits(MIN_CONTROL_RADIUS, MAX_CONTROL_RADIUS, 1).setValue(this.plugin.settings.appearance.controlRadius).setDynamicTooltip().setInstant(false).onChange((value) => void persistAppearance({ controlRadius: value }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Default column width").setDesc(`Width for columns that have not been resized (${MIN_DEFAULT_COLUMN_WIDTH}\u2013${MAX_DEFAULT_COLUMN_WIDTH} px). Saved per-column widths are left unchanged.`).addSlider((slider) => {
-      slider.setLimits(MIN_DEFAULT_COLUMN_WIDTH, MAX_DEFAULT_COLUMN_WIDTH, 4).setValue(this.plugin.settings.appearance.defaultColumnWidth).setDynamicTooltip().setInstant(false).onChange((value) => void persistAppearance({ defaultColumnWidth: value }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Horizontal cell alignment").setDesc("Choose how cell content is positioned left to right. Auto keeps the current field default.").addDropdown((dropdown) => {
-      dropdown.addOption("auto", "Auto (field default)").addOption("left", "Left").addOption("center", "Center").addOption("right", "Right").setValue(this.plugin.settings.appearance.horizontalAlignment).onChange((value) => void persistAppearance({
-        horizontalAlignment: value
-      }));
-    });
-    new import_obsidian6.Setting(containerEl).setName("Vertical cell alignment").setDesc("Align content to the top, middle, or bottom of each row.").addDropdown((dropdown) => {
-      dropdown.addOption("top", "Top").addOption("middle", "Middle").addOption("bottom", "Bottom").setValue(this.plugin.settings.appearance.verticalAlignment).onChange((value) => void persistAppearance({
-        verticalAlignment: value
-      }));
-    });
-    let customColorPicker = null;
-    new import_obsidian6.Setting(containerEl).setName("Table text color").setDesc("Use the Obsidian theme or choose a custom foreground for the table and its cells. Pick a color that contrasts with your background; select-chip labels keep their own colors.").addDropdown((dropdown) => {
-      dropdown.addOption("theme", "Use theme color").addOption("custom", "Custom color").setValue(this.plugin.settings.appearance.textColorMode).onChange((value) => {
-        const mode = value === "custom" ? "custom" : "theme";
-        customColorPicker?.setDisabled(mode !== "custom");
-        void persistAppearance({ textColorMode: mode });
-      });
-    }).addColorPicker((color) => {
-      customColorPicker = color;
-      color.setValue(this.plugin.settings.appearance.customTextColor).setDisabled(this.plugin.settings.appearance.textColorMode !== "custom").onChange((value) => void persistAppearance({ customTextColor: value }));
     });
     new import_obsidian6.Setting(containerEl).setName("Table display").setHeading();
     new import_obsidian6.Setting(containerEl).setName("Top horizontal scrollbar").setDesc(
@@ -33718,24 +33574,17 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
     let token = DEFAULT_SETTINGS.airtableToken;
     let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
     let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
-    let appearance = DEFAULT_SETTINGS.appearance;
     if (typeof data === "object" && data !== null) {
       const rawToken = Reflect.get(data, "airtableToken");
       const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
       const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
-      appearance = Reflect.get(data, "appearance");
       if (typeof rawToken === "string") token = rawToken;
       if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
       if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
         stackedTableGap = clampStackedTableGap(rawStackedTableGap);
       }
     }
-    this.settings = {
-      airtableToken: token,
-      showTopScrollbar,
-      stackedTableGap,
-      appearance: normalizeAppearanceSettings(appearance)
-    };
+    this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap };
   }
   async saveSettings() {
     await this.saveData(this.settings);

@@ -15,8 +15,6 @@ A `.tabula` file stores one or more independent tables, shown stacked vertically
 - **Field types** — text, long text, number, currency, percent, duration, rating, checkbox, date, date & time, URL, email, phone, single/multi select, attachments, auto number, created / last modified
 - **Selects** — colored tags, searchable dropdowns, create-on-type, option manager
 - **Views** — search, filter builder + query string, multi-sort, group by, hide fields, column resize/reorder, freeze primary column, row height
-- **Global appearance** — Airtable-like color palettes, row striping, density presets, corner radii, default column width, text color, and cell alignment
-- **Mobile grid** — retains spreadsheet-style horizontal scrolling with touch-friendly controls and column resizing
 - **Optional Airtable sync** — link a base/table, then pull or push with a personal access token
 
 ## Install

@@ -11,7 +11,6 @@ import {
 import {
 	clampStackedTableGap,
 	DEFAULT_SETTINGS,
-	normalizeAppearanceSettings,
 	PluginSettings,
 } from "./settings";
 import type { TableDocument } from "./data/types";
@@ -96,24 +95,17 @@ export default class TabulaPlugin extends Plugin {
 		let token = DEFAULT_SETTINGS.airtableToken;
 		let showTopScrollbar = DEFAULT_SETTINGS.showTopScrollbar;
 		let stackedTableGap = DEFAULT_SETTINGS.stackedTableGap;
-		let appearance: unknown = DEFAULT_SETTINGS.appearance;
 		if (typeof data === "object" && data !== null) {
 			const rawToken = Reflect.get(data, "airtableToken");
 			const rawScrollbarSetting = Reflect.get(data, "showTopScrollbar");
 			const rawStackedTableGap = Reflect.get(data, "stackedTableGap");
-			appearance = Reflect.get(data, "appearance");
 			if (typeof rawToken === "string") token = rawToken;
 			if (typeof rawScrollbarSetting === "boolean") showTopScrollbar = rawScrollbarSetting;
 			if (typeof rawStackedTableGap === "number" && Number.isFinite(rawStackedTableGap)) {
 				stackedTableGap = clampStackedTableGap(rawStackedTableGap);
 			}
 		}
-		this.settings = {
-			airtableToken: token,
-			showTopScrollbar,
-			stackedTableGap,
-			appearance: normalizeAppearanceSettings(appearance),
-		};
+		this.settings = { airtableToken: token, showTopScrollbar, stackedTableGap };
 	}
 
 	async saveSettings(): Promise<void> {
