@@ -9,6 +9,7 @@ A `.tabula` file stores one or more independent tables, shown stacked vertically
 - **Multiple tables per file** — add independent starter tables to one `.tabula` file, or remove a table when it is no longer needed
 - **Optional top horizontal scrollbar** — enable a synchronized scrollbar above each grid from Settings → Airtable Tabula; disabled by default
 - **Import and paste spreadsheets** — import `.csv` / `.xlsx` files, or paste spreadsheet cells/files directly into an open table and choose Replace, Create new, or Append
+- **Context menus** — right-click a cell for cell and row actions, the row-number gutter for row actions, or a column header for column actions
 - **Reorder rows and columns** — drag row and column handles on desktop or touch devices
 - **Field types** — text, long text, number, currency, percent, duration, rating, checkbox, date, date & time, URL, email, phone, single/multi select, attachments, auto number, created / last modified
 - **Selects** — colored tags, searchable dropdowns, create-on-type, option manager

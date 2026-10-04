@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ClipboardEvent as ReactClipboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent as ReactClipboardEvent } from "react";
 import { Notice } from "obsidian";
 import {
 	TableDocument,
@@ -7,7 +7,9 @@ import {
 	SortSpec,
 	RowHeight,
 	emptyCellValue,
+	isReadOnlyField,
 } from "../data/types";
+import { cellClipboardText, parseCellClipboardText } from "../data/cellClipboard";
 import {
 	createEmptyView,
 	createField,
@@ -170,6 +172,35 @@ export function TableApp({
 		});
 	};
 
+	const insertRow = (rowId: string, side: "before" | "after") => {
+		if (doc.view.sorts.length > 0) return;
+		const sourceIndex = doc.rows.findIndex((row) => row.id === rowId);
+		if (sourceIndex < 0) return;
+		const { row, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
+		const rows = [...doc.rows];
+		rows.splice(sourceIndex + (side === "after" ? 1 : 0), 0, row);
+		updateDoc({ ...doc, rows, autoNumberNext: nextAuto });
+		setSelectedRowId(row.id);
+	};
+
+	const duplicateRow = (rowId: string) => {
+		const sourceIndex = doc.rows.findIndex((row) => row.id === rowId);
+		if (sourceIndex < 0) return;
+		const source = doc.rows[sourceIndex];
+		const generated = createRow(doc.fields, doc.autoNumberNext ?? 1);
+		const cells = { ...generated.row.cells };
+		for (const field of doc.fields) {
+			if (isReadOnlyField(field)) continue;
+			const value = source.cells[field.id];
+			cells[field.id] = Array.isArray(value) ? [...value] : (value as never);
+		}
+		const row = touchLastModified({ ...generated.row, cells }, doc.fields);
+		const rows = [...doc.rows];
+		rows.splice(sourceIndex + 1, 0, row);
+		updateDoc({ ...doc, rows, autoNumberNext: generated.nextAuto });
+		setSelectedRowId(row.id);
+	};
+
 	const deleteRow = (rowId: string) => {
 		const recordMap = { ...(doc.sync?.recordMap ?? {}) };
 		delete recordMap[rowId];
@@ -240,18 +271,82 @@ export function TableApp({
 		});
 	};
 
-	const setCell = (rowId: string, fieldId: string, value: unknown) => {
+	const updateCellValue = (
+		rowId: string,
+		fieldId: string,
+		value: unknown,
+		fieldUpdate?: Field
+	) => {
+		const fields = fieldUpdate
+			? doc.fields.map((field) => (field.id === fieldId ? fieldUpdate : field))
+			: doc.fields;
 		updateDoc({
 			...doc,
+			fields,
 			rows: doc.rows.map((row) => {
 				if (row.id !== rowId) return row;
 				const next = {
 					...row,
 					cells: { ...row.cells, [fieldId]: value as never },
 				};
-				return touchLastModified(next, doc.fields);
+				return touchLastModified(next, fields);
 			}),
 		});
+	};
+
+	const setCell = (rowId: string, fieldId: string, value: unknown) =>
+		updateCellValue(rowId, fieldId, value);
+
+	const copyCell = async (rowId: string, fieldId: string): Promise<boolean> => {
+		const field = doc.fields.find((candidate) => candidate.id === fieldId);
+		const row = doc.rows.find((candidate) => candidate.id === rowId);
+		if (!field || !row) return false;
+		if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+			new Notice("Clipboard access is unavailable on this device");
+			return false;
+		}
+		try {
+			await navigator.clipboard.writeText(cellClipboardText(field, row.cells[fieldId]));
+			return true;
+		} catch (error) {
+			console.error(error);
+			new Notice("Could not copy this cell to the clipboard");
+			return false;
+		}
+	};
+
+	const cutCell = async (rowId: string, fieldId: string): Promise<void> => {
+		const field = doc.fields.find((candidate) => candidate.id === fieldId);
+		if (!field || isReadOnlyField(field)) return;
+		if (await copyCell(rowId, fieldId)) {
+			updateCellValue(rowId, fieldId, emptyCellValue(field.type));
+		}
+	};
+
+	const pasteCell = async (rowId: string, fieldId: string): Promise<void> => {
+		const field = doc.fields.find((candidate) => candidate.id === fieldId);
+		if (!field || isReadOnlyField(field)) return;
+		if (typeof navigator === "undefined" || !navigator.clipboard?.readText) {
+			new Notice("Clipboard access is unavailable on this device");
+			return;
+		}
+		try {
+			const parsed = parseCellClipboardText(field, await navigator.clipboard.readText());
+			if (!parsed.ok) {
+				new Notice(parsed.error);
+				return;
+			}
+			updateCellValue(rowId, fieldId, parsed.value, parsed.field);
+		} catch (error) {
+			console.error(error);
+			new Notice("Could not read the clipboard. Use the table’s standard paste shortcut instead.");
+		}
+	};
+
+	const clearCell = (rowId: string, fieldId: string): void => {
+		const field = doc.fields.find((candidate) => candidate.id === fieldId);
+		if (!field || isReadOnlyField(field)) return;
+		updateCellValue(rowId, fieldId, emptyCellValue(field.type));
 	};
 
 	const updateField = (field: Field) => {
@@ -440,6 +535,12 @@ export function TableApp({
 				canReorderRows={doc.view.sorts.length === 0}
 				onSelectRow={setSelectedRowId}
 				onSetCell={setCell}
+				onCopyCell={copyCell}
+				onCutCell={cutCell}
+				onPasteCell={pasteCell}
+				onClearCell={clearCell}
+				onInsertRow={insertRow}
+				onDuplicateRow={duplicateRow}
 				onDeleteRow={deleteRow}
 				onRenameField={renameField}
 				onDeleteField={deleteField}

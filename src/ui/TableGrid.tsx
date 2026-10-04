@@ -3,13 +3,17 @@ import {
 	useRef,
 	useState,
 	type JSX,
+	type MouseEvent as ReactMouseEvent,
 	type PointerEvent as ReactPointerEvent,
 } from "react";
+import { Menu } from "obsidian";
 import {
 	CellValue,
 	Field,
 	SelectOption,
 	TableDocument,
+	isReadOnlyField,
+	isSelectField,
 	visibleFields,
 } from "../data/types";
 import { RowGroup } from "../data/query";
@@ -34,6 +38,12 @@ interface Props {
 	canReorderRows: boolean;
 	onSelectRow: (rowId: string | null) => void;
 	onSetCell: (rowId: string, fieldId: string, value: CellValue) => void;
+	onCopyCell: (rowId: string, fieldId: string) => Promise<boolean>;
+	onCutCell: (rowId: string, fieldId: string) => Promise<void>;
+	onPasteCell: (rowId: string, fieldId: string) => Promise<void>;
+	onClearCell: (rowId: string, fieldId: string) => void;
+	onInsertRow: (rowId: string, side: "before" | "after") => void;
+	onDuplicateRow: (rowId: string) => void;
 	onDeleteRow: (rowId: string) => void;
 	onRenameField: (fieldId: string, name: string) => void;
 	onDeleteField: (fieldId: string) => void;
@@ -103,6 +113,75 @@ export function TableGrid(props: Props) {
 			resizeObserver?.disconnect();
 		};
 	}, [props.showTopScrollbar]);
+
+	const addRowContextItems = (menu: Menu, rowId: string) => {
+		if (!props.canReorderRows) {
+			menu.addItem((item) => item.setTitle("Clear sorting to insert in place").setIsLabel(true));
+		}
+		menu.addItem((item) =>
+			item
+				.setTitle("Insert row above")
+				.setDisabled(!props.canReorderRows)
+				.onClick(() => props.onInsertRow(rowId, "before"))
+		);
+		menu.addItem((item) =>
+			item
+				.setTitle("Insert row below")
+				.setDisabled(!props.canReorderRows)
+				.onClick(() => props.onInsertRow(rowId, "after"))
+		);
+		menu.addItem((item) => item.setTitle("Duplicate row").onClick(() => props.onDuplicateRow(rowId)));
+		menu.addSeparator();
+		menu.addItem((item) =>
+			item
+				.setTitle("Delete row")
+				.setWarning(true)
+				.onClick(() => props.onDeleteRow(rowId))
+		);
+	};
+
+	const showRowContextMenu = (event: ReactMouseEvent<HTMLElement>, rowId: string) => {
+		event.preventDefault();
+		event.stopPropagation();
+		const menu = new Menu();
+		addRowContextItems(menu, rowId);
+		menu.showAtMouseEvent(event.nativeEvent);
+	};
+
+	const showCellContextMenu = (
+		event: ReactMouseEvent<HTMLTableCellElement>,
+		rowId: string,
+		field: Field
+	) => {
+		event.preventDefault();
+		event.stopPropagation();
+		const menu = new Menu();
+		const readOnly = isReadOnlyField(field);
+		menu.addItem((item) =>
+			item.setTitle("Copy cell").onClick(() => void props.onCopyCell(rowId, field.id))
+		);
+		menu.addItem((item) =>
+			item
+				.setTitle("Cut cell")
+				.setDisabled(readOnly)
+				.onClick(() => void props.onCutCell(rowId, field.id))
+		);
+		menu.addItem((item) =>
+			item
+				.setTitle("Paste into cell")
+				.setDisabled(readOnly)
+				.onClick(() => void props.onPasteCell(rowId, field.id))
+		);
+		menu.addItem((item) =>
+			item
+				.setTitle("Clear cell")
+				.setDisabled(readOnly)
+				.onClick(() => props.onClearCell(rowId, field.id))
+		);
+		menu.addSeparator();
+		addRowContextItems(menu, rowId);
+		menu.showAtMouseEvent(event.nativeEvent);
+	};
 
 	const startReorder = (
 		kind: ReorderKind,
@@ -199,7 +278,7 @@ export function TableGrid(props: Props) {
 		if (group.label !== "") {
 			body.push(
 				<tr key={`g-${group.key}`} className="tabula-group-row">
-					<td colSpan={fields.length + 2}>
+					<td colSpan={fields.length + 1}>
 						<span className="tabula-group-label">{group.label}</span>
 						<span className="tabula-muted"> {group.rows.length}</span>
 					</td>
@@ -221,6 +300,7 @@ export function TableGrid(props: Props) {
 					key={row.id}
 					data-reorder-kind={props.canReorderRows ? "row" : undefined}
 					data-reorder-id={props.canReorderRows ? row.id : undefined}
+					onContextMenu={(event) => showRowContextMenu(event, row.id)}
 					className={[
 						props.selectedRowId === row.id ? "is-selected" : "",
 						isDragSource ? "is-dragging" : "",
@@ -230,7 +310,10 @@ export function TableGrid(props: Props) {
 						.join(" ") || undefined}
 					onClick={() => props.onSelectRow(row.id)}
 				>
-					<td className="tabula-row-num sticky-col">
+					<td
+						className="tabula-row-num sticky-col"
+						onContextMenu={(event) => showRowContextMenu(event, row.id)}
+					>
 						<div className="tabula-row-num-content">
 							<span>{index}</span>
 							<button
@@ -254,6 +337,7 @@ export function TableGrid(props: Props) {
 						<td
 							key={field.id}
 							className={fi === 0 && frozen ? "sticky-primary" : undefined}
+							onContextMenu={(event) => showCellContextMenu(event, row.id, field)}
 							style={{
 								width: widths[field.id] ?? 160,
 								minWidth: widths[field.id] ?? 160,
@@ -268,19 +352,6 @@ export function TableGrid(props: Props) {
 							/>
 						</td>
 					))}
-					<td className="tabula-row-actions">
-						<button
-							className="tabula-btn tabula-icon-btn"
-							type="button"
-							title="Delete row"
-							onClick={(e) => {
-								e.stopPropagation();
-								props.onDeleteRow(row.id);
-							}}
-						>
-							×
-						</button>
-					</td>
 				</tr>
 			);
 		}
@@ -345,14 +416,13 @@ export function TableGrid(props: Props) {
 									</th>
 								);
 							})}
-							<th className="tabula-row-actions" />
 						</tr>
 					</thead>
 					<tbody>
 						{body}
 						{totalRows === 0 && (
 							<tr>
-								<td colSpan={fields.length + 2} className="tabula-empty">
+								<td colSpan={fields.length + 1} className="tabula-empty">
 									No rows match the current search/filters.
 								</td>
 							</tr>
@@ -393,9 +463,45 @@ function FieldHeader({
 	const [menuOpen, setMenuOpen] = useState(false);
 	const startX = useRef(0);
 	const startW = useRef(width);
+	const nameInputRef = useRef<HTMLInputElement>(null);
+
+	const showFieldContextMenu = (event: ReactMouseEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		event.stopPropagation();
+		const menu = new Menu();
+		menu.addItem((item) =>
+			item.setTitle("Rename column").onClick(() => {
+				window.setTimeout(() => {
+					nameInputRef.current?.focus();
+					nameInputRef.current?.select();
+				}, 0);
+			})
+		);
+		menu.addItem((item) => item.setTitle("Insert column left").onClick(() => onInsert(field.id, "left")));
+		menu.addItem((item) => item.setTitle("Insert column right").onClick(() => onInsert(field.id, "right")));
+		menu.addSeparator();
+		menu.addItem((item) => item.setTitle("Sort A → Z").onClick(() => onSort(field.id, "asc")));
+		menu.addItem((item) => item.setTitle("Sort Z → A").onClick(() => onSort(field.id, "desc")));
+		menu.addItem((item) => item.setTitle("Hide column").onClick(() => onHide(field.id)));
+		if (isSelectField(field)) {
+			menu.addItem((item) => item.setTitle("Manage options…").onClick(() => onManageOptions(field.id)));
+		}
+		menu.addSeparator();
+		menu.addItem((item) =>
+			item
+				.setTitle("Delete column")
+				.setWarning(true)
+				.onClick(() => {
+					if (window.confirm(`Delete “${field.name}” and all its cell values?`)) {
+						onDelete(field.id);
+					}
+				})
+		);
+		menu.showAtMouseEvent(event.nativeEvent);
+	};
 
 	return (
-		<div className="tabula-th">
+		<div className="tabula-th" onContextMenu={showFieldContextMenu}>
 			<button
 				className="tabula-col-drag-handle"
 				type="button"
@@ -407,6 +513,7 @@ function FieldHeader({
 				⠿
 			</button>
 			<input
+				ref={nameInputRef}
 				className="tabula-th-name"
 				value={field.name}
 				onChange={(e) => onRename(field.id, e.target.value)}
@@ -457,6 +564,7 @@ function FieldHeader({
 			<div
 				className="tabula-col-resize"
 				onMouseDown={(e) => {
+					if (e.button !== 0) return;
 					e.preventDefault();
 					e.stopPropagation();
 					startX.current = e.clientX;

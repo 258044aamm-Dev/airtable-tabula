@@ -68,9 +68,22 @@ export default class TabulaPlugin extends Plugin {
 			menu.showAtMouseEvent(event);
 		});
 		ribbonIcon.addClass("tabula-ribbon-action");
-		ribbonIcon.style.color = "#8B5CF6";
-		ribbonIcon.style.setProperty("--icon-color", "#8B5CF6");
 		ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
+		const applyRibbonPurple = () => {
+			const setPurple = (element: HTMLElement | SVGElement) => {
+				element.style.setProperty("color", "#8B5CF6", "important");
+				element.style.setProperty("--icon-color", "#8B5CF6", "important");
+			};
+			setPurple(ribbonIcon);
+			for (const svgElement of Array.from(ribbonIcon.querySelectorAll<SVGElement>("svg, svg *"))) {
+				setPurple(svgElement);
+				svgElement.style.setProperty("stroke", "#8B5CF6", "important");
+			}
+		};
+		applyRibbonPurple();
+		const ribbonColorObserver = new MutationObserver(applyRibbonPurple);
+		ribbonColorObserver.observe(ribbonIcon, { childList: true, subtree: true });
+		this.register(() => ribbonColorObserver.disconnect());
 	}
 
 	async loadSettings(): Promise<void> {

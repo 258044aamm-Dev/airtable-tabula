@@ -1101,7 +1101,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef8(initialValue) {
+        function useRef9(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
@@ -1895,7 +1895,7 @@ var require_react_development = __commonJS({
         exports.useLayoutEffect = useLayoutEffect;
         exports.useMemo = useMemo4;
         exports.useReducer = useReducer;
-        exports.useRef = useRef8;
+        exports.useRef = useRef9;
         exports.useState = useState12;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
@@ -24501,10 +24501,10 @@ __export(main_exports, {
   default: () => TabulaPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian6 = require("obsidian");
+var import_obsidian7 = require("obsidian");
 
 // src/views/TableView.ts
-var import_obsidian4 = require("obsidian");
+var import_obsidian5 = require("obsidian");
 
 // src/data/types.ts
 var SELECT_COLORS = [
@@ -25054,11 +25054,120 @@ var import_react12 = __toESM(require_react());
 
 // src/ui/TableFileApp.tsx
 var import_react11 = __toESM(require_react());
-var import_obsidian3 = require("obsidian");
+var import_obsidian4 = require("obsidian");
 
 // src/ui/TableApp.tsx
 var import_react10 = __toESM(require_react());
-var import_obsidian2 = require("obsidian");
+var import_obsidian3 = require("obsidian");
+
+// src/data/cellClipboard.ts
+function cellClipboardText(field, value) {
+  if (value == null) return "";
+  switch (field.type) {
+    case "singleSelect":
+      return field.options.find((option) => option.id === value)?.name ?? "";
+    case "multiSelect":
+      return Array.isArray(value) ? value.map((id) => field.options.find((option) => option.id === id)?.name ?? "").filter(Boolean).join(", ") : "";
+    case "checkbox":
+      return value ? "TRUE" : "FALSE";
+    case "duration":
+      return typeof value === "number" ? formatDuration(value) : "";
+    case "attachment":
+      return Array.isArray(value) ? value.join("\n") : "";
+    default:
+      return Array.isArray(value) ? value.join(", ") : String(value);
+  }
+}
+function parseCellClipboardText(field, text) {
+  if (isReadOnlyField(field)) {
+    return { ok: false, error: `${field.name} is read-only` };
+  }
+  const trimmed = text.trim();
+  if (!trimmed) return { ok: true, value: emptyCellValue(field.type) };
+  switch (field.type) {
+    case "number":
+    case "currency":
+    case "percent":
+    case "rating": {
+      const normalized = trimmed.replace(/[$€£¥,\s]/g, "").replace(/%$/, "");
+      const value = Number(normalized);
+      return Number.isFinite(value) ? { ok: true, value } : { ok: false, error: `\u201C${text}\u201D is not a valid number for ${field.name}` };
+    }
+    case "duration": {
+      const value = parseDuration(trimmed);
+      return value == null ? { ok: false, error: `\u201C${text}\u201D is not a valid duration for ${field.name}` } : { ok: true, value };
+    }
+    case "checkbox": {
+      const value = trimmed.toLocaleLowerCase();
+      if (["true", "yes", "y", "1", "on", "checked"].includes(value)) {
+        return { ok: true, value: true };
+      }
+      if (["false", "no", "n", "0", "off", "unchecked"].includes(value)) {
+        return { ok: true, value: false };
+      }
+      return { ok: false, error: `\u201C${text}\u201D is not a valid checkbox value` };
+    }
+    case "date": {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        return isValidDate(trimmed) ? { ok: true, value: trimmed } : { ok: false, error: `\u201C${text}\u201D is not a valid date for ${field.name}` };
+      }
+      const date = new Date(trimmed);
+      return Number.isNaN(date.getTime()) ? { ok: false, error: `\u201C${text}\u201D is not a valid date for ${field.name}` } : { ok: true, value: date.toISOString().slice(0, 10) };
+    }
+    case "datetime": {
+      const date = new Date(trimmed);
+      return Number.isNaN(date.getTime()) ? { ok: false, error: `\u201C${text}\u201D is not a valid date and time for ${field.name}` } : { ok: true, value: date.toISOString() };
+    }
+    case "singleSelect": {
+      const option = field.options.find(
+        (candidate) => candidate.id === trimmed || candidate.name.toLocaleLowerCase() === trimmed.toLocaleLowerCase()
+      );
+      if (option) return { ok: true, value: option.id };
+      const added = createSelectOption(trimmed);
+      const updatedField = { ...field, options: [...field.options, added] };
+      return { ok: true, value: added.id, field: updatedField };
+    }
+    case "multiSelect": {
+      const names = text.split(/\r?\n|,\s*/).map((name) => name.trim()).filter(Boolean);
+      let options = [...field.options];
+      const ids = [];
+      for (const name of names) {
+        let option = options.find(
+          (candidate) => candidate.id === name || candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+        );
+        if (!option) {
+          option = createSelectOption(name);
+          options = [...options, option];
+        }
+        if (!ids.includes(option.id)) ids.push(option.id);
+      }
+      const updatedField = options.length === field.options.length ? field : { ...field, options };
+      return {
+        ok: true,
+        value: ids,
+        ...updatedField === field ? {} : { field: updatedField }
+      };
+    }
+    case "attachment": {
+      const paths = text.split(/\r?\n/).map((path) => path.trim()).filter(Boolean);
+      return { ok: true, value: Array.from(new Set(paths)) };
+    }
+    case "text":
+    case "longText":
+    case "url":
+    case "email":
+    case "phone":
+      return { ok: true, value: text };
+    case "autoNumber":
+    case "createdTime":
+    case "lastModifiedTime":
+      return { ok: false, error: `${field.name} is read-only` };
+  }
+}
+function isValidDate(value) {
+  const date = /* @__PURE__ */ new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
 
 // node_modules/saxen/dist/index.js
 var fromCharCode = String.fromCharCode;
@@ -31052,6 +31161,7 @@ function HideFieldsMenu({ doc, onChange }) {
 
 // src/ui/TableGrid.tsx
 var import_react6 = __toESM(require_react());
+var import_obsidian2 = require("obsidian");
 
 // src/ui/CellEditor.tsx
 var import_react4 = __toESM(require_react());
@@ -31634,6 +31744,50 @@ function TableGrid(props) {
       resizeObserver?.disconnect();
     };
   }, [props.showTopScrollbar]);
+  const addRowContextItems = (menu, rowId) => {
+    if (!props.canReorderRows) {
+      menu.addItem((item) => item.setTitle("Clear sorting to insert in place").setIsLabel(true));
+    }
+    menu.addItem(
+      (item) => item.setTitle("Insert row above").setDisabled(!props.canReorderRows).onClick(() => props.onInsertRow(rowId, "before"))
+    );
+    menu.addItem(
+      (item) => item.setTitle("Insert row below").setDisabled(!props.canReorderRows).onClick(() => props.onInsertRow(rowId, "after"))
+    );
+    menu.addItem((item) => item.setTitle("Duplicate row").onClick(() => props.onDuplicateRow(rowId)));
+    menu.addSeparator();
+    menu.addItem(
+      (item) => item.setTitle("Delete row").setWarning(true).onClick(() => props.onDeleteRow(rowId))
+    );
+  };
+  const showRowContextMenu = (event, rowId) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = new import_obsidian2.Menu();
+    addRowContextItems(menu, rowId);
+    menu.showAtMouseEvent(event.nativeEvent);
+  };
+  const showCellContextMenu = (event, rowId, field) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = new import_obsidian2.Menu();
+    const readOnly = isReadOnlyField(field);
+    menu.addItem(
+      (item) => item.setTitle("Copy cell").onClick(() => void props.onCopyCell(rowId, field.id))
+    );
+    menu.addItem(
+      (item) => item.setTitle("Cut cell").setDisabled(readOnly).onClick(() => void props.onCutCell(rowId, field.id))
+    );
+    menu.addItem(
+      (item) => item.setTitle("Paste into cell").setDisabled(readOnly).onClick(() => void props.onPasteCell(rowId, field.id))
+    );
+    menu.addItem(
+      (item) => item.setTitle("Clear cell").setDisabled(readOnly).onClick(() => props.onClearCell(rowId, field.id))
+    );
+    menu.addSeparator();
+    addRowContextItems(menu, rowId);
+    menu.showAtMouseEvent(event.nativeEvent);
+  };
   const startReorder = (kind, sourceId, event) => {
     if (event.pointerType === "mouse" && event.button !== 0 || kind === "row" && !props.canReorderRows) return;
     event.preventDefault();
@@ -31718,7 +31872,7 @@ function TableGrid(props) {
   for (const group of props.groups) {
     if (group.label !== "") {
       body.push(
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { className: "tabula-group-row", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("td", { colSpan: fields.length + 2, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { className: "tabula-group-row", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("td", { colSpan: fields.length + 1, children: [
           /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-group-label", children: group.label }),
           /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { className: "tabula-muted", children: [
             " ",
@@ -31738,6 +31892,7 @@ function TableGrid(props) {
           {
             "data-reorder-kind": props.canReorderRows ? "row" : void 0,
             "data-reorder-id": props.canReorderRows ? row.id : void 0,
+            onContextMenu: (event) => showRowContextMenu(event, row.id),
             className: [
               props.selectedRowId === row.id ? "is-selected" : "",
               isDragSource ? "is-dragging" : "",
@@ -31745,26 +31900,34 @@ function TableGrid(props) {
             ].filter(Boolean).join(" ") || void 0,
             onClick: () => props.onSelectRow(row.id),
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { className: "tabula-row-num sticky-col", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-row-num-content", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { children: index }),
-                /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-                  "button",
-                  {
-                    className: "tabula-row-drag-handle",
-                    type: "button",
-                    "aria-label": `Drag row ${index} to reorder`,
-                    title: props.canReorderRows ? "Drag to reorder row" : "Clear sorting to manually reorder rows",
-                    disabled: !props.canReorderRows,
-                    onPointerDown: (event) => startReorder("row", row.id, event),
-                    onClick: (event) => event.stopPropagation(),
-                    children: "\u283F"
-                  }
-                )
-              ] }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                "td",
+                {
+                  className: "tabula-row-num sticky-col",
+                  onContextMenu: (event) => showRowContextMenu(event, row.id),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-row-num-content", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { children: index }),
+                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                      "button",
+                      {
+                        className: "tabula-row-drag-handle",
+                        type: "button",
+                        "aria-label": `Drag row ${index} to reorder`,
+                        title: props.canReorderRows ? "Drag to reorder row" : "Clear sorting to manually reorder rows",
+                        disabled: !props.canReorderRows,
+                        onPointerDown: (event) => startReorder("row", row.id, event),
+                        onClick: (event) => event.stopPropagation(),
+                        children: "\u283F"
+                      }
+                    )
+                  ] })
+                }
+              ),
               fields.map((field, fi) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                 "td",
                 {
                   className: fi === 0 && frozen ? "sticky-primary" : void 0,
+                  onContextMenu: (event) => showCellContextMenu(event, row.id, field),
                   style: {
                     width: widths[field.id] ?? 160,
                     minWidth: widths[field.id] ?? 160
@@ -31781,20 +31944,7 @@ function TableGrid(props) {
                   )
                 },
                 field.id
-              )),
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { className: "tabula-row-actions", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-                "button",
-                {
-                  className: "tabula-btn tabula-icon-btn",
-                  type: "button",
-                  title: "Delete row",
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    props.onDeleteRow(row.id);
-                  },
-                  children: "\xD7"
-                }
-              ) })
+              ))
             ]
           },
           row.id
@@ -31856,12 +32006,11 @@ function TableGrid(props) {
                   },
                   field.id
                 );
-              }),
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-actions" })
+              })
             ] }) }),
             /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tbody", { children: [
               body,
-              totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
+              totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 1, className: "tabula-empty", children: "No rows match the current search/filters." }) })
             ] })
           ]
         }
@@ -31885,7 +32034,39 @@ function FieldHeader({
   const [menuOpen, setMenuOpen] = (0, import_react6.useState)(false);
   const startX = (0, import_react6.useRef)(0);
   const startW = (0, import_react6.useRef)(width);
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-th", children: [
+  const nameInputRef = (0, import_react6.useRef)(null);
+  const showFieldContextMenu = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = new import_obsidian2.Menu();
+    menu.addItem(
+      (item) => item.setTitle("Rename column").onClick(() => {
+        window.setTimeout(() => {
+          nameInputRef.current?.focus();
+          nameInputRef.current?.select();
+        }, 0);
+      })
+    );
+    menu.addItem((item) => item.setTitle("Insert column left").onClick(() => onInsert(field.id, "left")));
+    menu.addItem((item) => item.setTitle("Insert column right").onClick(() => onInsert(field.id, "right")));
+    menu.addSeparator();
+    menu.addItem((item) => item.setTitle("Sort A \u2192 Z").onClick(() => onSort(field.id, "asc")));
+    menu.addItem((item) => item.setTitle("Sort Z \u2192 A").onClick(() => onSort(field.id, "desc")));
+    menu.addItem((item) => item.setTitle("Hide column").onClick(() => onHide(field.id)));
+    if (isSelectField(field)) {
+      menu.addItem((item) => item.setTitle("Manage options\u2026").onClick(() => onManageOptions(field.id)));
+    }
+    menu.addSeparator();
+    menu.addItem(
+      (item) => item.setTitle("Delete column").setWarning(true).onClick(() => {
+        if (window.confirm(`Delete \u201C${field.name}\u201D and all its cell values?`)) {
+          onDelete(field.id);
+        }
+      })
+    );
+    menu.showAtMouseEvent(event.nativeEvent);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-th", onContextMenu: showFieldContextMenu, children: [
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
@@ -31901,6 +32082,7 @@ function FieldHeader({
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "input",
       {
+        ref: nameInputRef,
         className: "tabula-th-name",
         value: field.name,
         onChange: (e) => onRename(field.id, e.target.value)
@@ -31957,6 +32139,7 @@ function FieldHeader({
       {
         className: "tabula-col-resize",
         onMouseDown: (e) => {
+          if (e.button !== 0) return;
           e.preventDefault();
           e.stopPropagation();
           startX.current = e.clientX;
@@ -32433,13 +32616,13 @@ function TableApp({
   const requestClipboardPaste = (0, import_react10.useCallback)(() => {
     void readSpreadsheetClipboard().then((payload) => {
       if (!payload) {
-        new import_obsidian2.Notice("Clipboard has no CSV, XLSX, or spreadsheet cell data");
+        new import_obsidian3.Notice("Clipboard has no CSV, XLSX, or spreadsheet cell data");
         return;
       }
       setPasteCandidate(payload);
     }).catch((error2) => {
       console.error(error2);
-      new import_obsidian2.Notice("Clipboard access was unavailable. Focus the table and press Ctrl/Cmd+V instead.");
+      new import_obsidian3.Notice("Clipboard access was unavailable. Focus the table and press Ctrl/Cmd+V instead.");
     });
   }, []);
   (0, import_react10.useEffect)(() => {
@@ -32476,7 +32659,7 @@ function TableApp({
       event.stopPropagation();
       void spreadsheetToMatrix(file).then((matrix2) => setPasteCandidate({ matrix: matrix2, sourceName: file.name })).catch((error2) => {
         console.error(error2);
-        new import_obsidian2.Notice(error2 instanceof Error ? error2.message : "Could not read pasted spreadsheet");
+        new import_obsidian3.Notice(error2 instanceof Error ? error2.message : "Could not read pasted spreadsheet");
       });
       return;
     }
@@ -32500,6 +32683,33 @@ function TableApp({
       rows: [...doc.rows, row],
       autoNumberNext: nextAuto
     });
+  };
+  const insertRow = (rowId, side) => {
+    if (doc.view.sorts.length > 0) return;
+    const sourceIndex = doc.rows.findIndex((row2) => row2.id === rowId);
+    if (sourceIndex < 0) return;
+    const { row, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
+    const rows = [...doc.rows];
+    rows.splice(sourceIndex + (side === "after" ? 1 : 0), 0, row);
+    updateDoc({ ...doc, rows, autoNumberNext: nextAuto });
+    setSelectedRowId(row.id);
+  };
+  const duplicateRow = (rowId) => {
+    const sourceIndex = doc.rows.findIndex((row2) => row2.id === rowId);
+    if (sourceIndex < 0) return;
+    const source = doc.rows[sourceIndex];
+    const generated = createRow(doc.fields, doc.autoNumberNext ?? 1);
+    const cells = { ...generated.row.cells };
+    for (const field of doc.fields) {
+      if (isReadOnlyField(field)) continue;
+      const value = source.cells[field.id];
+      cells[field.id] = Array.isArray(value) ? [...value] : value;
+    }
+    const row = touchLastModified({ ...generated.row, cells }, doc.fields);
+    const rows = [...doc.rows];
+    rows.splice(sourceIndex + 1, 0, row);
+    updateDoc({ ...doc, rows, autoNumberNext: generated.nextAuto });
+    setSelectedRowId(row.id);
   };
   const deleteRow = (rowId) => {
     const recordMap = { ...doc.sync?.recordMap ?? {} };
@@ -32562,18 +32772,69 @@ function TableApp({
       fields: doc.fields.map((f) => f.id === fieldId ? { ...f, name } : f)
     });
   };
-  const setCell = (rowId, fieldId, value) => {
+  const updateCellValue = (rowId, fieldId, value, fieldUpdate) => {
+    const fields = fieldUpdate ? doc.fields.map((field) => field.id === fieldId ? fieldUpdate : field) : doc.fields;
     updateDoc({
       ...doc,
+      fields,
       rows: doc.rows.map((row) => {
         if (row.id !== rowId) return row;
         const next = {
           ...row,
           cells: { ...row.cells, [fieldId]: value }
         };
-        return touchLastModified(next, doc.fields);
+        return touchLastModified(next, fields);
       })
     });
+  };
+  const setCell = (rowId, fieldId, value) => updateCellValue(rowId, fieldId, value);
+  const copyCell = async (rowId, fieldId) => {
+    const field = doc.fields.find((candidate) => candidate.id === fieldId);
+    const row = doc.rows.find((candidate) => candidate.id === rowId);
+    if (!field || !row) return false;
+    if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+      new import_obsidian3.Notice("Clipboard access is unavailable on this device");
+      return false;
+    }
+    try {
+      await navigator.clipboard.writeText(cellClipboardText(field, row.cells[fieldId]));
+      return true;
+    } catch (error2) {
+      console.error(error2);
+      new import_obsidian3.Notice("Could not copy this cell to the clipboard");
+      return false;
+    }
+  };
+  const cutCell = async (rowId, fieldId) => {
+    const field = doc.fields.find((candidate) => candidate.id === fieldId);
+    if (!field || isReadOnlyField(field)) return;
+    if (await copyCell(rowId, fieldId)) {
+      updateCellValue(rowId, fieldId, emptyCellValue(field.type));
+    }
+  };
+  const pasteCell = async (rowId, fieldId) => {
+    const field = doc.fields.find((candidate) => candidate.id === fieldId);
+    if (!field || isReadOnlyField(field)) return;
+    if (typeof navigator === "undefined" || !navigator.clipboard?.readText) {
+      new import_obsidian3.Notice("Clipboard access is unavailable on this device");
+      return;
+    }
+    try {
+      const parsed = parseCellClipboardText(field, await navigator.clipboard.readText());
+      if (!parsed.ok) {
+        new import_obsidian3.Notice(parsed.error);
+        return;
+      }
+      updateCellValue(rowId, fieldId, parsed.value, parsed.field);
+    } catch (error2) {
+      console.error(error2);
+      new import_obsidian3.Notice("Could not read the clipboard. Use the table\u2019s standard paste shortcut instead.");
+    }
+  };
+  const clearCell = (rowId, fieldId) => {
+    const field = doc.fields.find((candidate) => candidate.id === fieldId);
+    if (!field || isReadOnlyField(field)) return;
+    updateCellValue(rowId, fieldId, emptyCellValue(field.type));
   };
   const updateField = (field) => {
     updateDoc({
@@ -32640,17 +32901,17 @@ function TableApp({
     setShowHide(false);
     setQueryError(void 0);
     setPasteCandidate(null);
-    new import_obsidian2.Notice(`Replaced table with ${incoming.rows.length} rows`);
+    new import_obsidian3.Notice(`Replaced table with ${incoming.rows.length} rows`);
   };
   const appendFromPaste = (incoming) => {
     const result = appendSpreadsheetToTable(doc, incoming);
     updateDoc(result.doc);
     setPasteCandidate(null);
-    new import_obsidian2.Notice(
+    new import_obsidian3.Notice(
       `Appended ${result.addedRows} rows${result.addedFields ? ` and added ${result.addedFields} fields` : ""}`
     );
     if (doc.sync && result.addedFields > 0) {
-      new import_obsidian2.Notice("New fields are local only until they are mapped to Airtable");
+      new import_obsidian3.Notice("New fields are local only until they are mapped to Airtable");
     }
   };
   const createFromPaste = async (incoming) => {
@@ -32664,10 +32925,10 @@ function TableApp({
       const client = new AirtableClient(airtableToken.trim());
       const next = await pullFromAirtable(client, doc);
       updateDoc(next);
-      new import_obsidian2.Notice(`Pulled ${next.rows.length} rows from Airtable`);
+      new import_obsidian3.Notice(`Pulled ${next.rows.length} rows from Airtable`);
     } catch (e) {
       console.error(e);
-      new import_obsidian2.Notice(e instanceof Error ? e.message : "Pull failed");
+      new import_obsidian3.Notice(e instanceof Error ? e.message : "Pull failed");
     } finally {
       setSyncBusy(false);
     }
@@ -32679,10 +32940,10 @@ function TableApp({
       const client = new AirtableClient(airtableToken.trim());
       const next = await pushToAirtable(client, doc);
       updateDoc(next);
-      new import_obsidian2.Notice(`Pushed ${doc.rows.length} rows to Airtable`);
+      new import_obsidian3.Notice(`Pushed ${doc.rows.length} rows to Airtable`);
     } catch (e) {
       console.error(e);
-      new import_obsidian2.Notice(e instanceof Error ? e.message : "Push failed");
+      new import_obsidian3.Notice(e instanceof Error ? e.message : "Push failed");
     } finally {
       setSyncBusy(false);
     }
@@ -32748,6 +33009,12 @@ function TableApp({
         canReorderRows: doc.view.sorts.length === 0,
         onSelectRow: setSelectedRowId,
         onSetCell: setCell,
+        onCopyCell: copyCell,
+        onCutCell: cutCell,
+        onPasteCell: pasteCell,
+        onClearCell: clearCell,
+        onInsertRow: insertRow,
+        onDuplicateRow: duplicateRow,
         onDeleteRow: deleteRow,
         onRenameField: renameField,
         onDeleteField: deleteField,
@@ -32791,7 +33058,7 @@ function TableApp({
         onClose: () => setShowLinkModal(false),
         onLinked: (next) => {
           updateDoc(next);
-          new import_obsidian2.Notice(
+          new import_obsidian3.Notice(
             `Linked to ${next.sync?.baseName ?? "base"} / ${next.sync?.tableName ?? "table"}`
           );
         }
@@ -32830,7 +33097,7 @@ function TableFileApp({
   const dispatchClipboardPaste = (0, import_react11.useCallback)(() => {
     const handler = clipboardHandlers.current.get(activeTableIdRef.current);
     if (handler) handler();
-    else new import_obsidian3.Notice("Click inside a table before pasting from the ribbon");
+    else new import_obsidian4.Notice("Click inside a table before pasting from the ribbon");
   }, []);
   (0, import_react11.useEffect)(() => {
     onRegisterClipboardPaste(dispatchClipboardPaste);
@@ -32857,7 +33124,7 @@ function TableFileApp({
     }
     clipboardHandlers.current.delete(tableId);
     onRemoveTable(tableId);
-    new import_obsidian3.Notice(`Removed ${tableName || "table"}`);
+    new import_obsidian4.Notice(`Removed ${tableName || "table"}`);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`, children: [
     /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
@@ -32931,7 +33198,7 @@ function updateTableFileApp(root, props) {
 // src/views/TableView.ts
 var VIEW_TYPE_TABULA = "airtable-tabula-view";
 var TABULA_EXTENSION = "tabula";
-var TableView = class extends import_obsidian4.TextFileView {
+var TableView = class extends import_obsidian5.TextFileView {
   constructor(leaf, plugin) {
     super(leaf);
     this.reactRoot = null;
@@ -33075,8 +33342,8 @@ var DEFAULT_SETTINGS = {
 };
 
 // src/ui/SettingsTab.ts
-var import_obsidian5 = require("obsidian");
-var TabulaSettingTab = class extends import_obsidian5.PluginSettingTab {
+var import_obsidian6 = require("obsidian");
+var TabulaSettingTab = class extends import_obsidian6.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -33084,11 +33351,11 @@ var TabulaSettingTab = class extends import_obsidian5.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian5.Setting(containerEl).setName("Airtable sync").setHeading();
-    new import_obsidian5.Setting(containerEl).setDesc(
+    new import_obsidian6.Setting(containerEl).setName("Airtable sync").setHeading();
+    new import_obsidian6.Setting(containerEl).setDesc(
       "Optional sync with Airtable.com. Create a personal access token at airtable.com/create/tokens with scopes: data.records:read, data.records:write, schema.bases:read \u2014 and access to your bases."
     );
-    new import_obsidian5.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
+    new import_obsidian6.Setting(containerEl).setName("Airtable personal access token").setDesc("Stored in this vault\u2019s plugin data. Leave empty to disable sync.").addText((text) => {
       text.inputEl.type = "password";
       text.inputEl.autocomplete = "off";
       text.setPlaceholder("pat\u2026");
@@ -33098,8 +33365,8 @@ var TabulaSettingTab = class extends import_obsidian5.PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
-    new import_obsidian5.Setting(containerEl).setName("Table display").setHeading();
-    new import_obsidian5.Setting(containerEl).setName("Top horizontal scrollbar").setDesc(
+    new import_obsidian6.Setting(containerEl).setName("Table display").setHeading();
+    new import_obsidian6.Setting(containerEl).setName("Top horizontal scrollbar").setDesc(
       "Show a synchronized scrollbar above wide tables. This setting applies to all tables and is off by default."
     ).addToggle((toggle) => {
       toggle.setValue(this.plugin.settings.showTopScrollbar).onChange(async (value) => {
@@ -33112,7 +33379,7 @@ var TabulaSettingTab = class extends import_obsidian5.PluginSettingTab {
 };
 
 // src/main.ts
-var TabulaPlugin = class extends import_obsidian6.Plugin {
+var TabulaPlugin = class extends import_obsidian7.Plugin {
   constructor() {
     super(...arguments);
     this.settings = { ...DEFAULT_SETTINGS };
@@ -33141,7 +33408,7 @@ var TabulaPlugin = class extends import_obsidian6.Plugin {
       callback: () => this.requestClipboardPaste()
     });
     const ribbonIcon = this.addRibbonIcon("table", "Airtable Tabula actions", (event) => {
-      const menu = new import_obsidian6.Menu();
+      const menu = new import_obsidian7.Menu();
       menu.addItem(
         (item) => item.setTitle("Create new table").onClick(() => void this.createNewTable())
       );
@@ -33154,9 +33421,22 @@ var TabulaPlugin = class extends import_obsidian6.Plugin {
       menu.showAtMouseEvent(event);
     });
     ribbonIcon.addClass("tabula-ribbon-action");
-    ribbonIcon.style.color = "#8B5CF6";
-    ribbonIcon.style.setProperty("--icon-color", "#8B5CF6");
     ribbonIcon.setAttribute("aria-label", "Airtable Tabula actions");
+    const applyRibbonPurple = () => {
+      const setPurple = (element) => {
+        element.style.setProperty("color", "#8B5CF6", "important");
+        element.style.setProperty("--icon-color", "#8B5CF6", "important");
+      };
+      setPurple(ribbonIcon);
+      for (const svgElement of Array.from(ribbonIcon.querySelectorAll("svg, svg *"))) {
+        setPurple(svgElement);
+        svgElement.style.setProperty("stroke", "#8B5CF6", "important");
+      }
+    };
+    applyRibbonPurple();
+    const ribbonColorObserver = new MutationObserver(applyRibbonPurple);
+    ribbonColorObserver.observe(ribbonIcon, { childList: true, subtree: true });
+    this.register(() => ribbonColorObserver.disconnect());
   }
   async loadSettings() {
     const data = await this.loadData();
@@ -33185,32 +33465,32 @@ var TabulaPlugin = class extends import_obsidian6.Plugin {
       const doc = await spreadsheetToTable(file);
       const created = await this.writeTableFile(doc.name, serializeTableDocument(doc));
       await this.app.workspace.getLeaf(true).openFile(created);
-      new import_obsidian6.Notice(`Imported ${doc.rows.length} rows from ${file.name}`);
+      new import_obsidian7.Notice(`Imported ${doc.rows.length} rows from ${file.name}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian6.Notice(e instanceof Error ? e.message : "Import failed");
+      new import_obsidian7.Notice(e instanceof Error ? e.message : "Import failed");
     }
   }
   requestClipboardPaste() {
     const tableView = this.app.workspace.getActiveViewOfType(TableView);
     if (!tableView?.requestClipboardPaste()) {
-      new import_obsidian6.Notice("Open a Tabula table before pasting spreadsheet data from the ribbon");
+      new import_obsidian7.Notice("Open a Tabula table before pasting spreadsheet data from the ribbon");
     }
   }
   async createTableFromPaste(doc) {
     const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
     await this.app.workspace.getLeaf(true).openFile(file);
-    new import_obsidian6.Notice(`Created ${file.basename} from pasted data`);
+    new import_obsidian7.Notice(`Created ${file.basename} from pasted data`);
   }
   async createNewTable() {
     const doc = createDefaultTable("Untitled Table");
     try {
       const file = await this.writeTableFile(doc.name, serializeTableDocument(doc));
       await this.app.workspace.getLeaf(true).openFile(file);
-      new import_obsidian6.Notice(`Created ${file.basename}`);
+      new import_obsidian7.Notice(`Created ${file.basename}`);
     } catch (e) {
       console.error(e);
-      new import_obsidian6.Notice("Failed to create table");
+      new import_obsidian7.Notice("Failed to create table");
     }
   }
   async writeTableFile(baseName, content) {
