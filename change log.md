@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.31] - 2026-10-05
+
+Removed the temporary on-screen diagnostic overlay (DebugOverlay) at user
+request. No functional or visual change: the v0.1.30 height contract —
+two hops, `height: var(--tabula-mount-h, 100%)` with the ResizeObserver
+anchor in TableView — stays exactly as shipped.
+
 ## [0.1.30] - 2026-10-05
 
 **Clean-sheet rewrite of the layout height chain**, driven by the measurements the

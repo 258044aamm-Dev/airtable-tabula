@@ -9,7 +9,6 @@ import {
 	serializeTableFileDocument,
 } from "../data/store";
 import { mountTableFileApp, updateTableFileApp } from "../ui/mount";
-import { installDebugOverlay } from "../ui/DebugOverlay";
 import type { TableFileAppProps } from "../ui/mount";
 import type TabulaPlugin from "../main";
 
@@ -24,7 +23,6 @@ export class TableView extends TextFileView {
 	private saveTimer: number | null = null;
 	private applyingExternal = false;
 	private clipboardPasteHandler: (() => void) | null = null;
-	private disposeDebugOverlay: (() => void) | null = null;
 	private mountSizeObserver: ResizeObserver | null = null;
 
 	private registerClipboardPaste = (handler: (() => void) | null): void => {
@@ -92,8 +90,6 @@ export class TableView extends TextFileView {
 		this.mountSizeObserver.observe(this.contentEl);
 		this.syncMountHeight();
 		this.remount();
-		// TEMPORARY DIAGNOSTIC -- see src/ui/DebugOverlay.ts
-		this.disposeDebugOverlay = installDebugOverlay(this.contentEl);
 	}
 
 	private syncMountHeight(): void {
@@ -109,8 +105,6 @@ export class TableView extends TextFileView {
 	async onClose(): Promise<void> {
 		this.mountSizeObserver?.disconnect();
 		this.mountSizeObserver = null;
-		this.disposeDebugOverlay?.();
-		this.disposeDebugOverlay = null;
 		if (this.saveTimer != null) {
 			window.clearTimeout(this.saveTimer);
 			this.saveTimer = null;
