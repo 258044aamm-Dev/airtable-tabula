@@ -24,10 +24,21 @@
 	min-height: 0;
 }
 
+/* `height: 100%`, not just flex-grow. The view has a definite height on every
+   platform (measured 482.4px on a phone), so a percentage resolves against it.
+   flex-grow does NOT: a theme is injected after plugin CSS, and a mobile
+   theme's `.is-mobile .view-content { flex-direction: row }` matches the
+   plugin's own selector on specificity and, being later, wins. That flips the
+   view's main axis to horizontal, where `flex: 1 1 auto` sizes the child's
+   width and leaves its height at content -- and the content is free to
+   collapse to nothing because every layer below carries `min-height: 0`.
+   The measured result was mount 0px, page 20px, card 1px. A percentage is
+   immune to all of that. */
 .tabula-mount {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
+	height: 100%;
 	min-height: 0;
 }
 

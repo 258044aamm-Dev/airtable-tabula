@@ -6,6 +6,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.28] - 2026-10-05
+
+The phone finally reported its own numbers (v0.1.27), and they explain every failure since v0.1.23.
+
+### Fixed
+- **The plugin page fills the view again on a phone whose theme re-lays the view out as a row.** The page now carries `height: 100%` again, alongside `flex: 1 1 auto`.
+
+### Root cause, measured on the device
+The diagnostic panel reported this on the phone:
+
+    div.view-content.tabula-view    482   css-height 482.4px  flex 1 1 auto
+    div.tabula-mount                  0   css-height 0px      flex 1 1 auto
+    div.tabula-file-root             20   css-height 20px     flex 1 1 auto
+    div.tabula-root (card)            1   css-height 1.06667px
+
+The view has a **definite** 482.4px height, yet its only flex child with `flex: 1 1 auto` measured **0px**. A flex item with `flex-grow: 1` inside a column container cannot be 0px. The only way that happens is if the container's main axis is horizontal.
+
+It is. A theme is injected *after* plugin CSS, and a mobile theme's `.is-mobile .view-content { flex-direction: row }` matches the plugin's own `.view-content.tabula-view` on specificity, so being later, it wins. With the main axis horizontal, `flex-grow` sizes the child's **width** and its height falls back to content -- and every layer below carries `min-height: 0`, so the content collapsed all the way down: page 20px, card 1.07px.
+
+v0.1.25 removed `height: 100%` from `.tabula-mount` and v0.1.26 replaced it with flex-grow. That is what broke it. A percentage resolves against the parent's definite height and is completely indifferent to `flex-direction`, which is why it is restored.
+
+Measured after the fix, with the theme's `row` override active: **100.0% fill at 1, 2, 3, 8 and 30 rows**, and the card still hugs its content (422-462px) instead of stretching.
+
+### Also corrected
+- **v0.1.26 was wrong** and made the phone worse, shrinking the page from 246px to 40px. `flex: 1 1 auto` on `.view-content` is correct and is kept; the fault was in dropping the percentage below it.
+- **No overlay element exists.** The panel's search for a large `fixed`/`absolute`/`sticky` element inside the view returned `(none)`. The reported "overlay" was empty space all along, not a layer covering the table.
+- The file holds **two stacked tables**: `815 + 120 (stackedTableGap) + 767 = 1702px`, exactly the file root's `scrollHeight`. The stacked-table gap is real but was not the reported problem.
+
+### Test harness
+- `fill-test.py` replaces `keyboard-overlap-test.py`. Every value in `harness/mobile-repro.html` is transcribed from the phone's own output rather than invented, and the view's `flex-direction` is forced to `row` to simulate the theme. The desktop harness is retained for the `column` case.
+- **Every earlier harness set `column`**, which is why six releases could not observe the failure they were written to catch. The new test was verified to fail when `height: 100%` is removed, not just to pass when it is present.
+
+### Still present
+The v0.1.27 diagnostic panel is still on, so the fix can be confirmed on the phone in one screenshot: it should read `FILL 100%`. It is removed in the next release.
+
+Build clean; functest reports ALL CHECKS PASSED; 0 of 24 controls repainted in both themes; desktop card geometry unchanged.
+
 ## [0.1.27] - 2026-10-05
 
 **DIAGNOSTIC BUILD — NOT A FIX.** v0.1.26 made the phone layout worse (the plugin page shrank from 246px to 40px). This release adds no functional change; it paints live measurements on screen so the failing device can finally be measured.
