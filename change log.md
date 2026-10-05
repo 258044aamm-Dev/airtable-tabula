@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.22] - 2026-10-05
+
+Colour fix for the blue-purple cells, search box and buttons reported on a real device. The palette was never wrong: Obsidian's own base stylesheet was repainting the table's form controls on top of it.
+
+### Fixed
+- **Cells, "+ New row", the search box and toolbar buttons are no longer Obsidian's blue-purple.** Obsidian ships rules like `.view-content input[type=text]:not(.checkbox)` and `.view-content button` that paint every input and button inside a view with the theme's interactive colours. Those selectors outranked the plugin's single-class rules, so the controls were repainted while every non-control element (a `<div>`) kept the correct warm palette. That is why the header capsule, grid and row-number band looked right while the cells did not.
+- Two things were needed, because neither alone was sufficient:
+  - **The variables Obsidian reads are remapped on the plugin root.** `--interactive-normal`, `--interactive-hover`, `--text-normal` and `--background-modifier-border` are redefined on `.tabula-file-root` to point at the table's own tokens. This cannot be outranked by any selector, so the palette holds even if Obsidian's rule wins. It also corrects the cell and search **text** colour, which was likewise being overridden.
+  - **Every form-control rule is now scoped to `.tabula-view .tabula-mount .tabula-file-root <element>.<class>`.** These are the plugin's real ancestor classes (`TableView.ts` sets `.tabula-view` and `.tabula-mount`). The scoping raises specificity above Obsidian's, so controls that deliberately differ from the default surface — the terracotta primary button, transparent drag handles, rating stars, icon buttons, the search field's stronger border, select options, the create-option row and the inline header rename — keep their own colours instead of falling back to the generic one.
+- 35 selector blocks were rescoped. Rules that style something *inside* a control (for example the pill within a select option) are unchanged; they were never competing with Obsidian.
+
+### Not changed
+- No `!important` was introduced; the fix is specificity and variable scoping only.
+- The settings tab renders outside the plugin view and uses no plugin classes, so it is unaffected.
+- Focus rings keep the native Obsidian focus ring, as previously decided. `--interactive-accent` was deliberately left alone so focus behaviour is unchanged.
+
+### Verified
+`obsidian-scope-test.py` reproduces Obsidian's base rules verbatim, injects them **after** the plugin stylesheet (the worst case for source order), and asserts that no control changes computed background, colour or border in either theme. It covers all 17 control classes; the 7 that only exist behind a closed dropdown or a rename state are synthesised from the real TSX markup so none can ship unverified. Result: 0 of 24 controls repainted, light and dark. The functional suite still reports `ALL CHECKS PASSED`, including the row-highlight regression guard and the frozen-column sticky checks, and the plugin builds clean.
+
 ## [0.1.21] - 2026-10-05
 
 Layout fixes for problems reported on a real device. v0.1.20 claimed these were fixed after measuring against a harness that did not reproduce the real component tree; it omitted `.tabula-file-table` and `.tabula-grid-area` and gave its pane no fixed height, so those measurements were meaningless. The verifier is now built on the real tree.

@@ -82,6 +82,13 @@
 	--tabula-header-ink: #1e1b18;
 	--tabula-chip-bg: #f4efe6;
 	--tabula-chip-border: #e6e0d5;
+	/* Obsidian repaints every input/button inside .view-content with its own
+	   interactive variables, which outranks our single-class rules. Remap the
+	   variables it reads so the table keeps its own palette. */
+	--interactive-normal: var(--tabula-cell-bg);
+	--interactive-hover: var(--tabula-row-hover);
+	--text-normal: var(--tabula-ink);
+	--background-modifier-border: var(--tabula-cell-border);
 	--tabula-chrome: #cc785c;
 	--tabula-chrome-dim: #8c827a;
 	--tabula-muted: #8c827a;
@@ -139,6 +146,13 @@
 	--tabula-header-ink: #ece7e1;
 	--tabula-chip-bg: #1b1a17;
 	--tabula-chip-border: #38342e;
+	/* Obsidian repaints every input/button inside .view-content with its own
+	   interactive variables, which outranks our single-class rules. Remap the
+	   variables it reads so the table keeps its own palette. */
+	--interactive-normal: var(--tabula-cell-bg);
+	--interactive-hover: var(--tabula-row-hover);
+	--text-normal: var(--tabula-ink);
+	--background-modifier-border: var(--tabula-cell-border);
 	--tabula-chrome: #cc785c;
 	--tabula-chrome-dim: #8c827a;
 	--tabula-muted: #8c827a;
@@ -316,9 +330,9 @@
 	display: contents;
 }
 
-.tabula-search,
+.tabula-view .tabula-mount .tabula-file-root input.tabula-search,
 .tabula-query-input,
-.tabula-select-search {
+.tabula-view .tabula-mount .tabula-file-root input.tabula-select-search {
 	border: 1px solid var(--tabula-border-strong);
 	border-radius: 16px;
 	background: var(--tabula-cell-bg);
@@ -330,7 +344,7 @@
 	transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
-.tabula-search {
+.tabula-view .tabula-mount .tabula-file-root input.tabula-search {
 	width: 100%;
 	max-width: 100%;
 	flex: 1 1 180px;
@@ -346,15 +360,15 @@
 	background-size: 15px 15px;
 }
 
-.tabula-search:focus,
+.tabula-view .tabula-mount .tabula-file-root input.tabula-search:focus,
 .tabula-query-input:focus,
-.tabula-select-search:focus {
+.tabula-view .tabula-mount .tabula-file-root input.tabula-select-search:focus {
 	border-color: var(--tabula-focus);
 	outline: none;
 	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
 }
 
-.tabula-btn {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn {
 	appearance: none;
 	border: 1px solid var(--tabula-border-strong);
 	background: var(--tabula-cell-bg);
@@ -375,43 +389,43 @@
 	transition: all 0.12s ease;
 }
 
-.tabula-btn:hover {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn:hover {
 	border-color: var(--tabula-accent);
 	background: var(--tabula-row-hover);
 	color: var(--tabula-ink);
 }
 
-.tabula-btn.is-active {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn.is-active {
 	border-color: color-mix(in srgb, var(--tabula-accent) 38%, var(--tabula-border));
 	background: var(--tabula-accent-soft);
 	color: var(--tabula-accent-strong);
 }
 
-.tabula-btn-primary {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn-primary {
 	border-color: var(--tabula-primary-bg);
 	background: var(--tabula-primary-bg);
 	color: var(--tabula-primary-fg);
 }
 
-.tabula-btn-primary:hover {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn-primary:hover {
 	border-color: var(--tabula-accent-strong);
 	background: var(--tabula-accent-strong);
 	color: var(--tabula-primary-fg);
 }
 
-.tabula-btn-danger,
-.tabula-btn.is-danger {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn-danger,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn.is-danger {
 	color: var(--text-error, #ef4444);
 }
 
-.tabula-btn-danger:hover,
-.tabula-btn.is-danger:hover {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn-danger:hover,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-btn.is-danger:hover {
 	border-color: var(--text-error, #ef4444);
 	background: color-mix(in srgb, var(--text-error, #ef4444) 12%, transparent);
 	color: var(--text-error, #ef4444);
 }
 
-.tabula-icon-btn {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-icon-btn {
 	padding: 0 8px;
 	min-width: 32px;
 }
@@ -501,7 +515,7 @@
 	right: 0;
 }
 
-.tabula-menu-option {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-menu-option {
 	appearance: none;
 	display: flex;
 	align-items: center;
@@ -517,11 +531,11 @@
 	text-align: left;
 }
 
-.tabula-menu-option:hover:not(:disabled) {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-menu-option:hover:not(:disabled) {
 	background: var(--tabula-row-hover);
 }
 
-.tabula-menu-option.is-selected {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-menu-option.is-selected {
 	font-weight: 600;
 	color: var(--tabula-accent-strong);
 }
@@ -934,8 +948,8 @@
 	flex: 0 0 auto;
 }
 
-.tabula-row-drag-handle,
-.tabula-col-drag-handle {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-row-drag-handle,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-col-drag-handle {
 	appearance: none;
 	border: 0;
 	background: transparent;
@@ -950,20 +964,20 @@
 	transition: opacity 0.12s ease, color 0.12s ease;
 }
 
-.tabula-row-drag-handle:hover,
-.tabula-col-drag-handle:hover,
-.tabula-row-drag-handle:focus-visible,
-.tabula-col-drag-handle:focus-visible {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-row-drag-handle:hover,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-col-drag-handle:hover,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-row-drag-handle:focus-visible,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-col-drag-handle:focus-visible {
 	opacity: 1;
 	color: var(--tabula-accent-strong);
 }
 
-.tabula-row-drag-handle:active,
-.tabula-col-drag-handle:active {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-row-drag-handle:active,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-col-drag-handle:active {
 	cursor: grabbing;
 }
 
-.tabula-row-drag-handle:disabled {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-row-drag-handle:disabled {
 	opacity: 0.2;
 	cursor: not-allowed;
 }
@@ -1013,7 +1027,7 @@
 	color: var(--tabula-ink);
 }
 
-.tabula-th-name-editing {
+.tabula-view .tabula-mount .tabula-file-root input.tabula-th-name-editing {
 	border: 1px solid var(--tabula-accent);
 	background: var(--tabula-surface);
 	color: var(--tabula-ink);
@@ -1134,7 +1148,7 @@
    Cell Editors & Inputs
    ========================================================================== */
 
-.tabula-cell-input {
+.tabula-view .tabula-mount .tabula-file-root input.tabula-cell-input {
 	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
@@ -1150,7 +1164,7 @@
 	transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
-.tabula-cell-input:focus {
+.tabula-view .tabula-mount .tabula-file-root input.tabula-cell-input:focus {
 	border-color: var(--tabula-focus);
 	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
 }
@@ -1227,7 +1241,7 @@
 	padding: 6px 8px;
 }
 
-.tabula-star {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-star {
 	appearance: none;
 	border: none;
 	background: transparent;
@@ -1239,7 +1253,7 @@
 	transition: color 0.1s ease;
 }
 
-.tabula-star.is-on {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-star.is-on {
 	color: var(--tabula-accent-strong);
 }
 
@@ -1253,7 +1267,7 @@
 	height: 100%;
 }
 
-.tabula-select-trigger {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-trigger {
 	appearance: none;
 	border: 1px solid var(--tabula-cell-border);
 	border-radius: var(--tabula-cell-radius);
@@ -1270,14 +1284,14 @@
 	transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
-.tabula-select-trigger:focus-visible {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-trigger:focus-visible {
 	outline: none;
 	border-color: var(--tabula-focus);
 	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
 }
 
 /* Chevron drawn in CSS so no JSX change is required. */
-.tabula-select-trigger::after {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-trigger::after {
 	content: "";
 	position: absolute;
 	right: 14px;
@@ -1391,8 +1405,8 @@
 	gap: 1px;
 }
 
-.tabula-select-option,
-.tabula-select-manage {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-option,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-manage {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -1408,22 +1422,22 @@
 	font-size: 12px;
 }
 
-.tabula-select-option:hover,
-.tabula-select-option.is-highlighted,
-.tabula-select-manage:hover {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-option:hover,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-option.is-highlighted,
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-manage:hover {
 	background: var(--tabula-row-hover);
 }
 
-.tabula-select-option.is-active {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-option.is-active {
 	font-weight: 600;
 }
 
-.tabula-create-option {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-create-option {
 	color: var(--tabula-accent-strong);
 	font-weight: 600;
 }
 
-.tabula-select-manage {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-select-manage {
 	border-top: 1px solid var(--tabula-border);
 	margin-top: 4px;
 	padding-top: 6px;
@@ -1589,7 +1603,7 @@
 	font-size: 10px;
 }
 
-.tabula-add-row-footer {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-add-row-footer {
 	appearance: none;
 	box-sizing: border-box;
 	flex: 0 0 auto;
@@ -1619,7 +1633,7 @@
 	margin-right: 5px;
 }
 
-.tabula-add-row-footer:hover {
+.tabula-view .tabula-mount .tabula-file-root button.tabula-add-row-footer:hover {
 	background: var(--tabula-accent-soft);
 	border-color: var(--tabula-chrome);
 	color: var(--tabula-chrome);
@@ -1898,8 +1912,8 @@
 		min-height: 62px;
 	}
 
-	.tabula-row-drag-handle,
-	.tabula-col-drag-handle {
+	.tabula-view .tabula-mount .tabula-file-root button.tabula-row-drag-handle,
+	.tabula-view .tabula-mount .tabula-file-root button.tabula-col-drag-handle {
 		width: 36px;
 		height: 36px;
 		display: inline-flex;
@@ -1907,7 +1921,7 @@
 		justify-content: center;
 	}
 
-	.tabula-add-row-footer {
+	.tabula-view .tabula-mount .tabula-file-root button.tabula-add-row-footer {
 		display: flex;
 		min-height: 44px;
 		height: 44px;
