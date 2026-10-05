@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.29] - 2026-10-05
+
+**Diagnostic #2 — names the surface that slides up.** The user reported it precisely: before tapping an input everything is visible (94% fill since v0.1.28); the tap opens the keyboard AND a second surface that slides up from below and covers the middle. v0.1.27 could never see that surface because its overlay scan only searched *inside the view*.
+
+### The panel now has
+- **whole-document diff after the tap**: a baseline inventory is kept while the keyboard is closed; after any tap the panel lists what APPEARED, GREW, SHRANK or MOVED, with class, size, position and z-index. Whatever slides up is one of those by definition, wherever it lives in the app.
+- **whole-app covering-layer inventory** (was: view-only).
+- **app padding / safe-area-inset probe** — if the dark middle region is painted keyboard padding rather than an element, this section proves it.
+- `focus=` the tapped element, `ua=` the device string, and the live body classes.
+- `pointer-events: none` so the panel can never eat a tap.
+
+No layout, colour or behaviour change.
+
 ## [0.1.28] - 2026-10-05
 
 The phone finally reported its own numbers (v0.1.27), and they explain every failure since v0.1.23.
