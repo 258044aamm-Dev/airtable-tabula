@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.24] - 2026-10-05
+
+Follow-up to v0.1.23. Two of the three reported issues were still wrong, and one turned out to be a pre-existing defect that v0.1.23 had merely made visible. Verified first that v0.1.23 was genuinely installed and its rules present in the shipped stylesheet, so none of these are stale-cache symptoms.
+
+### Fixed
+- **The mobile toolbar no longer clips its controls.** The mobile primary row is 328px wide at a 390px viewport, but the controls need 374px once the Delete button appears. The search field was `flex: 1 1 0` with no minimum, so it absorbed the whole deficit and collapsed to a 58px magnifier-only pill while "+ Field" and "More" fell off the right edge. The row now wraps, and the search has a 120px floor so it can never collapse. Measured: no control overflows and the search is never squashed, at 320, 360, 390 and 430px, both with and without a selection.
+
+  This overflow was **not** caused by the Delete button. With nothing selected the row already overflowed and "More" was already clipped; Delete only made an existing defect obvious. The toolbar is now verified at four widths instead of assumed.
+- **A focused cell now shows a single outline.** v0.1.23 removed the border *recolour* but left the 2px `box-shadow` ring, and that ring is itself a second rounded outline, so the cell still rendered two concentric radii. The capsule's own border is now the only focus cue: it turns terracotta and nothing else is drawn. The same treatment is applied to the search field, select triggers and the long-text editor.
+- **Two inputs were still under 16px on mobile, so iOS would still zoom on them.** `tabula-longtext-input` inherited 13px and the inline header-rename input was 11px; the v0.1.23 rule had listed only four input classes and missed both. All nine focusable inputs the plugin can render are now verified at 16px or more on a 390px viewport, including the option-manager row inputs. Desktop keeps the reference's 12px.
+
+### Not changed
+- The 120px gap between stacked tables is unchanged, by request. It is the empty band visible above the keyboard on a multi-table file, but it is the designed spacing rather than a defect.
+
+### Test harness
+- The focus guard was inverted to match the new design and now asserts both halves of "exactly one outline": the focused cell draws no outer ring, *and* its border carries the accent.
+- A new guard injects the Delete button into the real mobile toolbar and asserts nothing overflows and the search is not squashed, at four viewport widths.
+- The 16px guard was widened to four inputs, and the long-text and header-rename editors were added to the harness (outside the grid wrap, so the frozen-column geometry checks are unaffected).
+
+Build clean; functest reports ALL CHECKS PASSED; 0 of 24 controls repainted in both themes.
+
 ## [0.1.23] - 2026-10-05
 
 Three issues reported from a real device: no delete action when rows are checked, two outlines on a focused cell, and a tapped cell filling half the screen on mobile. The first is a new feature; the other two are CSS.

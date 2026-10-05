@@ -363,9 +363,9 @@
 .tabula-view .tabula-mount .tabula-file-root input.tabula-search:focus,
 .tabula-query-input:focus,
 .tabula-view .tabula-mount .tabula-file-root input.tabula-select-search:focus {
-	border-color: var(--tabula-border-strong);
+	border-color: var(--tabula-focus);
 	outline: none;
-	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
+	box-shadow: none;
 }
 
 .tabula-view .tabula-mount .tabula-file-root button.tabula-btn {
@@ -1203,12 +1203,13 @@
 	transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
-/* One focus indicator, not two. Recolouring the border AND drawing an outer
-   ring produced two concentric rounded outlines on the same capsule. The
-   border returns to its normal colour and the ring is the only cue. */
+/* One outline when focused, not two. Recolouring the border AND drawing an
+   outer box-shadow ring left the cell showing its capsule plus a second
+   rounded outline around it. The capsule's own border is the single focus
+   cue: it turns terracotta and nothing else is drawn. */
 .tabula-view .tabula-mount .tabula-file-root input.tabula-cell-input:focus {
-	border-color: var(--tabula-cell-border);
-	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
+	border-color: var(--tabula-focus);
+	box-shadow: none;
 }
 
 /* Numeric & Currency: Right-aligned */
@@ -1328,8 +1329,8 @@
 
 .tabula-view .tabula-mount .tabula-file-root button.tabula-select-trigger:focus-visible {
 	outline: none;
-	border-color: var(--tabula-cell-border);
-	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
+	border-color: var(--tabula-focus);
+	box-shadow: none;
 }
 
 /* Chevron drawn in CSS so no JSX change is required. */
@@ -1553,7 +1554,7 @@
 
 .tabula-longtext-input:focus {
 	border-color: var(--tabula-accent-strong);
-	box-shadow: 0 0 0 2px color-mix(in srgb, var(--tabula-accent) 24%, transparent);
+	box-shadow: none;
 }
 
 .tabula-longtext-popover-footer {
@@ -1902,9 +1903,18 @@
 		gap: 6px;
 	}
 
+	/* The primary row holds the search plus up to four buttons once the
+	   Delete button appears while rows are checked. At 390px that does not
+	   fit on one line: the search was being squeezed to a 58px magnifier
+	   pill and "+ Field" and "More" fell off the right edge. Let the row
+	   wrap, and give the search a floor so it never collapses to nothing. */
+	.tabula-mobile-primary-row {
+		flex-wrap: wrap;
+	}
+
 	.tabula-mobile-primary-row .tabula-search {
-		flex: 1 1 0;
-		min-width: 0;
+		flex: 1 1 120px;
+		min-width: 120px;
 		min-height: 44px;
 		height: 44px;
 	}
@@ -1918,7 +1928,10 @@
 	.tabula-view .tabula-mount .tabula-file-root input.tabula-search,
 	.tabula-view .tabula-mount .tabula-file-root input.tabula-select-search,
 	.tabula-view .tabula-mount .tabula-file-root input.tabula-query-input,
-	.tabula-view .tabula-mount .tabula-file-root input.tabula-th-name-editing {
+	.tabula-view .tabula-mount .tabula-file-root input.tabula-th-name-editing,
+	.tabula-longtext-input,
+	.tabula-option-row input,
+	.tabula-option-row select {
 		font-size: 16px;
 		line-height: 20px;
 	}
