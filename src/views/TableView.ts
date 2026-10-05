@@ -25,6 +25,7 @@ export class TableView extends TextFileView {
 	private applyingExternal = false;
 	private clipboardPasteHandler: (() => void) | null = null;
 	private disposeDebugOverlay: (() => void) | null = null;
+	private mountSizeObserver: ResizeObserver | null = null;
 
 	private registerClipboardPaste = (handler: (() => void) | null): void => {
 		this.clipboardPasteHandler = handler;
@@ -79,12 +80,35 @@ export class TableView extends TextFileView {
 		this.contentEl.empty();
 		this.contentEl.addClass("tabula-view");
 		this.mountEl = this.contentEl.createDiv({ cls: "tabula-mount" });
+		// Height contract, hop 1: the mount is anchored to the view's own
+		// measured height, written as --tabula-mount-h. Obsidian's mobile shell
+		// compresses its own containers when the keyboard opens and every
+		// percentage/flex layer between the view and the scroller collapsed
+		// along with them (mount measured 0px; measured on a real phone).
+		// Reading the view's clientHeight directly is the only anchor that
+		// cannot be lost in that chain. The CSS falls back to height: 100%
+		// so behaviour is identical wherever the percentage already resolved.
+		this.mountSizeObserver = new ResizeObserver(() => this.syncMountHeight());
+		this.mountSizeObserver.observe(this.contentEl);
+		this.syncMountHeight();
 		this.remount();
 		// TEMPORARY DIAGNOSTIC -- see src/ui/DebugOverlay.ts
 		this.disposeDebugOverlay = installDebugOverlay(this.contentEl);
 	}
 
+	private syncMountHeight(): void {
+		if (!this.mountEl) return;
+		const style = getComputedStyle(this.contentEl);
+		const padTB =
+			(parseFloat(style.paddingTop) || 0) +
+			(parseFloat(style.paddingBottom) || 0);
+		const h = Math.max(0, Math.round(this.contentEl.clientHeight - padTB));
+		this.mountEl.style.setProperty("--tabula-mount-h", h + "px");
+	}
+
 	async onClose(): Promise<void> {
+		this.mountSizeObserver?.disconnect();
+		this.mountSizeObserver = null;
 		this.disposeDebugOverlay?.();
 		this.disposeDebugOverlay = null;
 		if (this.saveTimer != null) {

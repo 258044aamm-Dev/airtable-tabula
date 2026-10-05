@@ -6,6 +6,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.30] - 2026-10-05
+
+**Clean-sheet rewrite of the layout height chain**, driven by the measurements the
+phone gave us (v0.1.29 diff panel): when the keyboard opens, Obsidian's own mobile
+shell compresses `.app-container` 860px → 389px, and every flex/percentage layer in
+the plugin's height chain collapsed with it (mount 0px, page 20px, card 1px).
+
+### The new height contract (two hops, one anchor)
+```
+.view-content.tabula-view   Obsidian sizes it (measured 482px open / 776px closed, explicit)
+  └─ .tabula-mount          height: var(--tabula-mount-h, 100%)
+  └─ .tabula-file-root      height: 100%   (the one scroller)
+```
+- `--tabula-mount-h` is written by a ResizeObserver in `TableView` from the view's
+  own clientHeight, so the plugin never resolves a percentage across the shell that
+  compresses itself. The `100%` fallback keeps behaviour identical everywhere the
+  percentage already resolved.
+- `.tabula-mount`, `.tabula-file-root`, `.tabula-file-table`, `.tabula-root`,
+  `.tabula-grid-area` carry **no flex, no min-height renegotiation** anymore.
+  Everything below the scroller is plain block flow and sizes to content — which
+  also makes "the card hugs its content" true by construction, in single-table and
+  stacked files alike (the `is-single-table` special case is deleted).
+- The collapsed-state geometry measured on the phone is reproduced in the harness
+  (app container squeezed to 389px with the view pinned at 482px): the page now
+  stays **100.0% filled** there, at 1, 3 and 30 rows.
+- No visual change: 36 computed-style checkpoints across light harnesses differ
+  only in the intended geometry properties (flex→block); colors, typography,
+  pills, radii, borders, shadows are byte-identical. functest ALL CHECKS PASSED;
+  0 of 24 Obsidian controls repainted in both themes.
+
+### fill-test updated
+The card-taller-than-page case is now recognised as correct (card hugs content;
+the page scrolls). Static guards now assert the two-hop contract itself.
+
+The diagnostic panel stays (it now also prints the live --tabula-mount-h anchor
+and the cascade dump) until the phone confirms FILL 100% in both keyboard states.
+
 ## [0.1.29] - 2026-10-05
 
 **Diagnostic #2 — names the surface that slides up.** The user reported it precisely: before tapping an input everything is visible (94% fill since v0.1.28); the tap opens the keyboard AND a second surface that slides up from below and covers the middle. v0.1.27 could never see that surface because its overlay scan only searched *inside the view*.

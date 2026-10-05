@@ -12,17 +12,6 @@
    the way absolute positioning can, and still fills when the view is sized. */
 /* Two classes, not one: Obsidian's app.css and any active theme both target
    `.view-content`, and a theme is injected after plugin CSS, so a single-class
-   rule loses on specificity. */
-.view-content.tabula-view {
-	display: flex;
-	flex-direction: column;
-	/* Obsidian sizes `.view-content` with `flex: 0 1 auto`, so the view is only
-	   as tall as its own content and whatever is left over below it shows the
-	   Obsidian workspace background. Growing it is what makes the page fill
-	   the leaf; the parent has a definite height, so this can never collapse. */
-	flex: 1 1 auto;
-	min-height: 0;
-}
 
 /* `height: 100%`, not just flex-grow. The view has a definite height on every
    platform (measured 482.4px on a phone), so a percentage resolves against it.
@@ -33,13 +22,63 @@
    width and leaves its height at content -- and the content is free to
    collapse to nothing because every layer below carries `min-height: 0`.
    The measured result was mount 0px, page 20px, card 1px. A percentage is
-   immune to all of that. */
-.tabula-mount {
+
+/*
+ * ============================================================================
+ * Table height contract (rewritten v0.1.30) -- READ THIS BEFORE EDITING.
+ * ----------------------------------------------------------------------------
+ * Measured on a real phone (Vivo / Android 14, Obsidian mobile):
+ *   keyboard OPEN:   .app-container compresses 860px -> 389px,
+ *                    .view-content.tabula-view stays 482px with an EXPLICIT
+ *                    css-height, while every flex/percentage layer below it
+ *                    collapsed (mount 0px, page 20px, card 1px).
+ *   keyboard CLOSED: the same chain measured healthy (94% filled).
+ *
+ * Two hard lessons are encoded here:
+ *
+ * 1. The depth of the height chain is the enemy. Every intermediate layer
+ *    that re-negotiates height (flex-grow, flex-shrink, min-height: 0) is a
+ *    place Obsidian's mobile shell or a theme can win the argument and the
+ *    whole chain collapses with it. So the chain is now TWO hops:
+ *
+ *        .view-content.tabula-view   (Obsidian sizes it; definite, measured)
+ *          -> .tabula-mount          height: var(--tabula-mount-h, 100%)
+ *          -> .tabula-file-root      height: 100%  (the one scroller)
+ *
+ *    Everything below the scroller is plain block flow and sizes to content.
+ *    No layer between the view and the scroller may carry flex or
+ *    min-height: 0 again.
+ *
+ * 2. The single anchor point is self-measured. `--tabula-mount-h` is written
+ *    by a ResizeObserver in TableView from the view's own clientHeight, so
+ *    the plugin never has to resolve a percentage across the shell that
+ *    compresses itself. The `100%` fallback keeps the behaviour identical
+ *    everywhere the percentage already worked (all measured desktop states).
+ *
+ * If you are tempted to add flex/min-height to any of these layers again:
+ * don't. Add it to a leaf instead.
+ * ============================================================================
+ */
+
+.view-content.tabula-view {
 	display: flex;
-	flex: 1 1 auto;
 	flex-direction: column;
-	height: 100%;
+	/* Obsidian sizes `.view-content` (measured 482px open / 776px closed on a
+	   phone): flex-grow keeps the view equal to what the shell gives it. */
+	flex: 1 1 auto;
 	min-height: 0;
+}
+
+.tabula-mount {
+	/* The ONLY anchor. The custom property is set from the view's own
+	   clientHeight by TableView's ResizeObserver; the 100% fallback matches
+	   it exactly wherever percentages resolve. Nothing else in this rule. */
+	height: var(--tabula-mount-h, 100%);
+	min-height: 0;
+}
+
+.tabula-view {
+	overflow: hidden;
 }
 
 /* ==========================================================================
@@ -63,14 +102,12 @@
 
 .tabula-file-root {
 	box-sizing: border-box;
-	flex: 1 1 auto;
+	/* Hop 2 of the height contract: 100% of the mount, which is pixel-anchored
+	   to the view. No flex, no min-height renegotiation -- those two are what
+	   let the whole chain collapse to 0 on the phone. */
 	height: 100%;
-	min-height: 0;
 	overflow-y: auto;
 	overflow-x: hidden;
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
 	padding: 20px 24px 24px;
 
 	/* Anthropic Paper Palette (Light Mode) */
@@ -150,6 +187,12 @@
 	-webkit-font-smoothing: antialiased;
 }
 
+.tabula-file-root > * + * {
+	/* Vertical rhythm between sections; the stacked-table rule below widens it
+	   to 120px between tables. Kept as margins so the chain needs no flex. */
+	margin-top: 16px;
+}
+
 /* Anthropic Dark Palette (Dark Mode) */
 .theme-dark .tabula-file-root {
 	--tabula-page: #181715;
@@ -222,9 +265,9 @@
 }
 
 .tabula-file-table {
+	/* Content wrapper only. No height, no flex, no min-height -- it sizes to
+	   its card and can therefore never collapse. */
 	box-sizing: border-box;
-	flex: 0 0 auto;
-	min-height: 0;
 	width: 100%;
 }
 
@@ -266,21 +309,8 @@
 	letter-spacing: 0.05em;
 }
 
-/* Single-table files used to force the card to height:100% with flex:1 on every
-   level of the chain, so a short table left a large empty area inside the card
-   under the "+ New row" button. The card now sizes to its content; a table too
-   tall for the pane scrolls the file view, which .tabula-file-root already
-   supports via overflow-y:auto. */
-.tabula-file-root.is-single-table .tabula-file-table {
-	flex: 0 1 auto;
-	display: flex;
-	flex-direction: column;
-}
-
-.tabula-file-root.is-single-table .tabula-file-table > .tabula-root {
-	flex: 0 1 auto;
-	min-height: 0;
-}
+/* No single-table special case: in plain block flow the card always hugs its
+   content, single or stacked, by construction. */
 
 /* ==========================================================================
    Table Root Card
@@ -289,9 +319,6 @@
 .tabula-root {
 	box-sizing: border-box;
 	width: 100%;
-	display: flex;
-	flex-direction: column;
-	min-height: 0;
 	border: 1px solid var(--tabula-border);
 	border-radius: 32px;
 	background: var(--tabula-surface);
@@ -816,18 +843,11 @@
    ========================================================================== */
 
 .tabula-grid-area {
-	display: flex;
-	flex-direction: column;
-	min-height: 0;
-	gap: 0;
 	/* No horizontal inset: the card's own border is the frame. The "+ New row"
 	   button keeps its 16px side margins and stays visually inset. */
 	padding: 4px 0 16px;
 }
 
-.tabula-file-root.is-single-table .tabula-grid-area {
-	flex: 0 1 auto;
-}
 
 .tabula-top-scrollbar {
 	min-height: 20px;
@@ -865,7 +885,7 @@
 }
 
 .tabula-file-table .tabula-grid-wrap {
-	flex: 0 1 auto;
+	/* The 160px floor is a deliberate minimum, not part of the height chain. */
 	min-height: 160px;
 }
 

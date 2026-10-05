@@ -33902,7 +33902,6 @@ var OUTSIDE = [
   ".workspace-leaf-content",
   ".workspace-leaf",
   ".workspace-tab-container",
-  ".workspace-tab-header-container",
   ".workspace-tabs",
   ".workspace-split",
   ".workspace",
@@ -33920,6 +33919,21 @@ var INSIDE = [
   ".tabula-grid-wrap",
   ".tabula-grid"
 ];
+var CASCADE_TARGETS = [".tabula-view", ".tabula-mount", ".tabula-file-root"];
+var SIZE_PROPS = [
+  "height",
+  "min-height",
+  "max-height",
+  "flex",
+  "flex-direction",
+  "align-items",
+  "position",
+  "top",
+  "bottom",
+  "inset",
+  "padding-top",
+  "padding-bottom"
+];
 var pad = (s, n) => (s.length > n ? s.slice(0, n - 1) + "~" : s).padEnd(n);
 var num = (n) => String(Math.round(n)).padStart(5) + " ";
 function labelOf(el) {
@@ -33934,9 +33948,7 @@ function keyOf(el) {
     let part = labelOf(cur);
     const parent = cur.parentElement;
     if (parent) {
-      const same = Array.from(parent.children).filter(
-        (c) => labelOf(c) === part
-      );
+      const same = Array.from(parent.children).filter((c) => labelOf(c) === part);
       if (same.length > 1) part += "[" + same.indexOf(cur) + "]";
     }
     parts.unshift(part);
@@ -33973,6 +33985,68 @@ function row(el) {
     pad(c.overflowY, 6)
   ].join(" ") + scroll;
 }
+function cascadeFor(el, selfLabel) {
+  const hits = [];
+  let sheetIdx = 0;
+  for (const sheet of Array.from(document.styleSheets)) {
+    sheetIdx++;
+    let origin = "inline";
+    try {
+      origin = sheet.href ? sheet.href.split("/").slice(-1)[0] : "inline";
+    } catch {
+      origin = "?";
+    }
+    let order = 0;
+    const walk = (rules) => {
+      if (!rules) return;
+      for (const rule of Array.from(rules)) {
+        order++;
+        const anyRule = rule;
+        if (anyRule.cssRules) {
+          walk(anyRule.cssRules);
+          continue;
+        }
+        if (!anyRule.selectorText || !anyRule.style) continue;
+        const groups = anyRule.selectorText.split(",");
+        let matched = false;
+        for (const sel of groups) {
+          try {
+            if (el.matches(sel.trim())) {
+              matched = true;
+              break;
+            }
+          } catch {
+          }
+        }
+        if (!matched) continue;
+        const decls = [];
+        for (const prop of SIZE_PROPS) {
+          const v = anyRule.style.getPropertyValue(prop);
+          if (v) decls.push(prop + ":" + v + (anyRule.style.getPropertyPriority(prop) ? "!" : ""));
+        }
+        for (const sh of ["flex-grow", "flex-shrink", "flex-basis"]) {
+          const v = anyRule.style.getPropertyValue(sh);
+          if (v) decls.push(sh + ":" + v);
+        }
+        if (!decls.length) continue;
+        hits.push(
+          "  s" + sheetIdx + "#" + order + " " + pad(origin, 15) + pad(tidySelector(anyRule.selectorText), 27) + decls.join("  ")
+        );
+      }
+    };
+    try {
+      walk(sheet.cssRules);
+    } catch {
+    }
+  }
+  const inline = el.getAttribute("style");
+  const out = [pad("> " + selfLabel, 28) + (inline ? "inline=[" + inline + "]" : "inline=(none)")];
+  out.push(...hits.slice(0, 10));
+  return out;
+}
+function tidySelector(s) {
+  return s.replace(/\s+/g, " ").trim();
+}
 function installDebugOverlay(host) {
   const pre = document.createElement("pre");
   pre.style.cssText = [
@@ -33986,7 +34060,7 @@ function installDebugOverlay(host) {
     "font:9px/1.25 ui-monospace,monospace",
     "padding:4px",
     "margin:0",
-    "max-height:74vh",
+    "max-height:82vh",
     "overflow:auto",
     "white-space:pre",
     "pointer-events:none",
@@ -34009,19 +34083,23 @@ function installDebugOverlay(host) {
     const all = document.body.querySelectorAll("*");
     const cap = Math.min(all.length, 4e3);
     for (let i = 0; i < cap; i++) {
-      const el = all[i];
       let b;
       try {
-        b = boxOf(el);
+        b = boxOf(all[i]);
       } catch {
         continue;
       }
-      if (interesting(el, b)) map.set(keyOf(el), b);
+      if (interesting(all[i], b)) map.set(keyOf(all[i]), b);
     }
     return map;
   };
+  const healthy = () => {
+    const m = host.querySelector(".tabula-mount");
+    return !!m && m.getBoundingClientRect().height > 100;
+  };
   const refreshBaseline = () => {
     if (document.activeElement && document.activeElement !== document.body) return;
+    if (!healthy()) return;
     baseline = capture();
     baselineAt = (/* @__PURE__ */ new Date()).toISOString().slice(11, 19);
   };
@@ -34046,53 +34124,59 @@ function installDebugOverlay(host) {
       "vh=" + window.innerHeight + " vv=" + (window.visualViewport ? Math.round(window.visualViewport.height) : "?") + " rows=" + document.querySelectorAll(".tabula-grid tbody tr").length + "  t+" + ms + "ms(" + lastEvent + ")"
     );
     lines.push(
-      "VIEW " + viewH + "px   PAGE " + pageH + "px   FILL " + (viewH ? Math.round(pageH / viewH * 100) : 0) + "%   baseline=" + (baselineAt || "none")
+      "VIEW " + viewH + "px   PAGE " + pageH + "px   FILL " + (viewH ? Math.round(pageH / viewH * 100) : 0) + "%   baseline=" + (baselineAt || "none") + "   anchor=" + pad(host.querySelector(".tabula-mount")?.style.getPropertyValue("--tabula-mount-h") || "(unset)", 9) + " mountH=" + (host.querySelector(".tabula-mount")?.getBoundingClientRect().height.toFixed(0) ?? "?")
     );
     const ae = document.activeElement;
+    lines.push("focus=" + (ae && ae !== document.body ? labelOf(ae) : "(none)"));
+    const app = document.querySelector(".app-container");
+    const leafC = document.querySelector(".workspace-leaf-content");
     lines.push(
-      "focus=" + (ae && ae !== document.body ? labelOf(ae) : "(none)") + "  ua=" + pad(navigator.userAgent, 60).trim()
+      "body: " + pad(document.body.className || "-", 52).trim()
     );
-    lines.push("body: " + pad(document.body.className || "(no classes)", 70).trim());
+    lines.push(
+      "appcls: " + pad(app ? app.getAttribute("class") || "-" : "-", 60).trim()
+    );
+    lines.push(
+      "leafcls: " + pad(leafC ? leafC.getAttribute("class") || "-" : "-", 60).trim()
+    );
+    lines.push("");
+    lines.push("-- cascade: size rules matching our chain --");
+    for (const sel of CASCADE_TARGETS) {
+      const el = sel === ".tabula-view" ? host : document.querySelector(sel);
+      lines.push(...el ? cascadeFor(el, sel) : [pad(sel, 28) + "(none)"]);
+    }
     lines.push("");
     lines.push("-- what the tap changed --");
     if (!baseline.size) {
-      lines.push("(no baseline yet -- tap out, then tap the input again)");
+      lines.push("(no healthy baseline yet)");
     } else {
-      const grew = [];
-      const shrank = [];
-      const moved = [];
+      const grew = [], shrank = [], moved = [];
       now.forEach((after, key) => {
         const before = baseline.get(key);
         if (!before || before.h < 8) {
-          if (after.h >= 40 && after.top < window.innerHeight)
-            grew.push(fmtDiff("+", before, after));
-        } else if (after.h - before.h >= 40) {
-          grew.push(fmtDiff("+", before, after));
-        } else if (before.h - after.h >= 40) {
-          shrank.push(fmtDiff("-", before, after));
-        } else if (Math.abs(after.top - before.top) >= 40) {
-          moved.push(fmtDiff("~", before, after));
-        }
+          if (after.h >= 40 && after.top < window.innerHeight) grew.push(fmtDiff("+", before, after));
+        } else if (after.h - before.h >= 40) grew.push(fmtDiff("+", before, after));
+        else if (before.h - after.h >= 40) shrank.push(fmtDiff("-", before, after));
+        else if (Math.abs(after.top - before.top) >= 40) moved.push(fmtDiff("~", before, after));
       });
       baseline.forEach((before, key) => {
-        if (!now.has(key) && before.h >= 40) shrank.push(fmtDiff("-", before, { ...before, h: 0, top: before.top }));
+        if (!now.has(key) && before.h >= 40)
+          shrank.push(fmtDiff("-", before, { ...before, h: 0, top: before.top }));
       });
-      const all = [...grew.slice(0, 12), ...shrank.slice(0, 12), ...moved.slice(0, 8)];
-      if (all.length) lines.push(...all);
-      else lines.push("(nothing changed vs baseline)");
+      const all = [...grew.slice(0, 14), ...shrank.slice(0, 14), ...moved.slice(0, 8)];
+      lines.push(...all.length ? all : ["(nothing changed vs baseline)"]);
     }
     lines.push("");
     lines.push("-- app padding / insets --");
-    const app = document.querySelector(".app-container");
     if (app) {
       const c = getComputedStyle(app);
       lines.push(
-        pad(".app-container", 22) + "h=" + num(Math.round(app.getBoundingClientRect().height)) + " pad t=" + pad(c.paddingTop, 7) + " b=" + pad(c.paddingBottom, 7) + " pos=" + c.position + " bg=" + pad(c.backgroundColor, 18)
+        pad(".app-container", 22) + "h=" + num(Math.round(app.getBoundingClientRect().height)) + " pad t=" + pad(c.paddingTop, 7) + " b=" + pad(c.paddingBottom, 7)
       );
     }
     const bodyC = getComputedStyle(document.body);
     lines.push(
-      pad("body", 22) + "h=" + num(Math.round(document.body.getBoundingClientRect().height)) + " pad b=" + pad(bodyC.paddingBottom, 7) + " --safe-area-inset-bottom=" + pad(bodyC.getPropertyValue("--safe-area-inset-bottom") || "(unset)", 8)
+      pad("body", 22) + "h=" + num(Math.round(document.body.getBoundingClientRect().height)) + " safe-inset-bottom=" + pad(bodyC.getPropertyValue("--safe-area-inset-bottom") || "(unset)", 8) + " safe-inset-top=" + pad(bodyC.getPropertyValue("--safe-area-inset-top") || "(unset)", 7)
     );
     lines.push("");
     lines.push("-- covering layer inventory (whole app) --");
@@ -34102,9 +34186,7 @@ function installDebugOverlay(host) {
       if (b.h < 60 || b.w < 60) return;
       covers++;
       if (covers > 14) return;
-      lines.push(
-        pad(b.label, 34) + num(b.h) + "@" + String(b.top).padStart(4) + " " + pad(b.pos, 9) + "z=" + b.z
-      );
+      lines.push(pad(b.label, 34) + num(b.h) + "@" + String(b.top).padStart(4) + " " + pad(b.pos, 9) + "z=" + b.z);
     });
     if (!covers) lines.push("(none -- the cover is painted background, not an element)");
     lines.push("");
@@ -34152,6 +34234,7 @@ var TableView = class extends import_obsidian5.TextFileView {
     this.applyingExternal = false;
     this.clipboardPasteHandler = null;
     this.disposeDebugOverlay = null;
+    this.mountSizeObserver = null;
     this.registerClipboardPaste = (handler) => {
       this.clipboardPasteHandler = handler;
     };
@@ -34195,10 +34278,22 @@ var TableView = class extends import_obsidian5.TextFileView {
     this.contentEl.empty();
     this.contentEl.addClass("tabula-view");
     this.mountEl = this.contentEl.createDiv({ cls: "tabula-mount" });
+    this.mountSizeObserver = new ResizeObserver(() => this.syncMountHeight());
+    this.mountSizeObserver.observe(this.contentEl);
+    this.syncMountHeight();
     this.remount();
     this.disposeDebugOverlay = installDebugOverlay(this.contentEl);
   }
+  syncMountHeight() {
+    if (!this.mountEl) return;
+    const style = getComputedStyle(this.contentEl);
+    const padTB = (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0);
+    const h = Math.max(0, Math.round(this.contentEl.clientHeight - padTB));
+    this.mountEl.style.setProperty("--tabula-mount-h", h + "px");
+  }
   async onClose() {
+    this.mountSizeObserver?.disconnect();
+    this.mountSizeObserver = null;
     this.disposeDebugOverlay?.();
     this.disposeDebugOverlay = null;
     if (this.saveTimer != null) {
