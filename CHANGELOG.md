@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.21] - 2026-10-05
+
+Layout fixes for problems reported on a real device. v0.1.20 claimed these were fixed after measuring against a harness that did not reproduce the real component tree; it omitted `.tabula-file-table` and `.tabula-grid-area` and gave its pane no fixed height, so those measurements were meaningless. The verifier is now built on the real tree.
+
+### Fixed
+- **The empty space under "+ New row" is gone.** The single-table card was forced to `height: 100%` with `flex: 1 1 auto` at every level of the chain, so a short table left a large empty area inside the card. The card now sizes to its content; a tall table still scrolls inside the grid box.
+- **The table gained 16px per side.** `.tabula-grid-area` added `16px` horizontal padding (8px on mobile) on top of the file root's page margin, a second horizontal inset that had not been accounted for. Removed, so the card's own border is the frame. "+ New row" keeps its 16px side margins.
+- Mobile column widths are deliberately unchanged: a 160px minimum per column, so a wide table scrolls sideways on a phone.
+
+### Verified
+Rebuilt verifier mirrors the real tree and pins the pane to the viewport height the way Obsidian does. After the fix: card height no longer varies with pane height, empty space inside the grid box drops from 151px to 2px, horizontal dead space drops from 72px to 56px per side (48px of which is the Obsidian pane padding plus the file root's page margin, both kept on purpose). Reference spec diff unchanged at 58/59 in light and 55/59 in dark, the remainder the labelled card-padding deviation and the dark status-pill question.
+
 ## [0.1.20] - 2026-10-05
 
 Rebuilds the table view against the warm terracotta `Anthropic Table Workspace` reference, replacing the indigo chrome introduced in v0.1.19. This release does touch TSX: a row-select column and a rating score were added, and the frozen-column bands were re-pointed to make room.
@@ -66,6 +78,32 @@ distance, the header pins flush and body content passes behind it, the add-row b
 is not sticky, the select column is first in every row, `colSpan` covers the new
 column, the `N/5` score is flush to the cell's content edge, and an `is-selected` row
 is painted identically to a normal row.
+
+### Fixed — layout reported on a real device
+
+v0.1.20 removed a 28px card padding and was declared fixed, but the verification
+harness did not reproduce the real component tree: it omitted `.tabula-file-table`
+and `.tabula-grid-area`, and its pane had no fixed height. Every measurement taken
+against it was meaningless. Rebuilt on the real tree and re-measured.
+
+- **The empty space under "+ New row" is gone.** `styles.css:230` forced the
+  single-table card to `height: 100%` with `flex: 1 1 auto` at every level, so a
+  short table left a large empty area inside the card. The card now sizes to its
+  content. A table too tall for the pane still scrolls inside the grid box, which
+  is unchanged.
+- **The table gained 16px per side.** `.tabula-grid-area` carried `16px` horizontal
+  padding (8px on mobile) on top of the file root's own page margin, a second
+  inset nobody had accounted for. Removed; the card's border is now the frame. The
+  "+ New row" button keeps its own 16px margins and stays inset.
+- Mobile column widths are unchanged: 160px minimum, so a wide table scrolls
+  sideways on a phone by design.
+
+The interactive verifier now mirrors the real tree (file root with `is-single-table`,
+file controls, file table, grid area) and pins the pane to the viewport height the
+way Obsidian does. Measured after the fix: card height no longer varies with pane
+height, empty space inside the grid box 151px -> 2px, horizontal dead space
+72px -> 56px per side (48px of which is the Obsidian pane padding plus the
+file root's page margin, both kept deliberately).
 
 ### Not included
 Per scope: the `v2.4` version chip, the "Saved to Anthropic Cloud" title, the Prompt Evaluations / Model Benchmarks tab bar, and the "Dataset:" title.

@@ -221,15 +221,19 @@
 	letter-spacing: 0.05em;
 }
 
+/* Single-table files used to force the card to height:100% with flex:1 on every
+   level of the chain, so a short table left a large empty area inside the card
+   under the "+ New row" button. The card now sizes to its content; a table too
+   tall for the pane scrolls the file view, which .tabula-file-root already
+   supports via overflow-y:auto. */
 .tabula-file-root.is-single-table .tabula-file-table {
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 	display: flex;
 	flex-direction: column;
 }
 
 .tabula-file-root.is-single-table .tabula-file-table > .tabula-root {
-	height: 100%;
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 	min-height: 0;
 }
 
@@ -732,11 +736,13 @@
 	flex-direction: column;
 	min-height: 0;
 	gap: 0;
-	padding: 4px 16px 16px;
+	/* No horizontal inset: the card's own border is the frame. The "+ New row"
+	   button keeps its 16px side margins and stays visually inset. */
+	padding: 4px 0 16px;
 }
 
 .tabula-file-root.is-single-table .tabula-grid-area {
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 }
 
 .tabula-top-scrollbar {
@@ -772,11 +778,6 @@
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 	border-top: 0;
-}
-
-.tabula-file-root.is-single-table .tabula-grid-wrap {
-	flex: 1 1 auto;
-	min-height: 0;
 }
 
 .tabula-file-table .tabula-grid-wrap {
@@ -1876,7 +1877,7 @@
 	}
 
 	.tabula-grid-area {
-		padding: 0 8px 8px;
+		padding: 0 0 8px;
 	}
 
 	.tabula-grid.height-short td,
