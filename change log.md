@@ -6,6 +6,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.25] - 2026-10-05
+
+Addresses the "half the window is overlapped" report from a real iOS device.
+
+### Fixed
+- **The plugin view no longer declares a percentage height over Obsidian's own sizing.** `tabula-view` is Obsidian's `.view-content` element, which Obsidian sizes with `flex-grow`. The plugin's `height: 100%` overrode that stretch, and once the on-screen keyboard opened and the workspace leaf stopped having a definite height, the percentage resolved to `auto` and the view shrank to its content. The chain is now sized with in-flow flex (`display: flex` / `flex: 1 1 auto` / `min-height: 0`), which cannot collapse the way absolute positioning can.
+
+  The evidence is a pixel classification of the reported screenshot (720x1612): the plugin's warm `#181715`-family background occupies y=182-417 (236px), y=418-732 (315px) is cool `#1f1e2e` **Obsidian workspace background showing through**, and the keyboard starts at y=733. 315 of the 550px visible strip -- 57% -- was not the plugin.
+
+### Corrected
+- **The v0.1.24 diagnosis of this symptom was wrong.** That release attributed the band to the 120px stacked-table gap and, before that, to iOS rather than the plugin. Both are disproved by the screenshot: the band's colour is cool purple-navy, while the plugin's own page is warm (`R > B`) and the stacked gap would have been the plugin's own warm background. It was bare Obsidian background, and the cause was the height chain in the plugin's CSS.
+
+### Verification limits, stated plainly
+- The failure **could not be reproduced locally**. Two faithful attempts at Obsidian's flex chain disagreed with each other (253px vs 380px for the same structure), because each harness imposes its own height discipline. This is the fourth time a local harness has contradicted the real device, so the change is shipped as a well-reasoned fix with the regression guarded, not as a measured one.
+- A decisive next measurement is still wanted from the device: a screenshot of the same table with the **keyboard closed**. If the plugin then paints far more than ~236px, the band is purely the keyboard and no plugin can shrink it. If it also paints ~236px, the view is genuinely collapsing and a different element is the cause.
+
+### Test harness
+- New `keyboard-overlap-test.py` models both Obsidian sizing cases -- a flex-sized leaf with no definite height (the mobile-with-keyboard case) and a definite-height leaf (desktop) -- and asserts the plugin page fills the view in both. It also statically asserts `tabula-view` declares no `height`, so the specific regression cannot silently return.
+- An absolute-positioning variant was tried first and rejected: it collapsed the plugin to 2px in the desktop verifier when the view had no height.
+
+Build clean; functest reports ALL CHECKS PASSED; 0 of 24 controls repainted in both themes; desktop card geometry unchanged at 576px (still hugs content).
+
 ## [0.1.24] - 2026-10-05
 
 Follow-up to v0.1.23. Two of the three reported issues were still wrong, and one turned out to be a pre-existing defect that v0.1.23 had merely made visible. Verified first that v0.1.23 was genuinely installed and its rules present in the shipped stylesheet, so none of these are stale-cache symptoms.

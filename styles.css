@@ -4,10 +4,21 @@
  * Georgia serif titles, warm card surfaces, and purple ribbon branding.
  */
 
-.tabula-view,
-.tabula-mount {
-	height: 100%;
+/* Sizing the chain with flex rather than `height: 100%` at every level.
+   `height: 100%` on the view overrode the stretch Obsidian's own flex layout
+   gives it, and once the mobile keyboard opened the chain collapsed to its
+   content height: the table painted ~236px and the rest of the visible
+   window was bare Obsidian background. In-flow flex cannot collapse to zero
+   the way absolute positioning can, and still fills when the view is sized. */
+.tabula-view {
 	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.tabula-mount {
+	display: flex;
+	flex: 1 1 auto;
 	flex-direction: column;
 	min-height: 0;
 }
@@ -33,6 +44,7 @@
 
 .tabula-file-root {
 	box-sizing: border-box;
+	flex: 1 1 auto;
 	height: 100%;
 	min-height: 0;
 	overflow-y: auto;
