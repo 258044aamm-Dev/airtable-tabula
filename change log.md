@@ -6,6 +6,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.26] - 2026-10-05
+
+The real fix for "half the window is overlapped". v0.1.25 did not fix it; its diagnosis was wrong, and this release states the measured cause.
+
+### Fixed
+- **The view is now grown to fill the workspace leaf instead of sizing itself to its own content.** Obsidian lays `.view-content` out with `flex: 0 1 auto`, so `flex-grow` is 0 and the view is exactly as tall as the content inside it. Everything left over below the table was Obsidian's own workspace background. Neither v0.1.24 nor v0.1.25 ever set `flex` on the view, so both inherited `flex-grow: 0`. The view now sets `flex: 1 1 auto`.
+
+  The parent is measured, not assumed: `.workspace-leaf-content` computes to a definite height, so growing into it is safe and cannot collapse -- the failure mode that ruled out the `height: 100%` chains tried earlier.
+
+- **The rule is now `.view-content.tabula-view` rather than `.tabula-view`.** Obsidian's app.css and any active theme both target `.view-content`, and a theme is injected *after* plugin CSS, so a single-class rule loses on specificity. Two classes also beat a bare `.view-content` from the base stylesheet.
+
+### Root cause, measured rather than inferred
+The ancestor chain was read out of a live Obsidian console instead of being guessed at in a harness:
+
+    div.view-content.tabula-view   box=688  h=688px  disp=flex  flex=0 1 auto  ovfY=auto
+    div.workspace-leaf-content     box=726  h=726px  disp=flex  flex=0 1 auto  ovfY=hidden
+    div.workspace-leaf             box=726            disp=flex  flex=1 0 0px
+    ... up to body box=796
+
+`flex: 0 1 auto` on the view is the whole bug. Replaying that exact chain reproduces the phone screenshot structurally: with two rows the view is 72.8% of the available height and leaves 198px of bare Obsidian background beneath it, and it is 40.5% filled on the device. With the fix it is 100.0% at every row count from 1 to 60, and the card still hugs its content instead of stretching.
+
+### Corrected
+- **Two earlier diagnoses of this symptom were wrong and are not being carried forward.** v0.1.24 blamed the 120px stacked-table gap; v0.1.25 blamed a collapsing `height: 100%` chain. Both were disproved by the device. The v0.1.25 change is harmless and is kept, but it was never the cause.
+- **Every local harness used up to now was unfaithful**, because each one sized the leaf itself. A leaf with a fixed height leaves `.view-content` with nothing to fail against, so the bug could never appear locally -- which is why four releases claimed this was fixed. The new harness transcribes the console-reported chain, including the computed `flex` values and the authentic cascade order (Obsidian's base CSS before the plugin's), and it reproduces the failure before the fix.
+
+### Test harness
+- `keyboard-overlap-test.py` was rewritten against the real chain. It asserts the plugin page fills the view at seven row counts, that the card still hugs its content, and statically guards both the `flex: 1 1 auto` and the absence of any `height` on the view.
+
+Build clean; functest reports ALL CHECKS PASSED; 0 of 24 controls repainted in both themes; desktop card geometry unchanged at 576px.
+
 ## [0.1.25] - 2026-10-05
 
 Addresses the "half the window is overlapped" report from a real iOS device.

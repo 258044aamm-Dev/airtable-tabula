@@ -10,9 +10,17 @@
    content height: the table painted ~236px and the rest of the visible
    window was bare Obsidian background. In-flow flex cannot collapse to zero
    the way absolute positioning can, and still fills when the view is sized. */
-.tabula-view {
+/* Two classes, not one: Obsidian's app.css and any active theme both target
+   `.view-content`, and a theme is injected after plugin CSS, so a single-class
+   rule loses on specificity. */
+.view-content.tabula-view {
 	display: flex;
 	flex-direction: column;
+	/* Obsidian sizes `.view-content` with `flex: 0 1 auto`, so the view is only
+	   as tall as its own content and whatever is left over below it shows the
+	   Obsidian workspace background. Growing it is what makes the page fill
+	   the leaf; the parent has a definite height, so this can never collapse. */
+	flex: 1 1 auto;
 	min-height: 0;
 }
 
