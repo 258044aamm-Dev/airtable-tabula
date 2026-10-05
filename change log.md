@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.23] - 2026-10-05
+
+Three issues reported from a real device: no delete action when rows are checked, two outlines on a focused cell, and a tapped cell filling half the screen on mobile. The first is a new feature; the other two are CSS.
+
+### Added
+- **Bulk delete.** Checking rows now reveals a `Delete (n)` button in the toolbar, between `+ Row` and `+ Field`, labelled with the number of checked rows. It is rendered only while a selection exists, so the toolbar returns to exactly the reference layout the moment the selection is cleared. It opens a confirmation naming the table and the row count, and the delete runs as a single pass: the Airtable `recordMap` entries are removed, the rows are filtered out, the selected and checked id sets are pruned, and the selection clears. It uses a custom dialog rather than `window.confirm()`, which Obsidian's mobile WebView does not support. The per-row right-click "Delete row" menu item is unchanged.
+
+### Fixed
+- **A focused cell no longer shows two outlines.** `input.tabula-cell-input:focus` was recolouring the capsule border to the accent *and* drawing a 2px outer ring, both at the cell's 16px radius, which read as two concentric rounded borders. The border now returns to its normal colour and the ring is the only focus cue. The same treatment is applied to the search field and select triggers so all three behave identically. The reference defines no focus styling at all, so this treatment is the plugin's own; the earlier decision to keep the native focus ring rather than tint the row is unchanged.
+- **Tapping a cell no longer fills half the screen on mobile.** Inputs are now 16px on phones. iOS zooms the page on focus for any input whose computed font-size is under 16px, which is what made a tapped cell jump. Desktop keeps the reference's 12px.
+
+### Fixed (regression from v0.1.22)
+- **The mobile touch-target overrides were dead.** Rescoping the control rules to `.tabula-view .tabula-mount .tabula-file-root <element>.<class>` in v0.1.22 raised them to (0,4,1), which outranks the (0,2,0) overrides in the `max-width: 720px` block, so the mobile font-size bump never applied. Every media-query override targeting a control was audited for this; the affected ones are repaired and the touch targets, row heights and 36px drag handle are verified intact at 390px.
+
+### Test harness
+- `functest.py` was validating a **stale copy** of the stylesheet (`harness/styles.css`, a v0.1.21 snapshot) rather than the file being shipped, and its markup lacked the `.tabula-view` / `.tabula-mount` ancestor chain, so after the v0.1.22 rescoping no control rule matched there at all. Its "ALL CHECKS PASSED" was real but was not testing the current CSS. It now links `../repo/styles.css` directly, the stale copy has been deleted so it cannot drift again, the real ancestor chain is present, and a genuine `<input type="text">` cell was added so focus is testable.
+- Two regression guards added: a focused cell's border must not be the accent colour, and every input must compute to at least 16px at a 390px viewport.
+
 ## [0.1.22] - 2026-10-05
 
 Colour fix for the blue-purple cells, search box and buttons reported on a real device. The palette was never wrong: Obsidian's own base stylesheet was repainting the table's form controls on top of it.

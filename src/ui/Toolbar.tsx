@@ -16,6 +16,9 @@ interface Props {
 	onToggleHide: () => void;
 	onAddRow: () => void;
 	onAddField: (type: FieldType) => void;
+	/** How many rows are currently checked; drives the Delete button. */
+	checkedCount: number;
+	onRequestDeleteSelected: () => void;
 	onGroupBy: (fieldId: string | null) => void;
 	onRowHeight: (height: RowHeight) => void;
 	onToggleFrozen: () => void;
@@ -68,6 +71,21 @@ export function Toolbar(props: Props) {
 			title="Add a new row"
 		>
 			+ Row
+		</button>
+	);
+
+	// Only rendered while rows are checked, so the toolbar returns to exactly
+	// the reference layout the moment the selection is cleared.
+	const deleteSelectedControl = props.checkedCount > 0 && (
+		<button
+			className="tabula-btn tabula-btn-danger tabula-delete-selected"
+			type="button"
+			title={`Delete ${props.checkedCount} selected ${
+				props.checkedCount === 1 ? "row" : "rows"
+			}`}
+			onClick={props.onRequestDeleteSelected}
+		>
+			Delete ({props.checkedCount})
 		</button>
 	);
 
@@ -189,6 +207,7 @@ export function Toolbar(props: Props) {
 					<div className="tabula-mobile-primary-row">
 						{searchControl}
 						{addRowControl}
+						{deleteSelectedControl}
 						{addFieldControl}
 						<button
 							className="tabula-btn tabula-mobile-more"
@@ -223,6 +242,7 @@ export function Toolbar(props: Props) {
 					{searchControl}
 					<div className="tabula-toolbar-tools-desktop">{toolControls}</div>
 					{addRowControl}
+					{deleteSelectedControl}
 					{addFieldControl}
 					{rowCountControl}
 				</div>

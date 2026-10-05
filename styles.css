@@ -363,7 +363,7 @@
 .tabula-view .tabula-mount .tabula-file-root input.tabula-search:focus,
 .tabula-query-input:focus,
 .tabula-view .tabula-mount .tabula-file-root input.tabula-select-search:focus {
-	border-color: var(--tabula-focus);
+	border-color: var(--tabula-border-strong);
 	outline: none;
 	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
 }
@@ -423,6 +423,45 @@
 	border-color: var(--text-error, #ef4444);
 	background: color-mix(in srgb, var(--text-error, #ef4444) 12%, transparent);
 	color: var(--text-error, #ef4444);
+}
+
+/* Bulk delete, shown in the toolbar only while rows are checked. A quiet
+   danger tint rather than a solid fill, so it stays secondary to the
+   terracotta "+ Row" button it sits next to. */
+.tabula-view .tabula-mount .tabula-file-root button.tabula-delete-selected {
+	border-color: color-mix(in srgb, var(--text-error, #ef4444) 40%, transparent);
+	background: color-mix(in srgb, var(--text-error, #ef4444) 10%, transparent);
+	color: var(--text-error, #ef4444);
+	font-variant-numeric: tabular-nums;
+}
+
+.tabula-view .tabula-mount .tabula-file-root button.tabula-delete-selected:hover {
+	border-color: var(--text-error, #ef4444);
+	background: color-mix(in srgb, var(--text-error, #ef4444) 18%, transparent);
+	color: var(--text-error, #ef4444);
+}
+
+.tabula-confirm-modal {
+	width: min(420px, calc(100vw - 32px));
+}
+
+.tabula-confirm-text {
+	margin: 0;
+	color: var(--tabula-ink-muted);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.tabula-confirm-text strong {
+	color: var(--tabula-ink);
+	font-weight: 600;
+}
+
+.tabula-confirm-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
 }
 
 .tabula-view .tabula-mount .tabula-file-root button.tabula-icon-btn {
@@ -1164,8 +1203,11 @@
 	transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
+/* One focus indicator, not two. Recolouring the border AND drawing an outer
+   ring produced two concentric rounded outlines on the same capsule. The
+   border returns to its normal colour and the ring is the only cue. */
 .tabula-view .tabula-mount .tabula-file-root input.tabula-cell-input:focus {
-	border-color: var(--tabula-focus);
+	border-color: var(--tabula-cell-border);
 	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
 }
 
@@ -1286,7 +1328,7 @@
 
 .tabula-view .tabula-mount .tabula-file-root button.tabula-select-trigger:focus-visible {
 	outline: none;
-	border-color: var(--tabula-focus);
+	border-color: var(--tabula-cell-border);
 	box-shadow: 0 0 0 2px var(--tabula-focus-ring);
 }
 
@@ -1865,7 +1907,20 @@
 		min-width: 0;
 		min-height: 44px;
 		height: 44px;
-		font-size: 15px;
+	}
+
+	/* iOS zooms the page on focus for any input whose computed font-size is
+	   under 16px, which made a tapped cell fill half the screen. Every input
+	   is held at 16px on phones so the keyboard never triggers a zoom.
+	   The base rules are (0,4,1) after the v0.1.22 rescoping, so these
+	   overrides repeat the same ancestor chain to stay ahead of them. */
+	.tabula-view .tabula-mount .tabula-file-root input.tabula-cell-input,
+	.tabula-view .tabula-mount .tabula-file-root input.tabula-search,
+	.tabula-view .tabula-mount .tabula-file-root input.tabula-select-search,
+	.tabula-view .tabula-mount .tabula-file-root input.tabula-query-input,
+	.tabula-view .tabula-mount .tabula-file-root input.tabula-th-name-editing {
+		font-size: 16px;
+		line-height: 20px;
 	}
 
 	.tabula-mobile-primary-row .tabula-btn,

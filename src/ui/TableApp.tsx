@@ -27,6 +27,7 @@ import {
 	spreadsheetToMatrix,
 } from "../import/spreadsheet";
 import { PasteSpreadsheetModal } from "./PasteSpreadsheetModal";
+import { ConfirmModal } from "./ConfirmModal";
 import type { DropSide } from "./TableGrid";
 import {
 	filtersToQueryString,
@@ -71,6 +72,8 @@ export function TableApp({
 	const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 	const [checkedRowIds, setCheckedRowIds] = useState<ReadonlySet<string>>(() => new Set());
 	const [showLinkModal, setShowLinkModal] = useState(false);
+	// Non-null while the bulk-delete confirmation is open.
+	const [confirmDeleteCount, setConfirmDeleteCount] = useState<number | null>(null);
 	const [syncBusy, setSyncBusy] = useState(false);
 	const [pasteCandidate, setPasteCandidate] = useState<{
 		matrix: unknown[][];
@@ -270,6 +273,26 @@ export function TableApp({
 		});
 		if (selectedRowId === rowId) setSelectedRowId(null);
 	};
+
+	/**
+	 * Bulk delete for every checked row. Reuses deleteRow's bookkeeping so the
+	 * Airtable recordMap and the selected/checked id sets are pruned exactly as
+	 * they are for a single-row delete.
+	 */
+	const deleteCheckedRows = useCallback(() => {
+		const ids = [...checkedRowIds];
+		if (ids.length === 0) return;
+		const doomed = new Set(ids);
+		const recordMap = { ...(doc.sync?.recordMap ?? {}) };
+		for (const id of ids) delete recordMap[id];
+		updateDoc({
+			...doc,
+			rows: doc.rows.filter((r) => !doomed.has(r.id)),
+			sync: doc.sync ? { ...doc.sync, recordMap } : doc.sync,
+		});
+		if (selectedRowId && doomed.has(selectedRowId)) setSelectedRowId(null);
+		setCheckedRowIds(new Set());
+	}, [checkedRowIds, doc, selectedRowId, updateDoc]);
 
 	const addField = (type: FieldType, atIndex?: number) => {
 		const field = createField(type);
@@ -551,6 +574,8 @@ export function TableApp({
 				showFilters={showFilters}
 				showSorts={showSorts}
 				showHide={showHide}
+				checkedCount={checkedRowIds.size}
+				onRequestDeleteSelected={() => setConfirmDeleteCount(checkedRowIds.size)}
 				syncControl={
 					<SyncMenu
 						linked={Boolean(doc.sync)}
@@ -622,6 +647,14 @@ export function TableApp({
 				onResizeColumn={resizeColumn}
 				onAddRow={addRow}
 			/>
+			{confirmDeleteCount !== null && confirmDeleteCount > 0 && (
+				<ConfirmModal
+					count={confirmDeleteCount}
+					tableName={doc.name}
+					onConfirm={deleteCheckedRows}
+					onClose={() => setConfirmDeleteCount(null)}
+				/>
+			)}
 			{pasteCandidate && (
 				<PasteSpreadsheetModal
 					matrix={pasteCandidate.matrix}

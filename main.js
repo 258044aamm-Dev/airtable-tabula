@@ -1105,7 +1105,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect13(create, deps) {
+        function useEffect14(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1888,7 +1888,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect13;
+        exports.useEffect = useEffect14;
         exports.useId = useId2;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -24473,11 +24473,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx16 = jsxWithValidationDynamic;
-        var jsxs16 = jsxWithValidationStatic;
+        var jsx17 = jsxWithValidationDynamic;
+        var jsxs17 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx16;
-        exports.jsxs = jsxs16;
+        exports.jsx = jsx17;
+        exports.jsxs = jsxs17;
       })();
     }
   }
@@ -25050,10 +25050,10 @@ function parseDuration(input) {
 
 // src/ui/mount.tsx
 var import_client = __toESM(require_client());
-var import_react14 = __toESM(require_react());
+var import_react15 = __toESM(require_react());
 
 // src/ui/TableFileApp.tsx
-var import_react13 = __toESM(require_react());
+var import_react14 = __toESM(require_react());
 var import_obsidian4 = require("obsidian");
 
 // node_modules/saxen/dist/index.js
@@ -29577,7 +29577,7 @@ function PasteSpreadsheetModal(props) {
 }
 
 // src/ui/TableApp.tsx
-var import_react12 = __toESM(require_react());
+var import_react13 = __toESM(require_react());
 var import_obsidian3 = require("obsidian");
 
 // src/data/cellClipboard.ts
@@ -29687,6 +29687,83 @@ function parseCellClipboardText(field, text) {
 function isValidDate(value) {
   const date = /* @__PURE__ */ new Date(`${value}T00:00:00.000Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+// src/ui/ConfirmModal.tsx
+var import_react2 = __toESM(require_react());
+var import_jsx_runtime2 = __toESM(require_jsx_runtime());
+function ConfirmModal(props) {
+  const { count, tableName, onConfirm, onClose } = props;
+  (0, import_react2.useEffect)(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+  const noun = count === 1 ? "row" : "rows";
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    "div",
+    {
+      className: "tabula-modal tabula-confirm-modal",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-labelledby": "tabula-confirm-title",
+      onClick: (event) => event.stopPropagation(),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "tabula-modal-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("h3", { id: "tabula-confirm-title", children: [
+            "Delete ",
+            count,
+            " ",
+            noun,
+            "?"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            "button",
+            {
+              className: "tabula-btn tabula-icon-btn",
+              type: "button",
+              "aria-label": "Close",
+              onClick: onClose,
+              children: "\xD7"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("p", { className: "tabula-confirm-text", children: [
+          "This permanently removes ",
+          count,
+          " ",
+          noun,
+          " from",
+          " ",
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("strong", { children: tableName }),
+          ", together with every value in them. This cannot be undone."
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "tabula-confirm-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Cancel" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            "button",
+            {
+              className: "tabula-btn tabula-btn-danger",
+              type: "button",
+              autoFocus: true,
+              onClick: () => {
+                onConfirm();
+                onClose();
+              },
+              children: [
+                "Delete ",
+                count,
+                " ",
+                noun
+              ]
+            }
+          )
+        ] })
+      ]
+    }
+  ) });
 }
 
 // src/data/query.ts
@@ -30612,11 +30689,11 @@ function toAirtableValue(field, value) {
 }
 
 // src/ui/Toolbar.tsx
-var import_react3 = __toESM(require_react());
+var import_react4 = __toESM(require_react());
 
 // src/ui/MenuSelect.tsx
-var import_react2 = __toESM(require_react());
-var import_jsx_runtime2 = __toESM(require_jsx_runtime());
+var import_react3 = __toESM(require_react());
+var import_jsx_runtime3 = __toESM(require_jsx_runtime());
 function MenuSelect({
   label,
   value,
@@ -30629,11 +30706,11 @@ function MenuSelect({
   triggerLabel,
   align = "left"
 }) {
-  const [open, setOpen] = (0, import_react2.useState)(false);
-  const rootRef = (0, import_react2.useRef)(null);
+  const [open, setOpen] = (0, import_react3.useState)(false);
+  const rootRef = (0, import_react3.useRef)(null);
   const selected = options.find((o) => o.value === value);
   const display = triggerLabel ?? (variant === "control" ? selected?.label ?? "\u2026" : triggerLabel ?? selected?.label ?? "\u2026");
-  (0, import_react2.useEffect)(() => {
+  (0, import_react3.useEffect)(() => {
     if (!open) return;
     const onDoc = (e) => {
       if (!rootRef.current?.contains(e.target)) setOpen(false);
@@ -30649,14 +30726,14 @@ function MenuSelect({
     };
   }, [open]);
   const triggerClass = variant === "control" ? "tabula-menu-trigger" : variant === "button-primary" ? "tabula-btn tabula-btn-primary tabula-menu-btn" : "tabula-btn tabula-menu-btn";
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
     "div",
     {
       className: `tabula-menu-select ${className}`,
       ref: rootRef,
       title,
       children: [
-        variant === "control" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        variant === "control" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
           "button",
           {
             type: "button",
@@ -30666,12 +30743,12 @@ function MenuSelect({
             "aria-haspopup": "listbox",
             onClick: () => setOpen((v) => !v),
             children: [
-              label && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-label", children: label }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-value", children: display }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
+              label && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-label", children: label }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-value", children: display }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
             ]
           }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        ) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
           "button",
           {
             type: "button",
@@ -30682,17 +30759,17 @@ function MenuSelect({
             onClick: () => setOpen((v) => !v),
             children: [
               display,
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
             ]
           }
         ),
-        open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        open && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "div",
           {
             className: `tabula-menu-popover align-${align}`,
             role: "listbox",
             "aria-label": ariaLabel ?? label,
-            children: options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            children: options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
               "button",
               {
                 type: "button",
@@ -30707,7 +30784,7 @@ function MenuSelect({
                 },
                 children: [
                   opt.label,
-                  opt.value === value && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "tabula-menu-check", "aria-hidden": "true", children: "\u2713" })
+                  opt.value === value && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-check", "aria-hidden": "true", children: "\u2713" })
                 ]
               },
               opt.value || "__empty"
@@ -30720,16 +30797,16 @@ function MenuSelect({
 }
 
 // src/ui/Toolbar.tsx
-var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+var import_jsx_runtime4 = __toESM(require_jsx_runtime());
 var MOBILE_TOOLBAR_QUERY = "(max-width: 720px)";
 function Toolbar(props) {
   const { doc } = props;
-  const [isMobile, setIsMobile] = (0, import_react3.useState)(
+  const [isMobile, setIsMobile] = (0, import_react4.useState)(
     () => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(MOBILE_TOOLBAR_QUERY).matches
   );
-  const [mobileToolsOpen, setMobileToolsOpen] = (0, import_react3.useState)(false);
-  const mobileToolsId = `tabula-mobile-tools-${(0, import_react3.useId)().replace(/:/g, "")}`;
-  (0, import_react3.useEffect)(() => {
+  const [mobileToolsOpen, setMobileToolsOpen] = (0, import_react4.useState)(false);
+  const mobileToolsId = `tabula-mobile-tools-${(0, import_react4.useId)().replace(/:/g, "")}`;
+  (0, import_react4.useEffect)(() => {
     if (typeof window.matchMedia !== "function") return;
     const media = window.matchMedia(MOBILE_TOOLBAR_QUERY);
     const onChange = (event) => {
@@ -30743,7 +30820,7 @@ function Toolbar(props) {
     media.addListener(onChange);
     return () => media.removeListener(onChange);
   }, []);
-  const searchControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+  const searchControl = /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
     "input",
     {
       className: "tabula-search",
@@ -30754,7 +30831,7 @@ function Toolbar(props) {
       "aria-label": "Search rows"
     }
   );
-  const addRowControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+  const addRowControl = /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
     "button",
     {
       className: "tabula-btn tabula-btn-primary tabula-add-row-btn",
@@ -30764,7 +30841,21 @@ function Toolbar(props) {
       children: "+ Row"
     }
   );
-  const addFieldControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+  const deleteSelectedControl = props.checkedCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+    "button",
+    {
+      className: "tabula-btn tabula-btn-danger tabula-delete-selected",
+      type: "button",
+      title: `Delete ${props.checkedCount} selected ${props.checkedCount === 1 ? "row" : "rows"}`,
+      onClick: props.onRequestDeleteSelected,
+      children: [
+        "Delete (",
+        props.checkedCount,
+        ")"
+      ]
+    }
+  );
+  const addFieldControl = /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
     MenuSelect,
     {
       className: "tabula-add-field-control",
@@ -30783,8 +30874,8 @@ function Toolbar(props) {
       }))
     }
   );
-  const toolControls = /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+  const toolControls = /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
       "button",
       {
         className: `tabula-btn ${props.showFilters ? "is-active" : ""}`,
@@ -30798,7 +30889,7 @@ function Toolbar(props) {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
       "button",
       {
         className: `tabula-btn ${props.showSorts || doc.view.sorts.length > 0 ? "is-active" : ""}`,
@@ -30812,7 +30903,7 @@ function Toolbar(props) {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
       MenuSelect,
       {
         label: "Group",
@@ -30826,7 +30917,7 @@ function Toolbar(props) {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
       "button",
       {
         className: `tabula-btn ${props.showHide ? "is-active" : ""}`,
@@ -30840,8 +30931,8 @@ function Toolbar(props) {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
       MenuSelect,
       {
         label: "Height",
@@ -30856,7 +30947,7 @@ function Toolbar(props) {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
       MenuSelect,
       {
         label: "Freeze",
@@ -30873,13 +30964,13 @@ function Toolbar(props) {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-toolbar-sep", "aria-hidden": "true" }),
     props.syncControl
   ] });
   const rowCountText = `${props.rowCount}${props.rowCount !== doc.rows.length ? ` / ${doc.rows.length}` : ""} rows`;
-  const rowCountControl = /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-count", children: rowCountText });
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+  const rowCountControl = /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-count", children: rowCountText });
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-toolbar", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
       "input",
       {
         className: "tabula-title",
@@ -30888,12 +30979,13 @@ function Toolbar(props) {
         "aria-label": "Table name"
       }
     ),
-    isMobile ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar-actions tabula-toolbar-actions-mobile", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-mobile-primary-row", children: [
+    isMobile ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-toolbar-actions tabula-toolbar-actions-mobile", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-mobile-primary-row", children: [
         searchControl,
         addRowControl,
+        deleteSelectedControl,
         addFieldControl,
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
           "button",
           {
             className: "tabula-btn tabula-mobile-more",
@@ -30905,12 +30997,12 @@ function Toolbar(props) {
             onClick: () => setMobileToolsOpen((open) => !open),
             children: [
               "More",
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-menu-chevron", "aria-hidden": "true", children: "\u25BE" })
             ]
           }
         )
       ] }),
-      mobileToolsOpen && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      mobileToolsOpen && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
         "div",
         {
           className: "tabula-mobile-tools",
@@ -30921,11 +31013,12 @@ function Toolbar(props) {
           children: toolControls
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "tabula-count tabula-mobile-count", children: rowCountText })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "tabula-toolbar-actions", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-count tabula-mobile-count", children: rowCountText })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-toolbar-actions", children: [
       searchControl,
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "tabula-toolbar-tools-desktop", children: toolControls }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-toolbar-tools-desktop", children: toolControls }),
       addRowControl,
+      deleteSelectedControl,
       addFieldControl,
       rowCountControl
     ] })
@@ -30933,8 +31026,8 @@ function Toolbar(props) {
 }
 
 // src/ui/FilterBar.tsx
-var import_react4 = __toESM(require_react());
-var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+var import_react5 = __toESM(require_react());
+var import_jsx_runtime5 = __toESM(require_jsx_runtime());
 function FilterBar({
   doc,
   queryError,
@@ -30942,7 +31035,7 @@ function FilterBar({
   onFiltersChange
 }) {
   const { filters, query } = doc.view;
-  const [mode, setMode] = (0, import_react4.useState)("builder");
+  const [mode, setMode] = (0, import_react5.useState)("builder");
   const updateCondition = (id, patch) => {
     onFiltersChange({
       ...filters,
@@ -30974,9 +31067,9 @@ function FilterBar({
       conditions: filters.conditions.filter((c) => c.id !== id)
     });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-filter-bar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-filter-mode-header", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-filter-tabs", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-filter-bar", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "tabula-filter-mode-header", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-filter-tabs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
         "button",
         {
           type: "button",
@@ -30988,7 +31081,7 @@ function FilterBar({
           ]
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         "button",
         {
           type: "button",
@@ -30998,9 +31091,9 @@ function FilterBar({
         }
       )
     ] }) }),
-    mode === "query" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-query-section", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-query-row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    mode === "query" ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-query-section", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-query-row", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           "input",
           {
             className: `tabula-query-input ${queryError ? "has-error" : ""}`,
@@ -31011,20 +31104,20 @@ function FilterBar({
             "aria-label": "Filter query string"
           }
         ),
-        queryError && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-query-error", children: queryError })
+        queryError && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "tabula-query-error", children: queryError })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-query-tips", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "tabula-query-tip-label", children: "Syntax:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("code", { children: "field:value" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("code", { children: "name:~text" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("code", { children: "num:>10" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("code", { children: "status:!Done" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("code", { children: "tags:a,b" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("code", { children: "field:empty" })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-query-tips", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "tabula-query-tip-label", children: "Syntax:" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("code", { children: "field:value" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("code", { children: "name:~text" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("code", { children: "num:>10" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("code", { children: "status:!Done" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("code", { children: "tags:a,b" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("code", { children: "field:empty" })
       ] })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-builder-section", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-filter-controls", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-builder-section", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-filter-controls", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           MenuSelect,
           {
             value: filters.logic,
@@ -31039,8 +31132,8 @@ function FilterBar({
             ]
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: addCondition, children: "+ Condition" }),
-        filters.conditions.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: addCondition, children: "+ Condition" }),
+        filters.conditions.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           "button",
           {
             className: "tabula-btn",
@@ -31050,18 +31143,18 @@ function FilterBar({
           }
         )
       ] }),
-      filters.conditions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-filter-empty", children: [
+      filters.conditions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-filter-empty", children: [
         "No conditions applied. Click ",
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("strong", { children: "+ Condition" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("strong", { children: "+ Condition" }),
         " above to filter rows."
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-conditions", children: filters.conditions.map((condition) => {
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "tabula-conditions", children: filters.conditions.map((condition) => {
         const field = doc.fields.find((f) => f.id === condition.fieldId);
         const ops = field ? operatorsForField(field) : [];
         const needsValue = !["isEmpty", "isNotEmpty", "isTrue", "isFalse"].includes(
           condition.operator
         );
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "tabula-condition", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-condition", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             MenuSelect,
             {
               value: condition.fieldId,
@@ -31078,7 +31171,7 @@ function FilterBar({
               options: doc.fields.map((f) => ({ value: f.id, label: f.name }))
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             MenuSelect,
             {
               value: condition.operator,
@@ -31092,7 +31185,7 @@ function FilterBar({
               }))
             }
           ),
-          needsValue && field && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          needsValue && field && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             ConditionValueInput,
             {
               field,
@@ -31100,7 +31193,7 @@ function FilterBar({
               onChange: (value) => updateCondition(condition.id, { value })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "button",
             {
               className: "tabula-btn tabula-icon-btn is-danger",
@@ -31124,10 +31217,10 @@ function ConditionValueInput({
   if (field.type === "singleSelect" || field.type === "multiSelect") {
     if (condition.operator === "isAnyOf" || condition.operator === "containsAny" || condition.operator === "containsAll") {
       const selected = Array.isArray(condition.value) ? condition.value : [];
-      return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "tabula-multi-filter", children: field.options.map((opt) => {
+      return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "tabula-multi-filter", children: field.options.map((opt) => {
         const checked = selected.includes(opt.id);
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("label", { className: "tabula-check-label", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("label", { className: "tabula-check-label", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "input",
             {
               type: "checkbox",
@@ -31143,7 +31236,7 @@ function ConditionValueInput({
         ] }, opt.id);
       }) });
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       MenuSelect,
       {
         value: typeof condition.value === "string" ? condition.value : "",
@@ -31157,7 +31250,7 @@ function ConditionValueInput({
     );
   }
   if (isNumericField(field)) {
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       "input",
       {
         type: "number",
@@ -31167,7 +31260,7 @@ function ConditionValueInput({
     );
   }
   if (field.type === "date") {
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       "input",
       {
         type: "date",
@@ -31177,7 +31270,7 @@ function ConditionValueInput({
     );
   }
   if (field.type === "datetime" || field.type === "createdTime" || field.type === "lastModifiedTime") {
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       "input",
       {
         type: "datetime-local",
@@ -31189,7 +31282,7 @@ function ConditionValueInput({
   if (isSelectField(field)) {
     return null;
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
     "input",
     {
       type: "text",
@@ -31200,7 +31293,7 @@ function ConditionValueInput({
 }
 
 // src/ui/SortBar.tsx
-var import_jsx_runtime5 = __toESM(require_jsx_runtime());
+var import_jsx_runtime6 = __toESM(require_jsx_runtime());
 function SortBar({ doc, onChange }) {
   const { sorts } = doc.view;
   const update = (index, patch) => {
@@ -31211,15 +31304,15 @@ function SortBar({ doc, onChange }) {
     if (!field) return;
     onChange([...sorts, { fieldId: field.id, direction: "asc" }]);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-panel", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-panel-header", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("strong", { children: "Sort" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "tabula-btn", type: "button", onClick: add, children: "+ Sort" }),
-      sorts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "tabula-btn", type: "button", onClick: () => onChange([]), children: "Clear" })
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-panel", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-panel-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("strong", { children: "Sort" }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "tabula-btn", type: "button", onClick: add, children: "+ Sort" }),
+      sorts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "tabula-btn", type: "button", onClick: () => onChange([]), children: "Clear" })
     ] }),
-    sorts.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "tabula-panel-empty", children: "No sorts \u2014 click + Sort or use a column menu." }),
-    sorts.map((sort, index) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "tabula-condition", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    sorts.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "tabula-panel-empty", children: "No sorts \u2014 click + Sort or use a column menu." }),
+    sorts.map((sort, index) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-condition", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         MenuSelect,
         {
           value: sort.fieldId,
@@ -31228,7 +31321,7 @@ function SortBar({ doc, onChange }) {
           options: doc.fields.map((f) => ({ value: f.id, label: f.name }))
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         MenuSelect,
         {
           value: sort.direction,
@@ -31240,7 +31333,7 @@ function SortBar({ doc, onChange }) {
           ]
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         "button",
         {
           className: "tabula-btn tabula-icon-btn",
@@ -31254,7 +31347,7 @@ function SortBar({ doc, onChange }) {
 }
 
 // src/ui/HideFieldsMenu.tsx
-var import_jsx_runtime6 = __toESM(require_jsx_runtime());
+var import_jsx_runtime7 = __toESM(require_jsx_runtime());
 function HideFieldsMenu({ doc, onChange }) {
   const hidden = new Set(doc.view.hiddenFieldIds);
   const toggle = (fieldId) => {
@@ -31264,10 +31357,10 @@ function HideFieldsMenu({ doc, onChange }) {
       onChange([...doc.view.hiddenFieldIds, fieldId]);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-panel", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "tabula-panel-header", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("strong", { children: "Hide fields" }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-panel", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-panel-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("strong", { children: "Hide fields" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
         "button",
         {
           className: "tabula-btn",
@@ -31278,8 +31371,8 @@ function HideFieldsMenu({ doc, onChange }) {
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "tabula-hide-list", children: doc.fields.map((f) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "tabula-check-label", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "tabula-hide-list", children: doc.fields.map((f) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "tabula-check-label", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
         "input",
         {
           type: "checkbox",
@@ -31288,7 +31381,7 @@ function HideFieldsMenu({ doc, onChange }) {
         }
       ),
       f.name,
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "tabula-muted", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "tabula-muted", children: [
         "(",
         f.type,
         ")"
@@ -31298,15 +31391,15 @@ function HideFieldsMenu({ doc, onChange }) {
 }
 
 // src/ui/TableGrid.tsx
-var import_react8 = __toESM(require_react());
+var import_react9 = __toESM(require_react());
 var import_obsidian2 = require("obsidian");
 
 // src/ui/CellEditor.tsx
-var import_react6 = __toESM(require_react());
+var import_react7 = __toESM(require_react());
 
 // src/ui/SelectEditor.tsx
-var import_react5 = __toESM(require_react());
-var import_jsx_runtime7 = __toESM(require_jsx_runtime());
+var import_react6 = __toESM(require_react());
+var import_jsx_runtime8 = __toESM(require_jsx_runtime());
 function SelectEditor({
   field,
   value,
@@ -31314,12 +31407,12 @@ function SelectEditor({
   onAddOption,
   onManageOptions
 }) {
-  const [open, setOpen] = (0, import_react5.useState)(false);
-  const [q, setQ] = (0, import_react5.useState)("");
-  const [highlightIndex, setHighlightIndex] = (0, import_react5.useState)(0);
-  const rootRef = (0, import_react5.useRef)(null);
+  const [open, setOpen] = (0, import_react6.useState)(false);
+  const [q, setQ] = (0, import_react6.useState)("");
+  const [highlightIndex, setHighlightIndex] = (0, import_react6.useState)(0);
+  const rootRef = (0, import_react6.useRef)(null);
   const selectedIds = field.type === "singleSelect" ? typeof value === "string" ? [value] : [] : Array.isArray(value) ? value : [];
-  const filtered = (0, import_react5.useMemo)(() => {
+  const filtered = (0, import_react6.useMemo)(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return field.options;
     return field.options.filter((o) => o.name.toLowerCase().includes(needle));
@@ -31328,10 +31421,10 @@ function SelectEditor({
     q.trim() && !field.options.some((o) => o.name.toLowerCase() === q.trim().toLowerCase())
   );
   const totalItems = filtered.length + (canCreate ? 1 : 0);
-  (0, import_react5.useEffect)(() => {
+  (0, import_react6.useEffect)(() => {
     setHighlightIndex(0);
   }, [q, open]);
-  (0, import_react5.useEffect)(() => {
+  (0, import_react6.useEffect)(() => {
     const onDoc = (e) => {
       if (!rootRef.current?.contains(e.target)) {
         setOpen(false);
@@ -31368,8 +31461,8 @@ function SelectEditor({
       setQ("");
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-select", ref: rootRef, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-select", ref: rootRef, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       "button",
       {
         type: "button",
@@ -31377,16 +31470,16 @@ function SelectEditor({
         onClick: () => setOpen((v) => !v),
         "aria-expanded": open,
         "aria-haspopup": "listbox",
-        children: selectedIds.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-placeholder", children: "Select\u2026" }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-pills", children: selectedIds.map((id) => {
+        children: selectedIds.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-placeholder", children: "Select\u2026" }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-pills", children: selectedIds.map((id) => {
           const opt = field.options.find((o) => o.id === id);
           if (!opt) return null;
-          return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+          return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
             "span",
             {
               className: `tabula-pill tabula-color-${opt.color}`,
               children: [
                 opt.name,
-                field.type === "multiSelect" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+                field.type === "multiSelect" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
                   "span",
                   {
                     className: "tabula-pill-x",
@@ -31405,8 +31498,8 @@ function SelectEditor({
         }) })
       }
     ),
-    open && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-select-menu", role: "listbox", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    open && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-select-menu", role: "listbox", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
         "input",
         {
           className: "tabula-select-search",
@@ -31444,11 +31537,11 @@ function SelectEditor({
           }
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "tabula-select-options", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-select-options", children: [
         filtered.map((opt, index) => {
           const active = selectedIds.includes(opt.id);
           const isHighlighted = highlightIndex === index;
-          return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+          return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
             "button",
             {
               type: "button",
@@ -31456,14 +31549,14 @@ function SelectEditor({
               onClick: () => toggle(opt.id),
               onMouseEnter: () => setHighlightIndex(index),
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
-                active && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "tabula-check", children: "\u2713" })
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
+                active && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-check", children: "\u2713" })
               ]
             },
             opt.id
           );
         }),
-        canCreate && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+        canCreate && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
           "button",
           {
             type: "button",
@@ -31477,9 +31570,9 @@ function SelectEditor({
             ]
           }
         ),
-        filtered.length === 0 && !canCreate && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "tabula-menu-hint", children: "No matching options" })
+        filtered.length === 0 && !canCreate && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "tabula-menu-hint", children: "No matching options" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
         "button",
         {
           type: "button",
@@ -31496,11 +31589,11 @@ function SelectEditor({
 }
 
 // src/ui/CellEditor.tsx
-var import_jsx_runtime8 = __toESM(require_jsx_runtime());
+var import_jsx_runtime9 = __toESM(require_jsx_runtime());
 function CellEditor(props) {
   const { field, value, onChange } = props;
   if (field.type === "checkbox") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("label", { className: "tabula-checkbox-cell", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("label", { className: "tabula-checkbox-cell", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         type: "checkbox",
@@ -31510,10 +31603,10 @@ function CellEditor(props) {
     ) });
   }
   if (field.type === "rating") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(RatingCell, { field, value, onChange });
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(RatingCell, { field, value, onChange });
   }
   if (field.type === "singleSelect" || field.type === "multiSelect") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       SelectEditor,
       {
         field,
@@ -31525,7 +31618,7 @@ function CellEditor(props) {
     );
   }
   if (field.type === "attachment") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       AttachmentCell,
       {
         value: Array.isArray(value) ? value : [],
@@ -31534,7 +31627,7 @@ function CellEditor(props) {
     );
   }
   if (field.type === "longText") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       LongTextCell,
       {
         value: typeof value === "string" ? value : "",
@@ -31543,12 +31636,12 @@ function CellEditor(props) {
     );
   }
   if (isReadOnlyField(field)) {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-readonly", children: formatReadOnly(field, value) });
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-readonly", children: formatReadOnly(field, value) });
   }
   if (field.type === "number" || field.type === "currency" || field.type === "percent") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-affix-cell", children: [
-      field.type === "currency" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-affix", children: field.symbol ?? "$" }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-affix-cell", children: [
+      field.type === "currency" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-affix", children: field.symbol ?? "$" }),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         "input",
         {
           className: "tabula-cell-input tabula-number-input",
@@ -31557,11 +31650,11 @@ function CellEditor(props) {
           onChange: (e) => onChange(e.target.value === "" ? null : Number(e.target.value))
         }
       ),
-      field.type === "percent" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-affix", children: "%" })
+      field.type === "percent" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-affix", children: "%" })
     ] });
   }
   if (field.type === "duration") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         className: "tabula-cell-input",
@@ -31574,7 +31667,7 @@ function CellEditor(props) {
     );
   }
   if (field.type === "date") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         className: "tabula-cell-input",
@@ -31586,7 +31679,7 @@ function CellEditor(props) {
   }
   if (field.type === "datetime") {
     const local = typeof value === "string" && value ? toDatetimeLocal(value) : "";
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         className: "tabula-cell-input",
@@ -31606,7 +31699,7 @@ function CellEditor(props) {
     );
   }
   if (field.type === "url" || field.type === "email") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       LinkTextCell,
       {
         kind: field.type,
@@ -31616,7 +31709,7 @@ function CellEditor(props) {
     );
   }
   if (field.type === "phone") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         className: "tabula-cell-input",
@@ -31627,7 +31720,7 @@ function CellEditor(props) {
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
     TextCell,
     {
       value: typeof value === "string" ? value : "",
@@ -31642,12 +31735,12 @@ function RatingCell({
 }) {
   const max2 = field.max ?? 5;
   const current = typeof value === "number" ? value : 0;
-  const [hoverRating, setHoverRating] = (0, import_react6.useState)(null);
+  const [hoverRating, setHoverRating] = (0, import_react7.useState)(null);
   const activeStars = hoverRating ?? current;
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-rating", onMouseLeave: () => setHoverRating(null), children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-rating", onMouseLeave: () => setHoverRating(null), children: [
     Array.from({ length: max2 }, (_, i) => {
       const n = i + 1;
-      return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         "button",
         {
           type: "button",
@@ -31661,7 +31754,7 @@ function RatingCell({
         n
       );
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "tabula-rating-score", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "tabula-rating-score", children: [
       current,
       "/",
       max2
@@ -31691,12 +31784,12 @@ function TextCell({
   value,
   onChange
 }) {
-  const [draft, setDraft] = (0, import_react6.useState)(value);
-  const focused = (0, import_react6.useRef)(false);
-  (0, import_react6.useEffect)(() => {
+  const [draft, setDraft] = (0, import_react7.useState)(value);
+  const focused = (0, import_react7.useRef)(false);
+  (0, import_react7.useEffect)(() => {
     if (!focused.current) setDraft(value);
   }, [value]);
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
     "input",
     {
       className: "tabula-cell-input",
@@ -31723,12 +31816,12 @@ function LongTextCell({
   value,
   onChange
 }) {
-  const [draft, setDraft] = (0, import_react6.useState)(value);
-  const [expanded, setExpanded] = (0, import_react6.useState)(false);
-  const containerRef = (0, import_react6.useRef)(null);
-  const textareaRef = (0, import_react6.useRef)(null);
-  (0, import_react6.useEffect)(() => setDraft(value), [value]);
-  (0, import_react6.useEffect)(() => {
+  const [draft, setDraft] = (0, import_react7.useState)(value);
+  const [expanded, setExpanded] = (0, import_react7.useState)(false);
+  const containerRef = (0, import_react7.useRef)(null);
+  const textareaRef = (0, import_react7.useRef)(null);
+  (0, import_react7.useEffect)(() => setDraft(value), [value]);
+  (0, import_react7.useEffect)(() => {
     if (!expanded) return;
     const onDoc = (e) => {
       if (!containerRef.current?.contains(e.target)) {
@@ -31743,18 +31836,18 @@ function LongTextCell({
     onChange(draft);
     setExpanded(false);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-longtext-wrapper", ref: containerRef, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-longtext-wrapper", ref: containerRef, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "button",
       {
         type: "button",
         className: `tabula-longtext-preview ${expanded ? "is-active" : ""}`,
         onClick: () => setExpanded(true),
-        children: value || /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-placeholder", children: "Add text\u2026" })
+        children: value || /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-placeholder", children: "Add text\u2026" })
       }
     ),
-    expanded && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-longtext-popover", role: "dialog", "aria-label": "Edit text", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    expanded && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-longtext-popover", role: "dialog", "aria-label": "Edit text", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         "textarea",
         {
           ref: textareaRef,
@@ -31777,16 +31870,16 @@ function LongTextCell({
           }
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-longtext-popover-footer", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "tabula-muted tabula-longtext-count", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-longtext-popover-footer", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "tabula-muted tabula-longtext-count", children: [
           draft.length,
           " chars \xB7 ",
           draft.trim() ? draft.trim().split(/\s+/).length : 0,
           " words"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-longtext-actions", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "tabula-muted tabula-shortcut-hint", children: "Ctrl+Enter to save" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-longtext-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "tabula-muted tabula-shortcut-hint", children: "Ctrl+Enter to save" }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
             "button",
             {
               type: "button",
@@ -31805,14 +31898,14 @@ function LinkTextCell({
   value,
   onChange
 }) {
-  const [editing, setEditing] = (0, import_react6.useState)(!value);
-  const [draft, setDraft] = (0, import_react6.useState)(value);
-  (0, import_react6.useEffect)(() => setDraft(value), [value]);
+  const [editing, setEditing] = (0, import_react7.useState)(!value);
+  const [draft, setDraft] = (0, import_react7.useState)(value);
+  (0, import_react7.useEffect)(() => setDraft(value), [value]);
   if (!editing && value) {
     const href = kind === "email" ? `mailto:${value}` : value.startsWith("http://") || value.startsWith("https://") ? value : `https://${value}`;
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-link-cell", onDoubleClick: () => setEditing(true), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("a", { href, target: "_blank", rel: "noopener noreferrer", onClick: (e) => e.stopPropagation(), children: value }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-link-cell", onDoubleClick: () => setEditing(true), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("a", { href, target: "_blank", rel: "noopener noreferrer", onClick: (e) => e.stopPropagation(), children: value }),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         "button",
         {
           type: "button",
@@ -31824,7 +31917,7 @@ function LinkTextCell({
       )
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
     "input",
     {
       className: "tabula-cell-input",
@@ -31851,7 +31944,7 @@ function AttachmentCell({
   value,
   onChange
 }) {
-  const [draft, setDraft] = (0, import_react6.useState)("");
+  const [draft, setDraft] = (0, import_react7.useState)("");
   const add = () => {
     const path = draft.trim();
     if (!path) return;
@@ -31862,10 +31955,10 @@ function AttachmentCell({
     onChange([...value, path]);
     setDraft("");
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-attachments", children: [
-    value.map((path) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "tabula-attach-chip", title: path, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-attachments", children: [
+    value.map((path) => /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "tabula-attach-chip", title: path, children: [
       path.split("/").pop(),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         "button",
         {
           type: "button",
@@ -31876,7 +31969,7 @@ function AttachmentCell({
         }
       )
     ] }, path)),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         className: "tabula-cell-input tabula-attach-input",
@@ -31896,12 +31989,12 @@ function AttachmentCell({
 }
 
 // src/ui/FieldHeaderMenu.tsx
-var import_react7 = __toESM(require_react());
-var import_jsx_runtime9 = __toESM(require_jsx_runtime());
+var import_react8 = __toESM(require_react());
+var import_jsx_runtime10 = __toESM(require_jsx_runtime());
 function FieldHeaderMenu(props) {
-  const ref = (0, import_react7.useRef)(null);
-  const [confirmDelete, setConfirmDelete] = (0, import_react7.useState)(false);
-  (0, import_react7.useEffect)(() => {
+  const ref = (0, import_react8.useRef)(null);
+  const [confirmDelete, setConfirmDelete] = (0, import_react8.useState)(false);
+  (0, import_react8.useEffect)(() => {
     const onDoc = (e) => {
       if (!ref.current?.contains(e.target)) props.onClose();
     };
@@ -31915,8 +32008,8 @@ function FieldHeaderMenu(props) {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [props]);
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "tabula-field-menu", ref, role: "menu", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-field-menu", ref, role: "menu", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
         type: "button",
@@ -31927,14 +32020,14 @@ function FieldHeaderMenu(props) {
         children: "Rename column"
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onSortAsc, children: "Sort A \u2192 Z" }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onSortDesc, children: "Sort Z \u2192 A" }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onHide, children: "Hide column" }),
-    isSelectField(props.field) && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onManageOptions, children: "Manage options\u2026" }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onInsertLeft, children: "Insert column left" }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: props.onInsertRight, children: "Insert column right" }),
-    confirmDelete ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: props.onSortAsc, children: "Sort A \u2192 Z" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: props.onSortDesc, children: "Sort Z \u2192 A" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: props.onHide, children: "Hide column" }),
+    isSelectField(props.field) && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: props.onManageOptions, children: "Manage options\u2026" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: props.onInsertLeft, children: "Insert column left" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: props.onInsertRight, children: "Insert column right" }),
+    confirmDelete ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_jsx_runtime10.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
         "button",
         {
           type: "button",
@@ -31943,8 +32036,8 @@ function FieldHeaderMenu(props) {
           children: "Confirm delete"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { type: "button", onClick: () => setConfirmDelete(false), children: "Cancel" })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { type: "button", onClick: () => setConfirmDelete(false), children: "Cancel" })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
         type: "button",
@@ -31957,21 +32050,21 @@ function FieldHeaderMenu(props) {
 }
 
 // src/ui/TableGrid.tsx
-var import_jsx_runtime10 = __toESM(require_jsx_runtime());
+var import_jsx_runtime11 = __toESM(require_jsx_runtime());
 function TableGrid(props) {
   const fields = visibleFields(props.doc);
   const frozen = props.doc.view.frozenPrimary;
   const widths = props.doc.view.columnWidths;
   const totalRows = props.groups.reduce((n, g) => n + g.rows.length, 0);
-  const [dragState, setDragState] = (0, import_react8.useState)(null);
-  const [collapsedGroups, setCollapsedGroups] = (0, import_react8.useState)(/* @__PURE__ */ new Set());
-  const dragCleanup = (0, import_react8.useRef)(null);
-  const gridWrapRef = (0, import_react8.useRef)(null);
-  const topScrollbarRef = (0, import_react8.useRef)(null);
-  const topScrollbarInnerRef = (0, import_react8.useRef)(null);
-  const selectAllRef = (0, import_react8.useRef)(null);
+  const [dragState, setDragState] = (0, import_react9.useState)(null);
+  const [collapsedGroups, setCollapsedGroups] = (0, import_react9.useState)(/* @__PURE__ */ new Set());
+  const dragCleanup = (0, import_react9.useRef)(null);
+  const gridWrapRef = (0, import_react9.useRef)(null);
+  const topScrollbarRef = (0, import_react9.useRef)(null);
+  const topScrollbarInnerRef = (0, import_react9.useRef)(null);
+  const selectAllRef = (0, import_react9.useRef)(null);
   const someVisibleChecked = !props.allVisibleChecked && props.groups.some((g) => g.rows.some((r) => props.checkedRowIds.has(r.id)));
-  (0, import_react8.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     if (selectAllRef.current) selectAllRef.current.indeterminate = someVisibleChecked;
   }, [someVisibleChecked, props.allVisibleChecked]);
   const toggleGroup = (key) => {
@@ -31982,7 +32075,7 @@ function TableGrid(props) {
       return next;
     });
   };
-  (0, import_react8.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     if (!props.showTopScrollbar) return;
     const gridWrap = gridWrapRef.current;
     const topScrollbar = topScrollbarRef.current;
@@ -32139,7 +32232,7 @@ function TableGrid(props) {
     document.addEventListener("pointercancel", onCancel);
     window.addEventListener("blur", onCancel);
   };
-  (0, import_react8.useEffect)(
+  (0, import_react9.useEffect)(
     () => () => {
       dragCleanup.current?.();
     },
@@ -32227,16 +32320,16 @@ function TableGrid(props) {
     if (group.label !== "") {
       const isCollapsed = collapsedGroups.has(group.key);
       body.push(
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
           "tr",
           {
             className: "tabula-group-row",
             onClick: () => toggleGroup(group.key),
             title: "Click to collapse / expand group",
-            children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("td", { colSpan: fields.length + 2, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-group-chevron", "aria-hidden": "true", children: isCollapsed ? "\u25B8" : "\u25BE" }),
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-group-label", children: group.label }),
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { className: "tabula-muted", children: [
+            children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("td", { colSpan: fields.length + 2, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "tabula-group-chevron", "aria-hidden": "true", children: isCollapsed ? "\u25B8" : "\u25BE" }),
+              /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "tabula-group-label", children: group.label }),
+              /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("span", { className: "tabula-muted", children: [
                 " (",
                 group.rows.length,
                 ")"
@@ -32254,7 +32347,7 @@ function TableGrid(props) {
       const isDragSource = dragState?.kind === "row" && dragState.sourceId === row.id;
       const dropClass = dragState?.kind === "row" && dragState.targetId === row.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
       body.push(
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
           "tr",
           {
             "data-reorder-kind": props.canReorderRows ? "row" : void 0,
@@ -32267,12 +32360,12 @@ function TableGrid(props) {
             ].filter(Boolean).join(" ") || void 0,
             onClick: () => props.onSelectRow(row.id),
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                 "td",
                 {
                   className: "tabula-select-col sticky-col",
                   onContextMenu: (event) => showRowContextMenu(event, row.id),
-                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                  children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                     "input",
                     {
                       type: "checkbox",
@@ -32285,14 +32378,14 @@ function TableGrid(props) {
                   )
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                 "td",
                 {
                   className: "tabula-row-num sticky-rownum",
                   onContextMenu: (event) => showRowContextMenu(event, row.id),
-                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-row-num-content", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { children: index }),
-                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                  children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-row-num-content", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { children: index }),
+                    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                       "button",
                       {
                         className: "tabula-row-drag-handle",
@@ -32309,7 +32402,7 @@ function TableGrid(props) {
                   ] })
                 }
               ),
-              fields.map((field, fi) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+              fields.map((field, fi) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                 "td",
                 {
                   "data-cell-row": index - 1,
@@ -32320,7 +32413,7 @@ function TableGrid(props) {
                     width: widths[field.id] ?? 160,
                     minWidth: widths[field.id] ?? 160
                   },
-                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                  children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                     CellEditor,
                     {
                       field,
@@ -32340,18 +32433,18 @@ function TableGrid(props) {
       );
     }
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-grid-area", children: [
-    props.showTopScrollbar && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-grid-area", children: [
+    props.showTopScrollbar && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "div",
       {
         className: "tabula-top-scrollbar",
         ref: topScrollbarRef,
         tabIndex: 0,
         "aria-label": "Synchronized horizontal scrollbar for table",
-        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: "tabula-top-scrollbar-inner", ref: topScrollbarInnerRef })
+        children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-top-scrollbar-inner", ref: topScrollbarInnerRef })
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
       "div",
       {
         className: "tabula-grid-wrap",
@@ -32360,13 +32453,13 @@ function TableGrid(props) {
         "aria-label": "Table data grid",
         onKeyDownCapture: handleGridKeyDown,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
             "table",
             {
               className: `tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`,
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tr", { children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-select-col sticky-col", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("tr", { children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("th", { className: "tabula-select-col sticky-col", children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                     "input",
                     {
                       ref: selectAllRef,
@@ -32378,11 +32471,11 @@ function TableGrid(props) {
                       "aria-label": props.allVisibleChecked ? "Clear row selection" : "Select all rows"
                     }
                   ) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-num sticky-rownum", children: "#" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("th", { className: "tabula-row-num sticky-rownum", children: "#" }),
                   fields.map((field, fi) => {
                     const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
                     const dropClass = dragState?.kind === "field" && dragState.targetId === field.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
-                    return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                    return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                       "th",
                       {
                         "data-reorder-kind": "field",
@@ -32396,7 +32489,7 @@ function TableGrid(props) {
                           width: widths[field.id] ?? 160,
                           minWidth: widths[field.id] ?? 160
                         },
-                        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                        children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                           FieldHeader,
                           {
                             field,
@@ -32416,15 +32509,15 @@ function TableGrid(props) {
                     );
                   })
                 ] }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tbody", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("tbody", { children: [
                   body,
-                  totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
+                  totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
                 ] })
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-add-row-plus", "aria-hidden": "true", children: "+" }),
+          /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "tabula-add-row-plus", "aria-hidden": "true", children: "+" }),
             "New row"
           ] })
         ]
@@ -32444,13 +32537,13 @@ function FieldHeader({
   onBeginReorder,
   width
 }) {
-  const [menuOpen, setMenuOpen] = (0, import_react8.useState)(false);
-  const [isEditingName, setIsEditingName] = (0, import_react8.useState)(false);
-  const [nameDraft, setNameDraft] = (0, import_react8.useState)(field.name);
-  const startX = (0, import_react8.useRef)(0);
-  const startW = (0, import_react8.useRef)(width);
-  const nameInputRef = (0, import_react8.useRef)(null);
-  (0, import_react8.useEffect)(() => {
+  const [menuOpen, setMenuOpen] = (0, import_react9.useState)(false);
+  const [isEditingName, setIsEditingName] = (0, import_react9.useState)(false);
+  const [nameDraft, setNameDraft] = (0, import_react9.useState)(field.name);
+  const startX = (0, import_react9.useRef)(0);
+  const startW = (0, import_react9.useRef)(width);
+  const nameInputRef = (0, import_react9.useRef)(null);
+  (0, import_react9.useEffect)(() => {
     setNameDraft(field.name);
   }, [field.name]);
   const startRenaming = () => {
@@ -32494,8 +32587,8 @@ function FieldHeader({
     );
     menu.showAtMouseEvent(event.nativeEvent);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-th", onContextMenu: showFieldContextMenu, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-th", onContextMenu: showFieldContextMenu, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "button",
       {
         className: "tabula-col-drag-handle",
@@ -32508,7 +32601,7 @@ function FieldHeader({
         children: "\u283F"
       }
     ),
-    isEditingName ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    isEditingName ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "input",
       {
         ref: nameInputRef,
@@ -32525,7 +32618,7 @@ function FieldHeader({
           }
         }
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    ) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "span",
       {
         className: "tabula-th-name",
@@ -32534,8 +32627,8 @@ function FieldHeader({
         children: field.name
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-th-type", children: fieldTypeLabel(field) }),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: "tabula-th-type", children: fieldTypeLabel(field) }),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "button",
       {
         className: "tabula-btn tabula-icon-btn",
@@ -32546,7 +32639,7 @@ function FieldHeader({
         children: "\xB7\xB7\xB7"
       }
     ),
-    menuOpen && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    menuOpen && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       FieldHeaderMenu,
       {
         field,
@@ -32582,7 +32675,7 @@ function FieldHeader({
         }
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "div",
       {
         className: "tabula-col-resize",
@@ -32633,11 +32726,11 @@ function fieldTypeLabel(field) {
 }
 
 // src/ui/OptionManager.tsx
-var import_react9 = __toESM(require_react());
-var import_jsx_runtime11 = __toESM(require_jsx_runtime());
+var import_react10 = __toESM(require_react());
+var import_jsx_runtime12 = __toESM(require_jsx_runtime());
 function OptionManager({ field, onClose, onChange, onRemoveOption }) {
-  const [pendingDeleteId, setPendingDeleteId] = (0, import_react9.useState)(null);
-  (0, import_react9.useEffect)(() => {
+  const [pendingDeleteId, setPendingDeleteId] = (0, import_react10.useState)(null);
+  (0, import_react10.useEffect)(() => {
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
@@ -32670,7 +32763,7 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
     options[next] = tmp;
     onChange({ ...field, options });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
     "div",
     {
       className: "tabula-modal",
@@ -32678,16 +32771,16 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
       role: "dialog",
       "aria-label": "Manage options",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-modal-header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("h3", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-modal-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("h3", { children: [
             "Options \u2014 ",
             field.name
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "tabula-option-list", children: field.options.map((opt, index) => /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-option-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "tabula-option-list", children: field.options.map((opt, index) => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-option-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { className: `tabula-pill tabula-color-${opt.color}`, children: opt.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
             "input",
             {
               type: "text",
@@ -32695,17 +32788,17 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
               onChange: (e) => updateOption(opt.id, { name: e.target.value })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
             "select",
             {
               value: opt.color,
               onChange: (e) => updateOption(opt.id, {
                 color: e.target.value
               }),
-              children: SELECT_COLORS.map((c) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("option", { value: c, children: c }, c))
+              children: SELECT_COLORS.map((c) => /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("option", { value: c, children: c }, c))
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
             "button",
             {
               className: "tabula-btn tabula-icon-btn",
@@ -32715,7 +32808,7 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
               children: "\u2191"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
             "button",
             {
               className: "tabula-btn tabula-icon-btn",
@@ -32725,8 +32818,8 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
               children: "\u2193"
             }
           ),
-          pendingDeleteId === opt.id ? /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_jsx_runtime11.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+          pendingDeleteId === opt.id ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
               "button",
               {
                 className: "tabula-btn tabula-icon-btn is-danger",
@@ -32739,7 +32832,7 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
                 children: "\u2713"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
               "button",
               {
                 className: "tabula-btn tabula-icon-btn",
@@ -32749,7 +32842,7 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
                 children: "\u21A9"
               }
             )
-          ] }) : /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
             "button",
             {
               className: "tabula-btn tabula-icon-btn",
@@ -32760,15 +32853,15 @@ function OptionManager({ field, onClose, onChange, onRemoveOption }) {
             }
           )
         ] }, opt.id)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("button", { className: "tabula-btn", type: "button", onClick: addOption, children: "+ Add option" })
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("button", { className: "tabula-btn", type: "button", onClick: addOption, children: "+ Add option" })
       ]
     }
   ) });
 }
 
 // src/ui/SyncMenu.tsx
-var import_react10 = __toESM(require_react());
-var import_jsx_runtime12 = __toESM(require_jsx_runtime());
+var import_react11 = __toESM(require_react());
+var import_jsx_runtime13 = __toESM(require_jsx_runtime());
 function SyncMenu({
   linked,
   sync,
@@ -32779,9 +32872,9 @@ function SyncMenu({
   onPush,
   onUnlink
 }) {
-  const [open, setOpen] = (0, import_react10.useState)(false);
-  const ref = (0, import_react10.useRef)(null);
-  (0, import_react10.useEffect)(() => {
+  const [open, setOpen] = (0, import_react11.useState)(false);
+  const ref = (0, import_react11.useRef)(null);
+  (0, import_react11.useEffect)(() => {
     if (!open) return;
     const onDoc = (e) => {
       if (!ref.current?.contains(e.target)) setOpen(false);
@@ -32790,8 +32883,8 @@ function SyncMenu({
     return () => activeDocument.removeEventListener("mousedown", onDoc);
   }, [open]);
   const label = linked ? sync?.tableName ? `Sync \xB7 ${sync.tableName}` : "Sync \xB7 Linked" : "Sync";
-  return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-menu-select", ref, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-menu-select", ref, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
       "button",
       {
         type: "button",
@@ -32802,13 +32895,13 @@ function SyncMenu({
         title: hasToken ? linked ? "Airtable sync actions" : "Link this table to Airtable" : "Set an Airtable token in plugin settings first",
         children: [
           busy ? "Syncing\u2026" : label,
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { className: "tabula-menu-chevron", children: "\u25BE" })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "tabula-menu-chevron", children: "\u25BE" })
         ]
       }
     ),
-    open && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-menu-popover align-right", role: "menu", children: [
-      !hasToken && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "tabula-menu-hint", children: "Add a personal access token in Settings \u2192 Airtable Tabula." }),
-      hasToken && !linked && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+    open && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-menu-popover align-right", role: "menu", children: [
+      !hasToken && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "tabula-menu-hint", children: "Add a personal access token in Settings \u2192 Airtable Tabula." }),
+      hasToken && !linked && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "button",
         {
           type: "button",
@@ -32820,8 +32913,8 @@ function SyncMenu({
           children: "Link Airtable table\u2026"
         }
       ),
-      hasToken && linked && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+      hasToken && linked && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -32833,7 +32926,7 @@ function SyncMenu({
             children: "Pull from Airtable"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -32845,7 +32938,7 @@ function SyncMenu({
             children: "Push to Airtable"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -32857,7 +32950,7 @@ function SyncMenu({
             children: "Change link\u2026"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -32869,12 +32962,12 @@ function SyncMenu({
             children: "Unlink"
           }
         ),
-        (sync?.lastPulledAt || sync?.lastPushedAt) && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { className: "tabula-menu-hint", children: [
-          sync.lastPulledAt && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { children: [
+        (sync?.lastPulledAt || sync?.lastPushedAt) && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-menu-hint", children: [
+          sync.lastPulledAt && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { children: [
             "Pulled ",
             new Date(sync.lastPulledAt).toLocaleString()
           ] }),
-          sync.lastPushedAt && /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { children: [
+          sync.lastPushedAt && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { children: [
             "Pushed ",
             new Date(sync.lastPushedAt).toLocaleString()
           ] })
@@ -32885,26 +32978,26 @@ function SyncMenu({
 }
 
 // src/ui/LinkSyncModal.tsx
-var import_react11 = __toESM(require_react());
-var import_jsx_runtime13 = __toESM(require_jsx_runtime());
+var import_react12 = __toESM(require_react());
+var import_jsx_runtime14 = __toESM(require_jsx_runtime());
 function LinkSyncModal({ token, doc, onClose, onLinked }) {
-  const [bases, setBases] = (0, import_react11.useState)([]);
-  const [tables, setTables] = (0, import_react11.useState)([]);
-  const [baseId, setBaseId] = (0, import_react11.useState)(doc.sync?.baseId ?? "");
-  const [tableId, setTableId] = (0, import_react11.useState)(doc.sync?.tableId ?? "");
-  const [replaceSchema, setReplaceSchema] = (0, import_react11.useState)(!doc.fields.length || doc.rows.length === 0);
-  const [loading, setLoading] = (0, import_react11.useState)(true);
-  const [loadingTables, setLoadingTables] = (0, import_react11.useState)(false);
-  const [error2, setError] = (0, import_react11.useState)(null);
-  const [busy, setBusy] = (0, import_react11.useState)(false);
-  (0, import_react11.useEffect)(() => {
+  const [bases, setBases] = (0, import_react12.useState)([]);
+  const [tables, setTables] = (0, import_react12.useState)([]);
+  const [baseId, setBaseId] = (0, import_react12.useState)(doc.sync?.baseId ?? "");
+  const [tableId, setTableId] = (0, import_react12.useState)(doc.sync?.tableId ?? "");
+  const [replaceSchema, setReplaceSchema] = (0, import_react12.useState)(!doc.fields.length || doc.rows.length === 0);
+  const [loading, setLoading] = (0, import_react12.useState)(true);
+  const [loadingTables, setLoadingTables] = (0, import_react12.useState)(false);
+  const [error2, setError] = (0, import_react12.useState)(null);
+  const [busy, setBusy] = (0, import_react12.useState)(false);
+  (0, import_react12.useEffect)(() => {
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     let cancelled = false;
     void (async () => {
       try {
@@ -32925,7 +33018,7 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
       cancelled = true;
     };
   }, [token]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     if (!baseId) {
       setTables([]);
       return;
@@ -32978,7 +33071,7 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
       setBusy(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "tabula-modal-backdrop", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
     "div",
     {
       className: "tabula-modal",
@@ -32986,44 +33079,44 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
       role: "dialog",
       "aria-label": "Link Airtable table",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-modal-header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("h3", { children: "Link Airtable table" }),
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "tabula-modal-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("h3", { children: "Link Airtable table" }),
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("button", { className: "tabula-btn", type: "button", onClick: onClose, children: "Close" })
         ] }),
-        loading && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "tabula-muted", children: "Loading bases\u2026" }),
-        error2 && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "tabula-query-error", children: error2 }),
-        !loading && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tabula-sync-form", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "tabula-sync-field", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { children: "Base" }),
-            /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+        loading && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "tabula-muted", children: "Loading bases\u2026" }),
+        error2 && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "tabula-query-error", children: error2 }),
+        !loading && /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "tabula-sync-form", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { className: "tabula-sync-field", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { children: "Base" }),
+            /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
               "select",
               {
                 value: baseId,
                 onChange: (e) => setBaseId(e.target.value),
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: "", children: "Select base\u2026" }),
-                  bases.map((b) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: b.id, children: b.name }, b.id))
+                  /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("option", { value: "", children: "Select base\u2026" }),
+                  bases.map((b) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("option", { value: b.id, children: b.name }, b.id))
                 ]
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "tabula-sync-field", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { children: "Table" }),
-            /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { className: "tabula-sync-field", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { children: "Table" }),
+            /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
               "select",
               {
                 value: tableId,
                 onChange: (e) => setTableId(e.target.value),
                 disabled: !baseId || loadingTables,
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: "", children: loadingTables ? "Loading\u2026" : "Select table\u2026" }),
-                  tables.map((t) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("option", { value: t.id, children: t.name }, t.id))
+                  /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("option", { value: "", children: loadingTables ? "Loading\u2026" : "Select table\u2026" }),
+                  tables.map((t) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("option", { value: t.id, children: t.name }, t.id))
                 ]
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "tabula-check-label", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { className: "tabula-check-label", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
               "input",
               {
                 type: "checkbox",
@@ -33033,8 +33126,8 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
             ),
             "Replace local columns with Airtable schema (clears rows)"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "tabula-muted", children: "Fields are matched by name. Pull after linking to import records." }),
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "tabula-panel-header", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "tabula-muted", children: "Fields are matched by name. Pull after linking to import records." }),
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "tabula-panel-header", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
             "button",
             {
               className: "tabula-btn tabula-btn-primary",
@@ -33051,7 +33144,7 @@ function LinkSyncModal({ token, doc, onClose, onLinked }) {
 }
 
 // src/ui/TableApp.tsx
-var import_jsx_runtime14 = __toESM(require_jsx_runtime());
+var import_jsx_runtime15 = __toESM(require_jsx_runtime());
 function TableApp({
   doc,
   onChange,
@@ -33060,26 +33153,27 @@ function TableApp({
   airtableToken = "",
   showTopScrollbar = false
 }) {
-  const [showFilters, setShowFilters] = (0, import_react12.useState)(
+  const [showFilters, setShowFilters] = (0, import_react13.useState)(
     doc.view.filters.conditions.length > 0 || Boolean(doc.view.query)
   );
-  const [showSorts, setShowSorts] = (0, import_react12.useState)(doc.view.sorts.length > 0);
-  const [showHide, setShowHide] = (0, import_react12.useState)(false);
-  const [optionFieldId, setOptionFieldId] = (0, import_react12.useState)(null);
-  const [queryError, setQueryError] = (0, import_react12.useState)();
-  const [selectedRowId, setSelectedRowId] = (0, import_react12.useState)(null);
-  const [checkedRowIds, setCheckedRowIds] = (0, import_react12.useState)(() => /* @__PURE__ */ new Set());
-  const [showLinkModal, setShowLinkModal] = (0, import_react12.useState)(false);
-  const [syncBusy, setSyncBusy] = (0, import_react12.useState)(false);
-  const [pasteCandidate, setPasteCandidate] = (0, import_react12.useState)(null);
-  const groups = (0, import_react12.useMemo)(() => getGroupedRows(doc), [doc]);
+  const [showSorts, setShowSorts] = (0, import_react13.useState)(doc.view.sorts.length > 0);
+  const [showHide, setShowHide] = (0, import_react13.useState)(false);
+  const [optionFieldId, setOptionFieldId] = (0, import_react13.useState)(null);
+  const [queryError, setQueryError] = (0, import_react13.useState)();
+  const [selectedRowId, setSelectedRowId] = (0, import_react13.useState)(null);
+  const [checkedRowIds, setCheckedRowIds] = (0, import_react13.useState)(() => /* @__PURE__ */ new Set());
+  const [showLinkModal, setShowLinkModal] = (0, import_react13.useState)(false);
+  const [confirmDeleteCount, setConfirmDeleteCount] = (0, import_react13.useState)(null);
+  const [syncBusy, setSyncBusy] = (0, import_react13.useState)(false);
+  const [pasteCandidate, setPasteCandidate] = (0, import_react13.useState)(null);
+  const groups = (0, import_react13.useMemo)(() => getGroupedRows(doc), [doc]);
   const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
-  const visibleRowIds = (0, import_react12.useMemo)(
+  const visibleRowIds = (0, import_react13.useMemo)(
     () => groups.flatMap((g) => g.rows.map((r) => r.id)),
     [groups]
   );
   const allVisibleChecked = visibleRowIds.length > 0 && visibleRowIds.every((id) => checkedRowIds.has(id));
-  const toggleRowChecked = (0, import_react12.useCallback)((rowId) => {
+  const toggleRowChecked = (0, import_react13.useCallback)((rowId) => {
     setCheckedRowIds((prev) => {
       const next = new Set(prev);
       if (next.has(rowId)) next.delete(rowId);
@@ -33087,7 +33181,7 @@ function TableApp({
       return next;
     });
   }, []);
-  const setAllRowsChecked = (0, import_react12.useCallback)(
+  const setAllRowsChecked = (0, import_react13.useCallback)(
     (checked) => {
       setCheckedRowIds((prev) => {
         const next = new Set(prev);
@@ -33100,7 +33194,7 @@ function TableApp({
     },
     [visibleRowIds]
   );
-  (0, import_react12.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     setCheckedRowIds((prev) => {
       if (prev.size === 0) return prev;
       const live = new Set(doc.rows.map((r) => r.id));
@@ -33115,7 +33209,7 @@ function TableApp({
   }, [doc.rows]);
   const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
   const hasToken = Boolean(airtableToken.trim());
-  const requestClipboardPaste = (0, import_react12.useCallback)(() => {
+  const requestClipboardPaste = (0, import_react13.useCallback)(() => {
     void readSpreadsheetClipboard().then((payload) => {
       if (!payload) {
         new import_obsidian3.Notice("Clipboard has no CSV, XLSX, or spreadsheet cell data");
@@ -33127,7 +33221,7 @@ function TableApp({
       new import_obsidian3.Notice("Clipboard access was unavailable. Focus the table and press Ctrl/Cmd+V instead.");
     });
   }, []);
-  (0, import_react12.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     onRegisterClipboardPaste(requestClipboardPaste);
     return () => onRegisterClipboardPaste(null);
   }, [onRegisterClipboardPaste, requestClipboardPaste]);
@@ -33228,6 +33322,20 @@ function TableApp({
     });
     if (selectedRowId === rowId) setSelectedRowId(null);
   };
+  const deleteCheckedRows = (0, import_react13.useCallback)(() => {
+    const ids = [...checkedRowIds];
+    if (ids.length === 0) return;
+    const doomed = new Set(ids);
+    const recordMap = { ...doc.sync?.recordMap ?? {} };
+    for (const id of ids) delete recordMap[id];
+    updateDoc({
+      ...doc,
+      rows: doc.rows.filter((r) => !doomed.has(r.id)),
+      sync: doc.sync ? { ...doc.sync, recordMap } : doc.sync
+    });
+    if (selectedRowId && doomed.has(selectedRowId)) setSelectedRowId(null);
+    setCheckedRowIds(/* @__PURE__ */ new Set());
+  }, [checkedRowIds, doc, selectedRowId, updateDoc]);
   const addField = (type, atIndex) => {
     const field = createField(type);
     const fields = [...doc.fields];
@@ -33460,8 +33568,8 @@ function TableApp({
       setSyncBusy(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: `tabula-root height-${doc.view.rowHeight}`, onPaste: handlePaste, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: `tabula-root height-${doc.view.rowHeight}`, onPaste: handlePaste, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       Toolbar,
       {
         doc,
@@ -33469,7 +33577,9 @@ function TableApp({
         showFilters,
         showSorts,
         showHide,
-        syncControl: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        checkedCount: checkedRowIds.size,
+        onRequestDeleteSelected: () => setConfirmDeleteCount(checkedRowIds.size),
+        syncControl: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
           SyncMenu,
           {
             linked: Boolean(doc.sync),
@@ -33494,7 +33604,7 @@ function TableApp({
         onToggleFrozen: () => patchView({ frozenPrimary: !doc.view.frozenPrimary })
       }
     ),
-    showFilters && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    showFilters && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       FilterBar,
       {
         doc,
@@ -33503,15 +33613,15 @@ function TableApp({
         onFiltersChange: setFilters
       }
     ),
-    showSorts && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(SortBar, { doc, onChange: setSorts }),
-    showHide && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    showSorts && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(SortBar, { doc, onChange: setSorts }),
+    showHide && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       HideFieldsMenu,
       {
         doc,
         onChange: (hiddenFieldIds) => patchView({ hiddenFieldIds })
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       TableGrid,
       {
         doc,
@@ -33545,7 +33655,16 @@ function TableApp({
         onAddRow: addRow
       }
     ),
-    pasteCandidate && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    confirmDeleteCount !== null && confirmDeleteCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+      ConfirmModal,
+      {
+        count: confirmDeleteCount,
+        tableName: doc.name,
+        onConfirm: deleteCheckedRows,
+        onClose: () => setConfirmDeleteCount(null)
+      }
+    ),
+    pasteCandidate && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       PasteSpreadsheetModal,
       {
         matrix: pasteCandidate.matrix,
@@ -33557,7 +33676,7 @@ function TableApp({
         onCreateNew: createFromPaste
       }
     ),
-    optionField && (optionField.type === "singleSelect" || optionField.type === "multiSelect") && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    optionField && (optionField.type === "singleSelect" || optionField.type === "multiSelect") && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       OptionManager,
       {
         field: optionField,
@@ -33566,7 +33685,7 @@ function TableApp({
         onRemoveOption: (optionId) => removeOption(optionField.id, optionId)
       }
     ),
-    showLinkModal && hasToken && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    showLinkModal && hasToken && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       LinkSyncModal,
       {
         token: airtableToken.trim(),
@@ -33588,7 +33707,7 @@ function isSpreadsheetFile(file) {
 }
 
 // src/ui/TableFileApp.tsx
-var import_jsx_runtime15 = __toESM(require_jsx_runtime());
+var import_jsx_runtime16 = __toESM(require_jsx_runtime());
 function TableFileApp({
   file,
   onTableChange,
@@ -33601,28 +33720,28 @@ function TableFileApp({
   showTopScrollbar,
   stackedTableGap
 }) {
-  const [activeTableId, setActiveTableId] = (0, import_react13.useState)(file.tables[0]?.id ?? "");
-  const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react13.useState)(null);
-  const activeTableIdRef = (0, import_react13.useRef)(activeTableId);
-  const clipboardHandlers = (0, import_react13.useRef)(/* @__PURE__ */ new Map());
+  const [activeTableId, setActiveTableId] = (0, import_react14.useState)(file.tables[0]?.id ?? "");
+  const [stackedImportCandidate, setStackedImportCandidate] = (0, import_react14.useState)(null);
+  const activeTableIdRef = (0, import_react14.useRef)(activeTableId);
+  const clipboardHandlers = (0, import_react14.useRef)(/* @__PURE__ */ new Map());
   activeTableIdRef.current = activeTableId;
-  (0, import_react13.useEffect)(() => {
+  (0, import_react14.useEffect)(() => {
     if (!file.tables.some((entry) => entry.id === activeTableId)) {
       const nextId = file.tables[0]?.id ?? "";
       activeTableIdRef.current = nextId;
       setActiveTableId(nextId);
     }
   }, [activeTableId, file.tables]);
-  const dispatchClipboardPaste = (0, import_react13.useCallback)(() => {
+  const dispatchClipboardPaste = (0, import_react14.useCallback)(() => {
     const handler = clipboardHandlers.current.get(activeTableIdRef.current);
     if (handler) handler();
     else new import_obsidian4.Notice("Click inside a table before pasting from the ribbon");
   }, []);
-  (0, import_react13.useEffect)(() => {
+  (0, import_react14.useEffect)(() => {
     onRegisterClipboardPaste(dispatchClipboardPaste);
     return () => onRegisterClipboardPaste(null);
   }, [dispatchClipboardPaste, onRegisterClipboardPaste]);
-  const registerTableClipboardPaste = (0, import_react13.useCallback)(
+  const registerTableClipboardPaste = (0, import_react14.useCallback)(
     (tableId, handler) => {
       if (handler) clipboardHandlers.current.set(tableId, handler);
       else clipboardHandlers.current.delete(tableId);
@@ -33691,7 +33810,7 @@ function TableFileApp({
     onRemoveTable(tableId);
     new import_obsidian4.Notice(`Removed ${tableName || "table"}`);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
     "div",
     {
       className: `tabula-file-root ${file.tables.length === 1 ? "is-single-table" : ""}`,
@@ -33700,28 +33819,28 @@ function TableFileApp({
         "--tabula-stacked-table-divider-offset": `${-stackedTableGap / 2}px`
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-file-controls", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-file-count", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "tabula-file-controls", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "tabula-file-count", children: [
             file.tables.length,
             " ",
             file.tables.length === 1 ? "table" : "tables",
             " in this file"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: showAddTableMenu, children: "+ Add table" })
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: "tabula-btn tabula-btn-primary", type: "button", onClick: showAddTableMenu, children: "+ Add table" })
         ] }),
-        file.tables.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+        file.tables.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
           "section",
           {
             className: "tabula-file-table",
             onPointerDownCapture: () => setActiveTableId(entry.id),
             onFocusCapture: () => setActiveTableId(entry.id),
             children: [
-              file.tables.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tabula-table-section-header", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "tabula-table-section-title", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "tabula-table-section-index", children: [
+              file.tables.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "tabula-table-section-header", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "tabula-table-section-title", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "tabula-table-section-index", children: [
                   "Table ",
                   index + 1
                 ] }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
                   "button",
                   {
                     className: "tabula-btn tabula-btn-danger",
@@ -33737,7 +33856,7 @@ function TableFileApp({
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
                 TableApp,
                 {
                   doc: entry.table,
@@ -33752,7 +33871,7 @@ function TableFileApp({
           },
           entry.id
         )),
-        stackedImportCandidate && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        stackedImportCandidate && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
           PasteSpreadsheetModal,
           {
             mode: "stacked",
@@ -33770,11 +33889,11 @@ function TableFileApp({
 // src/ui/mount.tsx
 function mountTableFileApp(container, props) {
   const root = (0, import_client.createRoot)(container);
-  root.render((0, import_react14.createElement)(TableFileApp, props));
+  root.render((0, import_react15.createElement)(TableFileApp, props));
   return root;
 }
 function updateTableFileApp(root, props) {
-  root.render((0, import_react14.createElement)(TableFileApp, props));
+  root.render((0, import_react15.createElement)(TableFileApp, props));
 }
 
 // src/views/TableView.ts
