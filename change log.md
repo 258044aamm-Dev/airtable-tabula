@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.27] - 2026-10-05
+
+**DIAGNOSTIC BUILD — NOT A FIX.** v0.1.26 made the phone layout worse (the plugin page shrank from 246px to 40px). This release adds no functional change; it paints live measurements on screen so the failing device can finally be measured.
+
+### What it does
+Opening a table now draws a black panel across the top of the view with:
+
+- a large summary line — `VIEW <n>px  PAGE <n>px  FILL <n>%`
+- the measured height, position, CSS height, min-height, flex and overflow of the whole Obsidian ancestor chain and the whole plugin chain
+- a search for any element inside the view that is large and positioned (`fixed`/`absolute`/`sticky`) — a sibling overlay is invisible to both a parent walk and a child walk, and this is what the reported "overlay" could still turn out to be
+- the viewport height, `visualViewport` height, the table's row count, and which element currently has focus
+
+It re-measures on `focusin`, `focusout`, `resize`, `scroll` and `touchstart`, and every 400ms, so a screenshot taken *after* tapping a cell shows the state that matters rather than the state before.
+
+### Why it exists
+The desktop chain measures as completely healthy under v0.1.26 — `view-content` 688, `tabula-mount` 644, `tabula-file-root` 644, card 767 hugging its content, and the two stacked tables scroll correctly. The same build on the phone renders 40px of page background. Adding `flex: 1 1 auto` to `.view-content` should have made the mobile page *larger*; it made it smaller. That is the opposite of the prediction, which means the mobile chain is not the one that was modelled, and no desktop harness can tell me what it actually is.
+
+Also measured from the desktop probe: the file holds **two** stacked tables. `815 + 120 (stackedTableGap) + 767 = 1702px`, which is exactly the file root's `scrollHeight`. The stacked-table gap is real and present, but it is not what is being reported.
+
+The overlay will be removed in the next release once the phone measurements are in.
+
 ## [0.1.26] - 2026-10-05
 
 The real fix for "half the window is overlapped". v0.1.25 did not fix it; its diagnosis was wrong, and this release states the measured cause.

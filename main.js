@@ -13,8 +13,8 @@ var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name2 in all)
+    __defProp(target, name2, { get: all[name2], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -1009,10 +1009,10 @@ var require_react_development = __commonJS({
               get: function() {
                 return ownName;
               },
-              set: function(name) {
-                ownName = name;
+              set: function(name2) {
+                ownName = name2;
                 if (!render.name && !render.displayName) {
-                  render.displayName = name;
+                  render.displayName = name2;
                 }
               }
             });
@@ -1060,10 +1060,10 @@ var require_react_development = __commonJS({
               get: function() {
                 return ownName;
               },
-              set: function(name) {
-                ownName = name;
+              set: function(name2) {
+                ownName = name2;
                 if (!type.name && !type.displayName) {
-                  type.displayName = name;
+                  type.displayName = name2;
                 }
               }
             });
@@ -1231,7 +1231,7 @@ var require_react_development = __commonJS({
         }
         var ReactCurrentDispatcher$1 = ReactSharedInternals.ReactCurrentDispatcher;
         var prefix;
-        function describeBuiltInComponentFrame(name, source, ownerFn) {
+        function describeBuiltInComponentFrame(name2, source, ownerFn) {
           {
             if (prefix === void 0) {
               try {
@@ -1241,7 +1241,7 @@ var require_react_development = __commonJS({
                 prefix = match && match[1] || "";
               }
             }
-            return "\n" + prefix + name;
+            return "\n" + prefix + name2;
           }
         }
         var reentry = false;
@@ -1344,8 +1344,8 @@ var require_react_development = __commonJS({
             }
             Error.prepareStackTrace = previousPrepareStackTrace;
           }
-          var name = fn ? fn.displayName || fn.name : "";
-          var syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
+          var name2 = fn ? fn.displayName || fn.name : "";
+          var syntheticFrame = name2 ? describeBuiltInComponentFrame(name2) : "";
           {
             if (typeof fn === "function") {
               componentFrameCache.set(fn, syntheticFrame);
@@ -1460,9 +1460,9 @@ var require_react_development = __commonJS({
         }
         function getDeclarationErrorAddendum() {
           if (ReactCurrentOwner.current) {
-            var name = getComponentNameFromType(ReactCurrentOwner.current.type);
-            if (name) {
-              return "\n\nCheck the render method of `" + name + "`.";
+            var name2 = getComponentNameFromType(ReactCurrentOwner.current.type);
+            if (name2) {
+              return "\n\nCheck the render method of `" + name2 + "`.";
             }
           }
           return "";
@@ -1559,8 +1559,8 @@ var require_react_development = __commonJS({
               return;
             }
             if (propTypes) {
-              var name = getComponentNameFromType(type);
-              checkPropTypes(propTypes, element.props, "prop", name, element);
+              var name2 = getComponentNameFromType(type);
+              checkPropTypes(propTypes, element.props, "prop", name2, element);
             } else if (type.PropTypes !== void 0 && !propTypesMisspellWarningShown) {
               propTypesMisspellWarningShown = true;
               var _name = getComponentNameFromType(type);
@@ -2596,19 +2596,19 @@ var require_react_dom_development = __commonJS({
           }
           return false;
         }
-        function shouldIgnoreAttribute(name, propertyInfo, isCustomComponentTag) {
+        function shouldIgnoreAttribute(name2, propertyInfo, isCustomComponentTag) {
           if (propertyInfo !== null) {
             return propertyInfo.type === RESERVED;
           }
           if (isCustomComponentTag) {
             return false;
           }
-          if (name.length > 2 && (name[0] === "o" || name[0] === "O") && (name[1] === "n" || name[1] === "N")) {
+          if (name2.length > 2 && (name2[0] === "o" || name2[0] === "O") && (name2[1] === "n" || name2[1] === "N")) {
             return true;
           }
           return false;
         }
-        function shouldRemoveAttributeWithWarning(name, value, propertyInfo, isCustomComponentTag) {
+        function shouldRemoveAttributeWithWarning(name2, value, propertyInfo, isCustomComponentTag) {
           if (propertyInfo !== null && propertyInfo.type === RESERVED) {
             return false;
           }
@@ -2624,7 +2624,7 @@ var require_react_dom_development = __commonJS({
               if (propertyInfo !== null) {
                 return !propertyInfo.acceptsBooleans;
               } else {
-                var prefix2 = name.toLowerCase().slice(0, 5);
+                var prefix2 = name2.toLowerCase().slice(0, 5);
                 return prefix2 !== "data-" && prefix2 !== "aria-";
               }
             }
@@ -2632,11 +2632,11 @@ var require_react_dom_development = __commonJS({
               return false;
           }
         }
-        function shouldRemoveAttribute(name, value, propertyInfo, isCustomComponentTag) {
+        function shouldRemoveAttribute(name2, value, propertyInfo, isCustomComponentTag) {
           if (value === null || typeof value === "undefined") {
             return true;
           }
-          if (shouldRemoveAttributeWithWarning(name, value, propertyInfo, isCustomComponentTag)) {
+          if (shouldRemoveAttributeWithWarning(name2, value, propertyInfo, isCustomComponentTag)) {
             return true;
           }
           if (isCustomComponentTag) {
@@ -2656,15 +2656,15 @@ var require_react_dom_development = __commonJS({
           }
           return false;
         }
-        function getPropertyInfo(name) {
-          return properties.hasOwnProperty(name) ? properties[name] : null;
+        function getPropertyInfo(name2) {
+          return properties.hasOwnProperty(name2) ? properties[name2] : null;
         }
-        function PropertyInfoRecord(name, type, mustUseProperty, attributeName, attributeNamespace, sanitizeURL2, removeEmptyString) {
+        function PropertyInfoRecord(name2, type, mustUseProperty, attributeName, attributeNamespace, sanitizeURL2, removeEmptyString) {
           this.acceptsBooleans = type === BOOLEANISH_STRING || type === BOOLEAN || type === OVERLOADED_BOOLEAN;
           this.attributeName = attributeName;
           this.attributeNamespace = attributeNamespace;
           this.mustUseProperty = mustUseProperty;
-          this.propertyName = name;
+          this.propertyName = name2;
           this.type = type;
           this.sanitizeURL = sanitizeURL2;
           this.removeEmptyString = removeEmptyString;
@@ -2683,13 +2683,13 @@ var require_react_dom_development = __commonJS({
           "suppressHydrationWarning",
           "style"
         ];
-        reservedProps.forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        reservedProps.forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             RESERVED,
             false,
             // mustUseProperty
-            name,
+            name2,
             // attributeName
             null,
             // attributeNamespace
@@ -2699,9 +2699,9 @@ var require_react_dom_development = __commonJS({
           );
         });
         [["acceptCharset", "accept-charset"], ["className", "class"], ["htmlFor", "for"], ["httpEquiv", "http-equiv"]].forEach(function(_ref) {
-          var name = _ref[0], attributeName = _ref[1];
-          properties[name] = new PropertyInfoRecord(
-            name,
+          var name2 = _ref[0], attributeName = _ref[1];
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             STRING,
             false,
             // mustUseProperty
@@ -2714,13 +2714,13 @@ var require_react_dom_development = __commonJS({
             false
           );
         });
-        ["contentEditable", "draggable", "spellCheck", "value"].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ["contentEditable", "draggable", "spellCheck", "value"].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             BOOLEANISH_STRING,
             false,
             // mustUseProperty
-            name.toLowerCase(),
+            name2.toLowerCase(),
             // attributeName
             null,
             // attributeNamespace
@@ -2729,13 +2729,13 @@ var require_react_dom_development = __commonJS({
             false
           );
         });
-        ["autoReverse", "externalResourcesRequired", "focusable", "preserveAlpha"].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ["autoReverse", "externalResourcesRequired", "focusable", "preserveAlpha"].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             BOOLEANISH_STRING,
             false,
             // mustUseProperty
-            name,
+            name2,
             // attributeName
             null,
             // attributeNamespace
@@ -2771,13 +2771,13 @@ var require_react_dom_development = __commonJS({
           "seamless",
           // Microdata
           "itemScope"
-        ].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             BOOLEAN,
             false,
             // mustUseProperty
-            name.toLowerCase(),
+            name2.toLowerCase(),
             // attributeName
             null,
             // attributeNamespace
@@ -2796,13 +2796,13 @@ var require_react_dom_development = __commonJS({
           // NOTE: if you add a camelCased prop to this list,
           // you'll need to set attributeName to name.toLowerCase()
           // instead in the assignment below.
-        ].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             BOOLEAN,
             true,
             // mustUseProperty
-            name,
+            name2,
             // attributeName
             null,
             // attributeNamespace
@@ -2817,13 +2817,13 @@ var require_react_dom_development = __commonJS({
           // NOTE: if you add a camelCased prop to this list,
           // you'll need to set attributeName to name.toLowerCase()
           // instead in the assignment below.
-        ].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             OVERLOADED_BOOLEAN,
             false,
             // mustUseProperty
-            name,
+            name2,
             // attributeName
             null,
             // attributeNamespace
@@ -2840,13 +2840,13 @@ var require_react_dom_development = __commonJS({
           // NOTE: if you add a camelCased prop to this list,
           // you'll need to set attributeName to name.toLowerCase()
           // instead in the assignment below.
-        ].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             POSITIVE_NUMERIC,
             false,
             // mustUseProperty
-            name,
+            name2,
             // attributeName
             null,
             // attributeNamespace
@@ -2855,13 +2855,13 @@ var require_react_dom_development = __commonJS({
             false
           );
         });
-        ["rowSpan", "start"].forEach(function(name) {
-          properties[name] = new PropertyInfoRecord(
-            name,
+        ["rowSpan", "start"].forEach(function(name2) {
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             NUMERIC,
             false,
             // mustUseProperty
-            name.toLowerCase(),
+            name2.toLowerCase(),
             // attributeName
             null,
             // attributeNamespace
@@ -2952,9 +2952,9 @@ var require_react_dom_development = __commonJS({
           // you'll need to set attributeName to name.toLowerCase()
           // instead in the assignment below.
         ].forEach(function(attributeName) {
-          var name = attributeName.replace(CAMELIZE, capitalize);
-          properties[name] = new PropertyInfoRecord(
-            name,
+          var name2 = attributeName.replace(CAMELIZE, capitalize);
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             STRING,
             false,
             // mustUseProperty
@@ -2977,9 +2977,9 @@ var require_react_dom_development = __commonJS({
           // you'll need to set attributeName to name.toLowerCase()
           // instead in the assignment below.
         ].forEach(function(attributeName) {
-          var name = attributeName.replace(CAMELIZE, capitalize);
-          properties[name] = new PropertyInfoRecord(
-            name,
+          var name2 = attributeName.replace(CAMELIZE, capitalize);
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             STRING,
             false,
             // mustUseProperty
@@ -2998,9 +2998,9 @@ var require_react_dom_development = __commonJS({
           // you'll need to set attributeName to name.toLowerCase()
           // instead in the assignment below.
         ].forEach(function(attributeName) {
-          var name = attributeName.replace(CAMELIZE, capitalize);
-          properties[name] = new PropertyInfoRecord(
-            name,
+          var name2 = attributeName.replace(CAMELIZE, capitalize);
+          properties[name2] = new PropertyInfoRecord(
+            name2,
             STRING,
             false,
             // mustUseProperty
@@ -3063,14 +3063,14 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function getValueForProperty(node, name, expected, propertyInfo) {
+        function getValueForProperty(node, name2, expected, propertyInfo) {
           {
             if (propertyInfo.mustUseProperty) {
               var propertyName = propertyInfo.propertyName;
               return node[propertyName];
             } else {
               {
-                checkAttributeStringCoercion(expected, name);
+                checkAttributeStringCoercion(expected, name2);
               }
               if (propertyInfo.sanitizeURL) {
                 sanitizeURL("" + expected);
@@ -3083,7 +3083,7 @@ var require_react_dom_development = __commonJS({
                   if (value === "") {
                     return true;
                   }
-                  if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
+                  if (shouldRemoveAttribute(name2, expected, propertyInfo, false)) {
                     return value;
                   }
                   if (value === "" + expected) {
@@ -3092,7 +3092,7 @@ var require_react_dom_development = __commonJS({
                   return value;
                 }
               } else if (node.hasAttribute(attributeName)) {
-                if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
+                if (shouldRemoveAttribute(name2, expected, propertyInfo, false)) {
                   return node.getAttribute(attributeName);
                 }
                 if (propertyInfo.type === BOOLEAN) {
@@ -3100,7 +3100,7 @@ var require_react_dom_development = __commonJS({
                 }
                 stringValue = node.getAttribute(attributeName);
               }
-              if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
+              if (shouldRemoveAttribute(name2, expected, propertyInfo, false)) {
                 return stringValue === null ? expected : stringValue;
               } else if (stringValue === "" + expected) {
                 return expected;
@@ -3110,17 +3110,17 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function getValueForAttribute(node, name, expected, isCustomComponentTag) {
+        function getValueForAttribute(node, name2, expected, isCustomComponentTag) {
           {
-            if (!isAttributeNameSafe(name)) {
+            if (!isAttributeNameSafe(name2)) {
               return;
             }
-            if (!node.hasAttribute(name)) {
+            if (!node.hasAttribute(name2)) {
               return expected === void 0 ? void 0 : null;
             }
-            var value = node.getAttribute(name);
+            var value = node.getAttribute(name2);
             {
-              checkAttributeStringCoercion(expected, name);
+              checkAttributeStringCoercion(expected, name2);
             }
             if (value === "" + expected) {
               return expected;
@@ -3128,22 +3128,22 @@ var require_react_dom_development = __commonJS({
             return value;
           }
         }
-        function setValueForProperty(node, name, value, isCustomComponentTag) {
-          var propertyInfo = getPropertyInfo(name);
-          if (shouldIgnoreAttribute(name, propertyInfo, isCustomComponentTag)) {
+        function setValueForProperty(node, name2, value, isCustomComponentTag) {
+          var propertyInfo = getPropertyInfo(name2);
+          if (shouldIgnoreAttribute(name2, propertyInfo, isCustomComponentTag)) {
             return;
           }
-          if (shouldRemoveAttribute(name, value, propertyInfo, isCustomComponentTag)) {
+          if (shouldRemoveAttribute(name2, value, propertyInfo, isCustomComponentTag)) {
             value = null;
           }
           if (isCustomComponentTag || propertyInfo === null) {
-            if (isAttributeNameSafe(name)) {
-              var _attributeName = name;
+            if (isAttributeNameSafe(name2)) {
+              var _attributeName = name2;
               if (value === null) {
                 node.removeAttribute(_attributeName);
               } else {
                 {
-                  checkAttributeStringCoercion(value, name);
+                  checkAttributeStringCoercion(value, name2);
                 }
                 node.setAttribute(_attributeName, "" + value);
               }
@@ -3298,7 +3298,7 @@ var require_react_dom_development = __commonJS({
         }
         var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
         var prefix;
-        function describeBuiltInComponentFrame(name, source, ownerFn) {
+        function describeBuiltInComponentFrame(name2, source, ownerFn) {
           {
             if (prefix === void 0) {
               try {
@@ -3308,7 +3308,7 @@ var require_react_dom_development = __commonJS({
                 prefix = match && match[1] || "";
               }
             }
-            return "\n" + prefix + name;
+            return "\n" + prefix + name2;
           }
         }
         var reentry = false;
@@ -3411,8 +3411,8 @@ var require_react_dom_development = __commonJS({
             }
             Error.prepareStackTrace = previousPrepareStackTrace;
           }
-          var name = fn ? fn.displayName || fn.name : "";
-          var syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
+          var name2 = fn ? fn.displayName || fn.name : "";
+          var syntheticFrame = name2 ? describeBuiltInComponentFrame(name2) : "";
           {
             if (typeof fn === "function") {
               componentFrameCache.set(fn, syntheticFrame);
@@ -3940,16 +3940,16 @@ var require_react_dom_development = __commonJS({
               node.defaultValue = initialValue;
             }
           }
-          var name = node.name;
-          if (name !== "") {
+          var name2 = node.name;
+          if (name2 !== "") {
             node.name = "";
           }
           {
             node.defaultChecked = !node.defaultChecked;
             node.defaultChecked = !!node._wrapperState.initialChecked;
           }
-          if (name !== "") {
-            node.name = name;
+          if (name2 !== "") {
+            node.name = name2;
           }
         }
         function restoreControlledState(element, props) {
@@ -3958,16 +3958,16 @@ var require_react_dom_development = __commonJS({
           updateNamedCousins(node, props);
         }
         function updateNamedCousins(rootNode, props) {
-          var name = props.name;
-          if (props.type === "radio" && name != null) {
+          var name2 = props.name;
+          if (props.type === "radio" && name2 != null) {
             var queryRoot = rootNode;
             while (queryRoot.parentNode) {
               queryRoot = queryRoot.parentNode;
             }
             {
-              checkAttributeStringCoercion(name, "name");
+              checkAttributeStringCoercion(name2, "name");
             }
-            var group = queryRoot.querySelectorAll("input[name=" + JSON.stringify("" + name) + '][type="radio"]');
+            var group = queryRoot.querySelectorAll("input[name=" + JSON.stringify("" + name2) + '][type="radio"]');
             for (var i = 0; i < group.length; i++) {
               var otherNode = group[i];
               if (otherNode === rootNode || otherNode.form !== rootNode.form) {
@@ -4403,23 +4403,23 @@ var require_react_dom_development = __commonJS({
             isUnitlessNumber[prefixKey(prefix2, prop)] = isUnitlessNumber[prop];
           });
         });
-        function dangerousStyleValue(name, value, isCustomProperty) {
+        function dangerousStyleValue(name2, value, isCustomProperty) {
           var isEmpty = value == null || typeof value === "boolean" || value === "";
           if (isEmpty) {
             return "";
           }
-          if (!isCustomProperty && typeof value === "number" && value !== 0 && !(isUnitlessNumber.hasOwnProperty(name) && isUnitlessNumber[name])) {
+          if (!isCustomProperty && typeof value === "number" && value !== 0 && !(isUnitlessNumber.hasOwnProperty(name2) && isUnitlessNumber[name2])) {
             return value + "px";
           }
           {
-            checkCSSPropertyStringCoercion(value, name);
+            checkCSSPropertyStringCoercion(value, name2);
           }
           return ("" + value).trim();
         }
         var uppercasePattern = /([A-Z])/g;
         var msPattern = /^ms-/;
-        function hyphenateStyleName(name) {
-          return name.replace(uppercasePattern, "-$1").toLowerCase().replace(msPattern, "-ms-");
+        function hyphenateStyleName(name2) {
+          return name2.replace(uppercasePattern, "-$1").toLowerCase().replace(msPattern, "-ms-");
         }
         var warnValidStyle = function() {
         };
@@ -4437,61 +4437,61 @@ var require_react_dom_development = __commonJS({
               return character.toUpperCase();
             });
           };
-          var warnHyphenatedStyleName = function(name) {
-            if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
+          var warnHyphenatedStyleName = function(name2) {
+            if (warnedStyleNames.hasOwnProperty(name2) && warnedStyleNames[name2]) {
               return;
             }
-            warnedStyleNames[name] = true;
+            warnedStyleNames[name2] = true;
             error2(
               "Unsupported style property %s. Did you mean %s?",
-              name,
+              name2,
               // As Andi Smith suggests
               // (http://www.andismith.com/blog/2012/02/modernizr-prefixed/), an `-ms` prefix
               // is converted to lowercase `ms`.
-              camelize(name.replace(msPattern$1, "ms-"))
+              camelize(name2.replace(msPattern$1, "ms-"))
             );
           };
-          var warnBadVendoredStyleName = function(name) {
-            if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
+          var warnBadVendoredStyleName = function(name2) {
+            if (warnedStyleNames.hasOwnProperty(name2) && warnedStyleNames[name2]) {
               return;
             }
-            warnedStyleNames[name] = true;
-            error2("Unsupported vendor-prefixed style property %s. Did you mean %s?", name, name.charAt(0).toUpperCase() + name.slice(1));
+            warnedStyleNames[name2] = true;
+            error2("Unsupported vendor-prefixed style property %s. Did you mean %s?", name2, name2.charAt(0).toUpperCase() + name2.slice(1));
           };
-          var warnStyleValueWithSemicolon = function(name, value) {
+          var warnStyleValueWithSemicolon = function(name2, value) {
             if (warnedStyleValues.hasOwnProperty(value) && warnedStyleValues[value]) {
               return;
             }
             warnedStyleValues[value] = true;
-            error2(`Style property values shouldn't contain a semicolon. Try "%s: %s" instead.`, name, value.replace(badStyleValueWithSemicolonPattern, ""));
+            error2(`Style property values shouldn't contain a semicolon. Try "%s: %s" instead.`, name2, value.replace(badStyleValueWithSemicolonPattern, ""));
           };
-          var warnStyleValueIsNaN = function(name, value) {
+          var warnStyleValueIsNaN = function(name2, value) {
             if (warnedForNaNValue) {
               return;
             }
             warnedForNaNValue = true;
-            error2("`NaN` is an invalid value for the `%s` css style property.", name);
+            error2("`NaN` is an invalid value for the `%s` css style property.", name2);
           };
-          var warnStyleValueIsInfinity = function(name, value) {
+          var warnStyleValueIsInfinity = function(name2, value) {
             if (warnedForInfinityValue) {
               return;
             }
             warnedForInfinityValue = true;
-            error2("`Infinity` is an invalid value for the `%s` css style property.", name);
+            error2("`Infinity` is an invalid value for the `%s` css style property.", name2);
           };
-          warnValidStyle = function(name, value) {
-            if (name.indexOf("-") > -1) {
-              warnHyphenatedStyleName(name);
-            } else if (badVendoredStyleNamePattern.test(name)) {
-              warnBadVendoredStyleName(name);
+          warnValidStyle = function(name2, value) {
+            if (name2.indexOf("-") > -1) {
+              warnHyphenatedStyleName(name2);
+            } else if (badVendoredStyleNamePattern.test(name2)) {
+              warnBadVendoredStyleName(name2);
             } else if (badStyleValueWithSemicolonPattern.test(value)) {
-              warnStyleValueWithSemicolon(name, value);
+              warnStyleValueWithSemicolon(name2, value);
             }
             if (typeof value === "number") {
               if (isNaN(value)) {
-                warnStyleValueIsNaN(name, value);
+                warnStyleValueIsNaN(name2, value);
               } else if (!isFinite(value)) {
-                warnStyleValueIsInfinity(name, value);
+                warnStyleValueIsInfinity(name2, value);
               }
             }
           };
@@ -5195,35 +5195,35 @@ var require_react_dom_development = __commonJS({
         var warnedProperties = {};
         var rARIA = new RegExp("^(aria)-[" + ATTRIBUTE_NAME_CHAR + "]*$");
         var rARIACamel = new RegExp("^(aria)[A-Z][" + ATTRIBUTE_NAME_CHAR + "]*$");
-        function validateProperty(tagName, name) {
+        function validateProperty(tagName, name2) {
           {
-            if (hasOwnProperty2.call(warnedProperties, name) && warnedProperties[name]) {
+            if (hasOwnProperty2.call(warnedProperties, name2) && warnedProperties[name2]) {
               return true;
             }
-            if (rARIACamel.test(name)) {
-              var ariaName = "aria-" + name.slice(4).toLowerCase();
+            if (rARIACamel.test(name2)) {
+              var ariaName = "aria-" + name2.slice(4).toLowerCase();
               var correctName = ariaProperties.hasOwnProperty(ariaName) ? ariaName : null;
               if (correctName == null) {
-                error2("Invalid ARIA attribute `%s`. ARIA attributes follow the pattern aria-* and must be lowercase.", name);
-                warnedProperties[name] = true;
+                error2("Invalid ARIA attribute `%s`. ARIA attributes follow the pattern aria-* and must be lowercase.", name2);
+                warnedProperties[name2] = true;
                 return true;
               }
-              if (name !== correctName) {
-                error2("Invalid ARIA attribute `%s`. Did you mean `%s`?", name, correctName);
-                warnedProperties[name] = true;
+              if (name2 !== correctName) {
+                error2("Invalid ARIA attribute `%s`. Did you mean `%s`?", name2, correctName);
+                warnedProperties[name2] = true;
                 return true;
               }
             }
-            if (rARIA.test(name)) {
-              var lowerCasedName = name.toLowerCase();
+            if (rARIA.test(name2)) {
+              var lowerCasedName = name2.toLowerCase();
               var standardName = ariaProperties.hasOwnProperty(lowerCasedName) ? lowerCasedName : null;
               if (standardName == null) {
-                warnedProperties[name] = true;
+                warnedProperties[name2] = true;
                 return false;
               }
-              if (name !== standardName) {
-                error2("Unknown ARIA attribute `%s`. Did you mean `%s`?", name, standardName);
-                warnedProperties[name] = true;
+              if (name2 !== standardName) {
+                error2("Unknown ARIA attribute `%s`. Did you mean `%s`?", name2, standardName);
+                warnedProperties[name2] = true;
                 return true;
               }
             }
@@ -5279,95 +5279,95 @@ var require_react_dom_development = __commonJS({
           var INVALID_EVENT_NAME_REGEX = /^on[^A-Z]/;
           var rARIA$1 = new RegExp("^(aria)-[" + ATTRIBUTE_NAME_CHAR + "]*$");
           var rARIACamel$1 = new RegExp("^(aria)[A-Z][" + ATTRIBUTE_NAME_CHAR + "]*$");
-          validateProperty$1 = function(tagName, name, value, eventRegistry) {
-            if (hasOwnProperty2.call(warnedProperties$1, name) && warnedProperties$1[name]) {
+          validateProperty$1 = function(tagName, name2, value, eventRegistry) {
+            if (hasOwnProperty2.call(warnedProperties$1, name2) && warnedProperties$1[name2]) {
               return true;
             }
-            var lowerCasedName = name.toLowerCase();
+            var lowerCasedName = name2.toLowerCase();
             if (lowerCasedName === "onfocusin" || lowerCasedName === "onfocusout") {
               error2("React uses onFocus and onBlur instead of onFocusIn and onFocusOut. All React events are normalized to bubble, so onFocusIn and onFocusOut are not needed/supported by React.");
-              warnedProperties$1[name] = true;
+              warnedProperties$1[name2] = true;
               return true;
             }
             if (eventRegistry != null) {
               var registrationNameDependencies2 = eventRegistry.registrationNameDependencies, possibleRegistrationNames2 = eventRegistry.possibleRegistrationNames;
-              if (registrationNameDependencies2.hasOwnProperty(name)) {
+              if (registrationNameDependencies2.hasOwnProperty(name2)) {
                 return true;
               }
               var registrationName = possibleRegistrationNames2.hasOwnProperty(lowerCasedName) ? possibleRegistrationNames2[lowerCasedName] : null;
               if (registrationName != null) {
-                error2("Invalid event handler property `%s`. Did you mean `%s`?", name, registrationName);
-                warnedProperties$1[name] = true;
+                error2("Invalid event handler property `%s`. Did you mean `%s`?", name2, registrationName);
+                warnedProperties$1[name2] = true;
                 return true;
               }
-              if (EVENT_NAME_REGEX.test(name)) {
-                error2("Unknown event handler property `%s`. It will be ignored.", name);
-                warnedProperties$1[name] = true;
+              if (EVENT_NAME_REGEX.test(name2)) {
+                error2("Unknown event handler property `%s`. It will be ignored.", name2);
+                warnedProperties$1[name2] = true;
                 return true;
               }
-            } else if (EVENT_NAME_REGEX.test(name)) {
-              if (INVALID_EVENT_NAME_REGEX.test(name)) {
-                error2("Invalid event handler property `%s`. React events use the camelCase naming convention, for example `onClick`.", name);
+            } else if (EVENT_NAME_REGEX.test(name2)) {
+              if (INVALID_EVENT_NAME_REGEX.test(name2)) {
+                error2("Invalid event handler property `%s`. React events use the camelCase naming convention, for example `onClick`.", name2);
               }
-              warnedProperties$1[name] = true;
+              warnedProperties$1[name2] = true;
               return true;
             }
-            if (rARIA$1.test(name) || rARIACamel$1.test(name)) {
+            if (rARIA$1.test(name2) || rARIACamel$1.test(name2)) {
               return true;
             }
             if (lowerCasedName === "innerhtml") {
               error2("Directly setting property `innerHTML` is not permitted. For more information, lookup documentation on `dangerouslySetInnerHTML`.");
-              warnedProperties$1[name] = true;
+              warnedProperties$1[name2] = true;
               return true;
             }
             if (lowerCasedName === "aria") {
               error2("The `aria` attribute is reserved for future use in React. Pass individual `aria-` attributes instead.");
-              warnedProperties$1[name] = true;
+              warnedProperties$1[name2] = true;
               return true;
             }
             if (lowerCasedName === "is" && value !== null && value !== void 0 && typeof value !== "string") {
               error2("Received a `%s` for a string attribute `is`. If this is expected, cast the value to a string.", typeof value);
-              warnedProperties$1[name] = true;
+              warnedProperties$1[name2] = true;
               return true;
             }
             if (typeof value === "number" && isNaN(value)) {
-              error2("Received NaN for the `%s` attribute. If this is expected, cast the value to a string.", name);
-              warnedProperties$1[name] = true;
+              error2("Received NaN for the `%s` attribute. If this is expected, cast the value to a string.", name2);
+              warnedProperties$1[name2] = true;
               return true;
             }
-            var propertyInfo = getPropertyInfo(name);
+            var propertyInfo = getPropertyInfo(name2);
             var isReserved = propertyInfo !== null && propertyInfo.type === RESERVED;
             if (possibleStandardNames.hasOwnProperty(lowerCasedName)) {
               var standardName = possibleStandardNames[lowerCasedName];
-              if (standardName !== name) {
-                error2("Invalid DOM property `%s`. Did you mean `%s`?", name, standardName);
-                warnedProperties$1[name] = true;
+              if (standardName !== name2) {
+                error2("Invalid DOM property `%s`. Did you mean `%s`?", name2, standardName);
+                warnedProperties$1[name2] = true;
                 return true;
               }
-            } else if (!isReserved && name !== lowerCasedName) {
-              error2("React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.", name, lowerCasedName);
-              warnedProperties$1[name] = true;
+            } else if (!isReserved && name2 !== lowerCasedName) {
+              error2("React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.", name2, lowerCasedName);
+              warnedProperties$1[name2] = true;
               return true;
             }
-            if (typeof value === "boolean" && shouldRemoveAttributeWithWarning(name, value, propertyInfo, false)) {
+            if (typeof value === "boolean" && shouldRemoveAttributeWithWarning(name2, value, propertyInfo, false)) {
               if (value) {
-                error2('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.', value, name, name, value, name);
+                error2('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.', value, name2, name2, value, name2);
               } else {
-                error2('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.\n\nIf you used to conditionally omit it with %s={condition && value}, pass %s={condition ? value : undefined} instead.', value, name, name, value, name, name, name);
+                error2('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.\n\nIf you used to conditionally omit it with %s={condition && value}, pass %s={condition ? value : undefined} instead.', value, name2, name2, value, name2, name2, name2);
               }
-              warnedProperties$1[name] = true;
+              warnedProperties$1[name2] = true;
               return true;
             }
             if (isReserved) {
               return true;
             }
-            if (shouldRemoveAttributeWithWarning(name, value, propertyInfo, false)) {
-              warnedProperties$1[name] = true;
+            if (shouldRemoveAttributeWithWarning(name2, value, propertyInfo, false)) {
+              warnedProperties$1[name2] = true;
               return false;
             }
             if ((value === "false" || value === "true") && propertyInfo !== null && propertyInfo.type === BOOLEAN) {
-              error2("Received the string `%s` for the boolean attribute `%s`. %s Did you mean %s={%s}?", value, name, value === "false" ? "The browser will interpret it as a truthy value." : 'Although this works, it will not work as expected if you pass the string "false".', name, value);
-              warnedProperties$1[name] = true;
+              error2("Received the string `%s` for the boolean attribute `%s`. %s Did you mean %s={%s}?", value, name2, value === "false" ? "The browser will interpret it as a truthy value." : 'Although this works, it will not work as expected if you pass the string "false".', name2, value);
+              warnedProperties$1[name2] = true;
               return true;
             }
             return true;
@@ -5510,8 +5510,8 @@ var require_react_dom_development = __commonJS({
         function isInteractive(tag) {
           return tag === "button" || tag === "input" || tag === "select" || tag === "textarea";
         }
-        function shouldPreventMouseEvent(name, type, props) {
-          switch (name) {
+        function shouldPreventMouseEvent(name2, type, props) {
+          switch (name2) {
             case "onClick":
             case "onClickCapture":
             case "onDoubleClick":
@@ -5561,7 +5561,7 @@ var require_react_dom_development = __commonJS({
             passiveBrowserEventsSupported = false;
           }
         }
-        function invokeGuardedCallbackProd(name, func, context, a, b, c, d, e, f) {
+        function invokeGuardedCallbackProd(name2, func, context, a, b, c, d, e, f) {
           var funcArgs = Array.prototype.slice.call(arguments, 3);
           try {
             func.apply(context, funcArgs);
@@ -5573,7 +5573,7 @@ var require_react_dom_development = __commonJS({
         {
           if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof document !== "undefined" && typeof document.createEvent === "function") {
             var fakeNode = document.createElement("react");
-            invokeGuardedCallbackImpl = function invokeGuardedCallbackDev(name, func, context, a, b, c, d, e, f) {
+            invokeGuardedCallbackImpl = function invokeGuardedCallbackDev(name2, func, context, a, b, c, d, e, f) {
               if (typeof document === "undefined" || document === null) {
                 throw new Error("The `document` global was defined when React was initialized, but is not defined anymore. This can happen in a test environment if a component schedules an update from an asynchronous callback, but the test has already finished running. To solve this, you can either unmount the component at the end of your test (and ensure that any asynchronous operations get canceled in `componentWillUnmount`), or you can change the test itself to be asynchronous.");
               }
@@ -5613,7 +5613,7 @@ var require_react_dom_development = __commonJS({
                   }
                 }
               }
-              var evtType = "react-" + (name ? name : "invokeguardedcallback");
+              var evtType = "react-" + (name2 ? name2 : "invokeguardedcallback");
               window.addEventListener("error", handleWindowError);
               fakeNode.addEventListener(evtType, callCallback2, false);
               evt.initEvent(evtType, false, false);
@@ -5648,12 +5648,12 @@ var require_react_dom_development = __commonJS({
             caughtError = error3;
           }
         };
-        function invokeGuardedCallback(name, func, context, a, b, c, d, e, f) {
+        function invokeGuardedCallback(name2, func, context, a, b, c, d, e, f) {
           hasError = false;
           caughtError = null;
           invokeGuardedCallbackImpl$1.apply(reporter, arguments);
         }
-        function invokeGuardedCallbackAndCatchFirstError(name, func, context, a, b, c, d, e, f) {
+        function invokeGuardedCallbackAndCatchFirstError(name2, func, context, a, b, c, d, e, f) {
           invokeGuardedCallback.apply(this, arguments);
           if (hasError) {
             var error3 = clearCaughtError();
@@ -9314,8 +9314,8 @@ var require_react_dom_development = __commonJS({
             }
             didWarnInvalidHydration = true;
             var names = [];
-            attributeNames.forEach(function(name) {
-              names.push(name);
+            attributeNames.forEach(function(name2) {
+              names.push(name2);
             });
             error2("Extra attributes from the server: %s", names);
           };
@@ -9781,8 +9781,8 @@ var require_react_dom_development = __commonJS({
             extraAttributeNames = /* @__PURE__ */ new Set();
             var attributes = domElement.attributes;
             for (var _i = 0; _i < attributes.length; _i++) {
-              var name = attributes[_i].name.toLowerCase();
-              switch (name) {
+              var name2 = attributes[_i].name.toLowerCase();
+              switch (name2) {
                 // Controlled attributes are not validated
                 // TODO: Only ignore them on controlled tags.
                 case "value":
@@ -10925,8 +10925,8 @@ var require_react_dom_development = __commonJS({
               context[key] = unmaskedContext[key];
             }
             {
-              var name = getComponentNameFromFiber(workInProgress2) || "Unknown";
-              checkPropTypes(contextTypes, context, "context", name);
+              var name2 = getComponentNameFromFiber(workInProgress2) || "Unknown";
+              checkPropTypes(contextTypes, context, "context", name2);
             }
             if (instance) {
               cacheContext(workInProgress2, unmaskedContext, context);
@@ -10987,8 +10987,8 @@ var require_react_dom_development = __commonJS({
               }
             }
             {
-              var name = getComponentNameFromFiber(fiber) || "Unknown";
-              checkPropTypes(childContextTypes, childContext, "child context", name);
+              var name2 = getComponentNameFromFiber(fiber) || "Unknown";
+              checkPropTypes(childContextTypes, childContext, "child context", name2);
             }
             return assign({}, parentContext, childContext);
           }
@@ -13314,8 +13314,8 @@ var require_react_dom_development = __commonJS({
             return true;
           }
         }
-        function findFirstSuspended(row) {
-          var node = row;
+        function findFirstSuspended(row2) {
+          var node = row2;
           while (node !== null) {
             if (node.tag === SuspenseComponent) {
               var state = node.memoizedState;
@@ -13337,11 +13337,11 @@ var require_react_dom_development = __commonJS({
               node = node.child;
               continue;
             }
-            if (node === row) {
+            if (node === row2) {
               return null;
             }
             while (node.sibling === null) {
-              if (node.return === null || node.return === row) {
+              if (node.return === null || node.return === row2) {
                 return null;
               }
               node = node.return;
@@ -13448,12 +13448,12 @@ var require_react_dom_development = __commonJS({
                 for (var i = 0; i <= hookTypesUpdateIndexDev; i++) {
                   var oldHookName = hookTypesDev[i];
                   var newHookName = i === hookTypesUpdateIndexDev ? currentHookName : oldHookName;
-                  var row = i + 1 + ". " + oldHookName;
-                  while (row.length < secondColumnStart) {
-                    row += " ";
+                  var row2 = i + 1 + ". " + oldHookName;
+                  while (row2.length < secondColumnStart) {
+                    row2 += " ";
                   }
-                  row += newHookName + "\n";
-                  table += row;
+                  row2 += newHookName + "\n";
+                  table += row2;
                 }
                 error2("React has detected a change in the order of Hooks called by %s. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://reactjs.org/link/rules-of-hooks\n\n   Previous render            Next render\n   ------------------------------------------------------\n%s   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n", componentName, table);
               }
@@ -15505,92 +15505,92 @@ var require_react_dom_development = __commonJS({
         function checkClassInstance(workInProgress2, ctor, newProps) {
           var instance = workInProgress2.stateNode;
           {
-            var name = getComponentNameFromType(ctor) || "Component";
+            var name2 = getComponentNameFromType(ctor) || "Component";
             var renderPresent = instance.render;
             if (!renderPresent) {
               if (ctor.prototype && typeof ctor.prototype.render === "function") {
-                error2("%s(...): No `render` method found on the returned component instance: did you accidentally return an object from the constructor?", name);
+                error2("%s(...): No `render` method found on the returned component instance: did you accidentally return an object from the constructor?", name2);
               } else {
-                error2("%s(...): No `render` method found on the returned component instance: you may have forgotten to define `render`.", name);
+                error2("%s(...): No `render` method found on the returned component instance: you may have forgotten to define `render`.", name2);
               }
             }
             if (instance.getInitialState && !instance.getInitialState.isReactClassApproved && !instance.state) {
-              error2("getInitialState was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Did you mean to define a state property instead?", name);
+              error2("getInitialState was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Did you mean to define a state property instead?", name2);
             }
             if (instance.getDefaultProps && !instance.getDefaultProps.isReactClassApproved) {
-              error2("getDefaultProps was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Use a static property to define defaultProps instead.", name);
+              error2("getDefaultProps was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Use a static property to define defaultProps instead.", name2);
             }
             if (instance.propTypes) {
-              error2("propTypes was defined as an instance property on %s. Use a static property to define propTypes instead.", name);
+              error2("propTypes was defined as an instance property on %s. Use a static property to define propTypes instead.", name2);
             }
             if (instance.contextType) {
-              error2("contextType was defined as an instance property on %s. Use a static property to define contextType instead.", name);
+              error2("contextType was defined as an instance property on %s. Use a static property to define contextType instead.", name2);
             }
             {
               if (ctor.childContextTypes && !didWarnAboutLegacyContext$1.has(ctor) && // Strict Mode has its own warning for legacy context, so we can skip
               // this one.
               (workInProgress2.mode & StrictLegacyMode) === NoMode) {
                 didWarnAboutLegacyContext$1.add(ctor);
-                error2("%s uses the legacy childContextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext() instead\n\n.Learn more about this warning here: https://reactjs.org/link/legacy-context", name);
+                error2("%s uses the legacy childContextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext() instead\n\n.Learn more about this warning here: https://reactjs.org/link/legacy-context", name2);
               }
               if (ctor.contextTypes && !didWarnAboutLegacyContext$1.has(ctor) && // Strict Mode has its own warning for legacy context, so we can skip
               // this one.
               (workInProgress2.mode & StrictLegacyMode) === NoMode) {
                 didWarnAboutLegacyContext$1.add(ctor);
-                error2("%s uses the legacy contextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext() with static contextType instead.\n\nLearn more about this warning here: https://reactjs.org/link/legacy-context", name);
+                error2("%s uses the legacy contextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext() with static contextType instead.\n\nLearn more about this warning here: https://reactjs.org/link/legacy-context", name2);
               }
               if (instance.contextTypes) {
-                error2("contextTypes was defined as an instance property on %s. Use a static property to define contextTypes instead.", name);
+                error2("contextTypes was defined as an instance property on %s. Use a static property to define contextTypes instead.", name2);
               }
               if (ctor.contextType && ctor.contextTypes && !didWarnAboutContextTypeAndContextTypes.has(ctor)) {
                 didWarnAboutContextTypeAndContextTypes.add(ctor);
-                error2("%s declares both contextTypes and contextType static properties. The legacy contextTypes property will be ignored.", name);
+                error2("%s declares both contextTypes and contextType static properties. The legacy contextTypes property will be ignored.", name2);
               }
             }
             if (typeof instance.componentShouldUpdate === "function") {
-              error2("%s has a method called componentShouldUpdate(). Did you mean shouldComponentUpdate()? The name is phrased as a question because the function is expected to return a value.", name);
+              error2("%s has a method called componentShouldUpdate(). Did you mean shouldComponentUpdate()? The name is phrased as a question because the function is expected to return a value.", name2);
             }
             if (ctor.prototype && ctor.prototype.isPureReactComponent && typeof instance.shouldComponentUpdate !== "undefined") {
               error2("%s has a method called shouldComponentUpdate(). shouldComponentUpdate should not be used when extending React.PureComponent. Please extend React.Component if shouldComponentUpdate is used.", getComponentNameFromType(ctor) || "A pure component");
             }
             if (typeof instance.componentDidUnmount === "function") {
-              error2("%s has a method called componentDidUnmount(). But there is no such lifecycle method. Did you mean componentWillUnmount()?", name);
+              error2("%s has a method called componentDidUnmount(). But there is no such lifecycle method. Did you mean componentWillUnmount()?", name2);
             }
             if (typeof instance.componentDidReceiveProps === "function") {
-              error2("%s has a method called componentDidReceiveProps(). But there is no such lifecycle method. If you meant to update the state in response to changing props, use componentWillReceiveProps(). If you meant to fetch data or run side-effects or mutations after React has updated the UI, use componentDidUpdate().", name);
+              error2("%s has a method called componentDidReceiveProps(). But there is no such lifecycle method. If you meant to update the state in response to changing props, use componentWillReceiveProps(). If you meant to fetch data or run side-effects or mutations after React has updated the UI, use componentDidUpdate().", name2);
             }
             if (typeof instance.componentWillRecieveProps === "function") {
-              error2("%s has a method called componentWillRecieveProps(). Did you mean componentWillReceiveProps()?", name);
+              error2("%s has a method called componentWillRecieveProps(). Did you mean componentWillReceiveProps()?", name2);
             }
             if (typeof instance.UNSAFE_componentWillRecieveProps === "function") {
-              error2("%s has a method called UNSAFE_componentWillRecieveProps(). Did you mean UNSAFE_componentWillReceiveProps()?", name);
+              error2("%s has a method called UNSAFE_componentWillRecieveProps(). Did you mean UNSAFE_componentWillReceiveProps()?", name2);
             }
             var hasMutatedProps = instance.props !== newProps;
             if (instance.props !== void 0 && hasMutatedProps) {
-              error2("%s(...): When calling super() in `%s`, make sure to pass up the same props that your component's constructor was passed.", name, name);
+              error2("%s(...): When calling super() in `%s`, make sure to pass up the same props that your component's constructor was passed.", name2, name2);
             }
             if (instance.defaultProps) {
-              error2("Setting defaultProps as an instance property on %s is not supported and will be ignored. Instead, define defaultProps as a static property on %s.", name, name);
+              error2("Setting defaultProps as an instance property on %s is not supported and will be ignored. Instead, define defaultProps as a static property on %s.", name2, name2);
             }
             if (typeof instance.getSnapshotBeforeUpdate === "function" && typeof instance.componentDidUpdate !== "function" && !didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate.has(ctor)) {
               didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate.add(ctor);
               error2("%s: getSnapshotBeforeUpdate() should be used with componentDidUpdate(). This component defines getSnapshotBeforeUpdate() only.", getComponentNameFromType(ctor));
             }
             if (typeof instance.getDerivedStateFromProps === "function") {
-              error2("%s: getDerivedStateFromProps() is defined as an instance method and will be ignored. Instead, declare it as a static method.", name);
+              error2("%s: getDerivedStateFromProps() is defined as an instance method and will be ignored. Instead, declare it as a static method.", name2);
             }
             if (typeof instance.getDerivedStateFromError === "function") {
-              error2("%s: getDerivedStateFromError() is defined as an instance method and will be ignored. Instead, declare it as a static method.", name);
+              error2("%s: getDerivedStateFromError() is defined as an instance method and will be ignored. Instead, declare it as a static method.", name2);
             }
             if (typeof ctor.getSnapshotBeforeUpdate === "function") {
-              error2("%s: getSnapshotBeforeUpdate() is defined as a static method and will be ignored. Instead, declare it as an instance method.", name);
+              error2("%s: getSnapshotBeforeUpdate() is defined as a static method and will be ignored. Instead, declare it as an instance method.", name2);
             }
             var _state = instance.state;
             if (_state && (typeof _state !== "object" || isArray(_state))) {
-              error2("%s.state: must be set to an object or null", name);
+              error2("%s.state: must be set to an object or null", name2);
             }
             if (typeof instance.getChildContext === "function" && typeof ctor.childContextTypes !== "object") {
-              error2("%s.getChildContext(): childContextTypes must be defined in order to use getChildContext().", name);
+              error2("%s.getChildContext(): childContextTypes must be defined in order to use getChildContext().", name2);
             }
           }
         }
@@ -17377,14 +17377,14 @@ var require_react_dom_development = __commonJS({
           }
         }
         function findLastContentRow(firstChild) {
-          var row = firstChild;
+          var row2 = firstChild;
           var lastContentRow = null;
-          while (row !== null) {
-            var currentRow = row.alternate;
+          while (row2 !== null) {
+            var currentRow = row2.alternate;
             if (currentRow !== null && findFirstSuspended(currentRow) === null) {
-              lastContentRow = row;
+              lastContentRow = row2;
             }
-            row = row.sibling;
+            row2 = row2.sibling;
           }
           return lastContentRow;
         }
@@ -17538,18 +17538,18 @@ var require_react_dom_development = __commonJS({
               }
               case "backwards": {
                 var _tail = null;
-                var row = workInProgress2.child;
+                var row2 = workInProgress2.child;
                 workInProgress2.child = null;
-                while (row !== null) {
-                  var currentRow = row.alternate;
+                while (row2 !== null) {
+                  var currentRow = row2.alternate;
                   if (currentRow !== null && findFirstSuspended(currentRow) === null) {
-                    workInProgress2.child = row;
+                    workInProgress2.child = row2;
                     break;
                   }
-                  var nextRow = row.sibling;
-                  row.sibling = _tail;
-                  _tail = row;
-                  row = nextRow;
+                  var nextRow = row2.sibling;
+                  row2.sibling = _tail;
+                  _tail = row2;
+                  row2 = nextRow;
                 }
                 initSuspenseListRenderState(
                   workInProgress2,
@@ -18376,9 +18376,9 @@ var require_react_dom_development = __commonJS({
                 if (!didSuspendAlready) {
                   var cannotBeSuspended = renderHasNotSuspendedYet() && (current2 === null || (current2.flags & DidCapture) === NoFlags);
                   if (!cannotBeSuspended) {
-                    var row = workInProgress2.child;
-                    while (row !== null) {
-                      var suspended = findFirstSuspended(row);
+                    var row2 = workInProgress2.child;
+                    while (row2 !== null) {
+                      var suspended = findFirstSuspended(row2);
                       if (suspended !== null) {
                         didSuspendAlready = true;
                         workInProgress2.flags |= DidCapture;
@@ -18393,7 +18393,7 @@ var require_react_dom_development = __commonJS({
                         pushSuspenseContext(workInProgress2, setShallowSuspenseContext(suspenseStackCursor.current, ForceSuspenseFallback));
                         return workInProgress2.child;
                       }
-                      row = row.sibling;
+                      row2 = row2.sibling;
                     }
                   }
                   if (renderState.tail !== null && now() > getRenderTargetTime()) {
@@ -23827,7 +23827,7 @@ var require_react_jsx_runtime_development = __commonJS({
         }
         var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
         var prefix;
-        function describeBuiltInComponentFrame(name, source, ownerFn) {
+        function describeBuiltInComponentFrame(name2, source, ownerFn) {
           {
             if (prefix === void 0) {
               try {
@@ -23837,7 +23837,7 @@ var require_react_jsx_runtime_development = __commonJS({
                 prefix = match && match[1] || "";
               }
             }
-            return "\n" + prefix + name;
+            return "\n" + prefix + name2;
           }
         }
         var reentry = false;
@@ -23940,8 +23940,8 @@ var require_react_jsx_runtime_development = __commonJS({
             }
             Error.prepareStackTrace = previousPrepareStackTrace;
           }
-          var name = fn ? fn.displayName || fn.name : "";
-          var syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
+          var name2 = fn ? fn.displayName || fn.name : "";
+          var syntheticFrame = name2 ? describeBuiltInComponentFrame(name2) : "";
           {
             if (typeof fn === "function") {
               componentFrameCache.set(fn, syntheticFrame);
@@ -24259,9 +24259,9 @@ var require_react_jsx_runtime_development = __commonJS({
         function getDeclarationErrorAddendum() {
           {
             if (ReactCurrentOwner$1.current) {
-              var name = getComponentNameFromType(ReactCurrentOwner$1.current.type);
-              if (name) {
-                return "\n\nCheck the render method of `" + name + "`.";
+              var name2 = getComponentNameFromType(ReactCurrentOwner$1.current.type);
+              if (name2) {
+                return "\n\nCheck the render method of `" + name2 + "`.";
               }
             }
             return "";
@@ -24359,8 +24359,8 @@ var require_react_jsx_runtime_development = __commonJS({
               return;
             }
             if (propTypes) {
-              var name = getComponentNameFromType(type);
-              checkPropTypes(propTypes, element.props, "prop", name, element);
+              var name2 = getComponentNameFromType(type);
+              checkPropTypes(propTypes, element.props, "prop", name2, element);
             } else if (type.PropTypes !== void 0 && !propTypesMisspellWarningShown) {
               propTypesMisspellWarningShown = true;
               var _name = getComponentNameFromType(type);
@@ -24619,7 +24619,7 @@ function createEmptyView() {
     frozenPrimary: false
   };
 }
-function createDefaultTable(name = "Untitled") {
+function createDefaultTable(name2 = "Untitled") {
   const nameFieldId = createId("f");
   const statusFieldId = createId("f");
   const tagsFieldId = createId("f");
@@ -24630,7 +24630,7 @@ function createDefaultTable(name = "Untitled") {
   const design = createSelectOption("Design", "purple");
   return {
     version: 1,
-    name,
+    name: name2,
     autoNumberNext: 3,
     fields: [
       { id: nameFieldId, name: "Name", type: "text" },
@@ -24668,16 +24668,16 @@ function createDefaultTable(name = "Untitled") {
     view: createEmptyView()
   };
 }
-function createSelectOption(name, color) {
+function createSelectOption(name2, color) {
   return {
     id: createId("o"),
-    name,
+    name: name2,
     color: color ?? SELECT_COLORS[Math.floor(Math.random() * SELECT_COLORS.length)]
   };
 }
-function createField(type, name) {
+function createField(type, name2) {
   const id = createId("f");
-  const label = name ?? defaultFieldName(type);
+  const label = name2 ?? defaultFieldName(type);
   switch (type) {
     case "singleSelect":
       return {
@@ -24775,15 +24775,15 @@ function createRow(fields, autoNumberNext = 1) {
   }
   return { row: { id: createId("r"), cells }, nextAuto };
 }
-function touchLastModified(row, fields) {
+function touchLastModified(row2, fields) {
   const stamp = nowIso();
-  const cells = { ...row.cells };
+  const cells = { ...row2.cells };
   for (const field of fields) {
     if (field.type === "lastModifiedTime") {
       cells[field.id] = stamp;
     }
   }
-  return { ...row, cells };
+  return { ...row2, cells };
 }
 function parseTableDocument(raw) {
   if (!raw.trim()) {
@@ -24794,7 +24794,7 @@ function parseTableDocument(raw) {
     throw new Error("Invalid table document");
   }
   const fields = Array.isArray(parsed.fields) ? parsed.fields.map(normalizeField) : [];
-  const rows = Array.isArray(parsed.rows) ? parsed.rows.map((row) => normalizeRow(row, fields)) : [];
+  const rows = Array.isArray(parsed.rows) ? parsed.rows.map((row2) => normalizeRow(row2, fields)) : [];
   return {
     version: 1,
     name: typeof parsed.name === "string" ? parsed.name : "Untitled",
@@ -24848,51 +24848,51 @@ function serializeTableFileDocument(file) {
 }
 function normalizeField(field) {
   const id = typeof field.id === "string" ? field.id : createId("f");
-  const name = typeof field.name === "string" ? field.name : "Field";
+  const name2 = typeof field.name === "string" ? field.name : "Field";
   const type = field.type ?? "text";
   if (type === "singleSelect" || type === "multiSelect") {
     const options = Array.isArray(field.options) ? field.options.map(normalizeOption) : [];
-    return { id, name, type, options };
+    return { id, name: name2, type, options };
   }
   if (type === "currency") {
     const symbol = typeof field.symbol === "string" ? field.symbol : "$";
-    return { id, name, type, symbol };
+    return { id, name: name2, type, symbol };
   }
   if (type === "rating") {
     const max2 = typeof field.max === "number" ? field.max : 5;
-    return { id, name, type, max: max2 };
+    return { id, name: name2, type, max: max2 };
   }
   switch (type) {
     case "text":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "longText":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "number":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "percent":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "duration":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "checkbox":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "date":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "datetime":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "url":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "email":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "phone":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "attachment":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "autoNumber":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "createdTime":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "lastModifiedTime":
-      return { id, name, type };
+      return { id, name: name2, type };
   }
 }
 function normalizeOption(option) {
@@ -24902,10 +24902,10 @@ function normalizeOption(option) {
     color: SELECT_COLORS.includes(option.color) ? option.color : "gray"
   };
 }
-function normalizeRow(row, fields) {
-  const id = typeof row.id === "string" ? row.id : createId("r");
+function normalizeRow(row2, fields) {
+  const id = typeof row2.id === "string" ? row2.id : createId("r");
   const cells = {};
-  const incoming = row.cells && typeof row.cells === "object" ? row.cells : {};
+  const incoming = row2.cells && typeof row2.cells === "object" ? row2.cells : {};
   for (const field of fields) {
     cells[field.id] = sanitizeCellValue(field, incoming[field.id]);
   }
@@ -25004,24 +25004,24 @@ function removeOptionFromDocument(doc, fieldId, optionId) {
       options: field.options.filter((o) => o.id !== optionId)
     };
   });
-  const rows = doc.rows.map((row) => {
+  const rows = doc.rows.map((row2) => {
     const field = fields.find((f) => f.id === fieldId);
-    if (!field || !isSelectField(field)) return row;
-    const current = row.cells[fieldId];
+    if (!field || !isSelectField(field)) return row2;
+    const current = row2.cells[fieldId];
     if (field.type === "singleSelect") {
       return {
-        ...row,
+        ...row2,
         cells: {
-          ...row.cells,
+          ...row2.cells,
           [fieldId]: current === optionId ? null : current
         }
       };
     }
     const list = Array.isArray(current) ? current : [];
     return {
-      ...row,
+      ...row2,
       cells: {
-        ...row.cells,
+        ...row2.cells,
         [fieldId]: list.filter((id) => id !== optionId)
       }
     };
@@ -25155,11 +25155,11 @@ function Parser(options) {
     }
     onWarning(err2, getContext);
   }
-  this["on"] = function(name, cb) {
+  this["on"] = function(name2, cb) {
     if (typeof cb !== "function") {
       throw error("required args <name, cb>");
     }
-    switch (name) {
+    switch (name2) {
       case "openTag":
         onOpenTag = cb;
         break;
@@ -25190,7 +25190,7 @@ function Parser(options) {
         onComment = cb;
         break;
       default:
-        throw error("unsupported event: " + name);
+        throw error("unsupported event: " + name2);
     }
     return this;
   };
@@ -25229,7 +25229,7 @@ function Parser(options) {
       if (cachedAttrs !== null) {
         return cachedAttrs;
       }
-      var nsUri, nsUriPrefix, nsName, defaultAlias = isNamespace && nsMatrix["xmlns"], attrList = isNamespace && maybeNS ? [] : null, i2 = attrsStart, s = attrsString, l = s.length, hasNewMatrix, newalias, value, alias, name, attrs = {}, seenAttrs = {}, skipAttr, w2, j2;
+      var nsUri, nsUriPrefix, nsName, defaultAlias = isNamespace && nsMatrix["xmlns"], attrList = isNamespace && maybeNS ? [] : null, i2 = attrsStart, s = attrsString, l = s.length, hasNewMatrix, newalias, value, alias, name2, attrs = {}, seenAttrs = {}, skipAttr, w2, j2;
       parseAttr:
         for (; i2 < l; i2++) {
           skipAttr = false;
@@ -25261,8 +25261,8 @@ function Parser(options) {
             handleWarning("illegal attribute name char");
             skipAttr = true;
           }
-          name = s.substring(i2, j2);
-          if (name === "xmlns:xmlns") {
+          name2 = s.substring(i2, j2);
+          if (name2 === "xmlns:xmlns") {
             handleWarning("illegal declaration of xmlns");
             skipAttr = true;
           }
@@ -25318,17 +25318,17 @@ function Parser(options) {
           if (skipAttr) {
             continue parseAttr;
           }
-          if (name in seenAttrs) {
-            handleWarning("attribute <" + name + "> already defined");
+          if (name2 in seenAttrs) {
+            handleWarning("attribute <" + name2 + "> already defined");
             continue;
           }
-          seenAttrs[name] = true;
+          seenAttrs[name2] = true;
           if (!isNamespace) {
-            attrs[name] = value;
+            attrs[name2] = value;
             continue;
           }
           if (maybeNS) {
-            newalias = name === "xmlns" ? "xmlns" : name.charCodeAt(0) === 120 && name.substr(0, 6) === "xmlns:" ? name.substr(6) : null;
+            newalias = name2 === "xmlns" ? "xmlns" : name2.charCodeAt(0) === 120 && name2.substr(0, 6) === "xmlns:" ? name2.substr(6) : null;
             if (newalias !== null) {
               nsUri = decodeEntities(value);
               nsUriPrefix = uriPrefix(newalias);
@@ -25355,37 +25355,37 @@ function Parser(options) {
                 }
                 nsMatrix[nsUriPrefix] = nsUri;
               }
-              attrs[name] = value;
+              attrs[name2] = value;
               continue;
             }
-            attrList.push(name, value);
+            attrList.push(name2, value);
             continue;
           }
-          w2 = name.indexOf(":");
+          w2 = name2.indexOf(":");
           if (w2 === -1) {
-            attrs[name] = value;
+            attrs[name2] = value;
             continue;
           }
-          if (!(nsName = nsMatrix[name.substring(0, w2)])) {
-            handleWarning(missingNamespaceForPrefix(name.substring(0, w2)));
+          if (!(nsName = nsMatrix[name2.substring(0, w2)])) {
+            handleWarning(missingNamespaceForPrefix(name2.substring(0, w2)));
             continue;
           }
-          name = defaultAlias === nsName ? name.substr(w2 + 1) : nsName + name.substr(w2);
-          attrs[name] = value;
+          name2 = defaultAlias === nsName ? name2.substr(w2 + 1) : nsName + name2.substr(w2);
+          attrs[name2] = value;
         }
       if (maybeNS) {
         for (i2 = 0, l = attrList.length; i2 < l; i2++) {
-          name = attrList[i2++];
+          name2 = attrList[i2++];
           value = attrList[i2];
-          w2 = name.indexOf(":");
+          w2 = name2.indexOf(":");
           if (w2 !== -1) {
-            if (!(nsName = nsMatrix[name.substring(0, w2)])) {
-              handleWarning(missingNamespaceForPrefix(name.substring(0, w2)));
+            if (!(nsName = nsMatrix[name2.substring(0, w2)])) {
+              handleWarning(missingNamespaceForPrefix(name2.substring(0, w2)));
               continue;
             }
-            name = defaultAlias === nsName ? name.substr(w2 + 1) : nsName + name.substr(w2);
+            name2 = defaultAlias === nsName ? name2.substr(w2 + 1) : nsName + name2.substr(w2);
           }
-          attrs[name] = value;
+          attrs[name2] = value;
         }
       }
       return cachedAttrs = attrs;
@@ -26373,14 +26373,14 @@ function unzipAsync(archive) {
 
 // node_modules/read-excel-file/modules/utility/checkpoint.js
 var latestCheckpointTimestamp;
-function checkpoint(name) {
+function checkpoint(name2) {
   var now = Date.now();
   var shouldOutputLog = typeof global !== "undefined" ? Boolean(global.READ_EXCEL_FILE_CHECKPOINTS) : typeof window !== "undefined" ? Boolean(window.READ_EXCEL_FILE_CHECKPOINTS) : false;
   if (shouldOutputLog) {
     if (latestCheckpointTimestamp) {
       console.log("  -", now - latestCheckpointTimestamp, "ms");
     }
-    console.log("*", name);
+    console.log("*", name2);
   }
   latestCheckpointTimestamp = now;
 }
@@ -27191,10 +27191,10 @@ function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
 function parseCellAddress(coordinatesString) {
-  var _coordinatesString$sp = coordinatesString.split(/(\d+)/), _coordinatesString$sp2 = _slicedToArray(_coordinatesString$sp, 2), column = _coordinatesString$sp2[0], row = _coordinatesString$sp2[1];
+  var _coordinatesString$sp = coordinatesString.split(/(\d+)/), _coordinatesString$sp2 = _slicedToArray(_coordinatesString$sp, 2), column = _coordinatesString$sp2[0], row2 = _coordinatesString$sp2[1];
   return [
     // Row number (starting at `1`).
-    Number(row),
+    Number(row2),
     // Column number (starting at `1`).
     // It's not clear if the `column` part could ever be non-trimmed,
     // but this `.trim()` call was already here when I copied this code from somewhere.
@@ -27258,11 +27258,11 @@ function _arrayWithHoles2(arr) {
   if (Array.isArray(arr)) return arr;
 }
 function parseCell(attributes, value, inlineString, sharedStrings, styles, epoch1904, options) {
-  var _parseCellAddress = parseCellAddress(attributes.r), _parseCellAddress2 = _slicedToArray2(_parseCellAddress, 2), row = _parseCellAddress2[0], column = _parseCellAddress2[1];
+  var _parseCellAddress = parseCellAddress(attributes.r), _parseCellAddress2 = _slicedToArray2(_parseCellAddress, 2), row2 = _parseCellAddress2[0], column = _parseCellAddress2[1];
   var type = attributes.t;
   var styleId = attributes.s ? Number(attributes.s) : void 0;
   return {
-    row,
+    row: row2,
     column,
     value: parseCellValue(value, type, {
       inlineString,
@@ -27480,8 +27480,8 @@ function dropEmptyColumns(data) {
   while (i >= 0) {
     var empty = true;
     for (var _iterator = _createForOfIteratorHelperLoose3(data), _step; !(_step = _iterator()).done; ) {
-      var row = _step.value;
-      if (accessor(row[i]) !== null) {
+      var row2 = _step.value;
+      if (accessor(row2[i]) !== null) {
         empty = false;
         break;
       }
@@ -27682,9 +27682,9 @@ function onTextInSheet(text, state) {
 }
 function parseSheetDimensionRef(ref) {
   var dimensions = ref.split(":").map(parseCellAddress).map(function(_ref2) {
-    var _ref3 = _slicedToArray4(_ref2, 2), row = _ref3[0], column = _ref3[1];
+    var _ref3 = _slicedToArray4(_ref2, 2), row2 = _ref3[0], column = _ref3[1];
     return {
-      row,
+      row: row2,
       column
     };
   });
@@ -27913,8 +27913,8 @@ function getSheetRelationId(sheet, sheets) {
       }
     }
     throw new Error('Sheet "'.concat(sheet, '" not found. Available sheets: ').concat(sheets.map(function(_ref3) {
-      var name = _ref3.name;
-      return '"'.concat(name, '"');
+      var name2 = _ref3.name;
+      return '"'.concat(name2, '"');
     }).join(", ")));
   } else {
     if (sheet <= sheets.length) {
@@ -27991,10 +27991,10 @@ function readFiles(filesInfo, contents, parseXmlStream2) {
   }
   var promises = [];
   var _loop2 = function _loop22() {
-    var name = _Object$keys2[_i2];
-    if (isPromise(results[name])) {
-      promises.push(results[name].then(function(result) {
-        results[name] = result;
+    var name2 = _Object$keys2[_i2];
+    if (isPromise(results[name2])) {
+      promises.push(results[name2].then(function(result) {
+        results[name2] = result;
       }));
     }
   };
@@ -28376,8 +28376,8 @@ function parseSheetDataWithPerRowErrors(data, schema, optionsCustom) {
   validateSchema(schema);
   var options = applyDefaultOptions(optionsCustom);
   var _data = _toArray(data), columns = _data[0], dataRows = _data.slice(1);
-  return dataRows.map(function(row) {
-    return parseDataRow(row, schema, columns, options);
+  return dataRows.map(function(row2) {
+    return parseDataRow(row2, schema, columns, options);
   });
 }
 function parseDataRow(dataRow, schema, columns, options) {
@@ -28419,14 +28419,14 @@ function parseDataRow(dataRow, schema, columns, options) {
     object: transformValue(value, isEmptyValue2, void 0, options)
   };
 }
-function parseObject(row, schema, path, columns, options) {
+function parseObject(row2, schema, path, columns, options) {
   var object = {};
   var isEmptyObject = true;
   var errors = [];
   var children = [];
   for (var _i = 0, _Object$keys = Object.keys(schema); _i < _Object$keys.length; _i++) {
     var key = _Object$keys[_i];
-    var child = parseProperty(row, schema[key], getPropertyPath(key, path), columns, options);
+    var child = parseProperty(row2, schema[key], getPropertyPath(key, path), columns, options);
     if (child.errors) {
       errors = errors.concat(child.errors);
     } else {
@@ -28455,13 +28455,13 @@ function parseObject(row, schema, path, columns, options) {
     children
   };
 }
-function parseProperty(row, schemaEntry, path, columns, options) {
+function parseProperty(row2, schemaEntry, path, columns, options) {
   var columnIndex = schemaEntry.column ? columns.indexOf(schemaEntry.column) : void 0;
   var isMissingColumn = schemaEntry.column ? columnIndex < 0 : void 0;
   var _ref = schemaEntry.column ? isMissingColumn ? {
     value: options.propertyValueWhenColumnIsMissing,
     isEmptyValue: true
-  } : parseCellValueWithPossibleErrors(row[columnIndex], schemaEntry, columnIndex, options) : parseObject(row, schemaEntry.schema, path, columns, options), value = _ref.value, isEmptyValue2 = _ref.isEmptyValue, errors = _ref.errors, children = _ref.children;
+  } : parseCellValueWithPossibleErrors(row2[columnIndex], schemaEntry, columnIndex, options) : parseObject(row2, schemaEntry.schema, path, columns, options), value = _ref.value, isEmptyValue2 = _ref.isEmptyValue, errors = _ref.errors, children = _ref.children;
   if (errors) {
     return {
       // Return the errors.
@@ -28909,11 +28909,11 @@ async function spreadsheetToTable(file, firstRowIsHeader = true) {
   return matrixToTable(matrix, file.name, firstRowIsHeader);
 }
 async function spreadsheetToMatrix(file) {
-  const name = file.name.toLowerCase();
-  if (name.endsWith(".csv") || file.type === CSV_MIME) {
+  const name2 = file.name.toLowerCase();
+  if (name2.endsWith(".csv") || file.type === CSV_MIME) {
     return parseCsv(await file.text());
   }
-  if (name.endsWith(".xlsx") || file.type === XLSX_MIME) {
+  if (name2.endsWith(".xlsx") || file.type === XLSX_MIME) {
     return await readSheet(file);
   }
   throw new Error("Unsupported file type. Use .csv or .xlsx");
@@ -28922,7 +28922,7 @@ function matrixToTable(matrix, fileName, firstRowIsHeader = true) {
   if (!matrix.length) {
     throw new Error("Spreadsheet is empty");
   }
-  const maxColumns = matrix.reduce((max2, row) => Math.max(max2, row.length), 0);
+  const maxColumns = matrix.reduce((max2, row2) => Math.max(max2, row2.length), 0);
   if (maxColumns === 0) {
     throw new Error("Spreadsheet has no columns");
   }
@@ -28931,17 +28931,17 @@ function matrixToTable(matrix, fileName, firstRowIsHeader = true) {
     return label || `Column ${i + 1}`;
   }) : Array.from({ length: maxColumns }, (_, i) => `Column ${i + 1}`);
   const seen = /* @__PURE__ */ new Map();
-  const headers = headerRow.map((name) => {
-    const count = seen.get(name) ?? 0;
-    seen.set(name, count + 1);
-    return count === 0 ? name : `${name} ${count + 1}`;
+  const headers = headerRow.map((name2) => {
+    const count = seen.get(name2) ?? 0;
+    seen.set(name2, count + 1);
+    return count === 0 ? name2 : `${name2} ${count + 1}`;
   });
   const dataRows = (firstRowIsHeader ? matrix.slice(1) : matrix).filter(
-    (row) => row.some((cell) => String(cell ?? "").trim() !== "")
+    (row2) => row2.some((cell) => String(cell ?? "").trim() !== "")
   );
-  const columns = headers.map((name, colIndex) => {
-    const samples = dataRows.map((row) => row[colIndex]).filter((v) => v != null && String(v).trim() !== "");
-    return { name, type: inferFieldType(samples), samples };
+  const columns = headers.map((name2, colIndex) => {
+    const samples = dataRows.map((row2) => row2[colIndex]).filter((v) => v != null && String(v).trim() !== "");
+    return { name: name2, type: inferFieldType(samples), samples };
   });
   const fields = columns.map((col) => {
     const id = createId("f");
@@ -28951,7 +28951,7 @@ function matrixToTable(matrix, fileName, firstRowIsHeader = true) {
         id,
         name: col.name,
         type: "singleSelect",
-        options: unique.map((name) => createSelectOption(name, void 0))
+        options: unique.map((name2) => createSelectOption(name2, void 0))
       };
     }
     if (col.type === "checkbox") {
@@ -28990,11 +28990,11 @@ function clipboardTextToMatrix(text, types = []) {
   const isTsv = normalizedTypes.includes(TSV_MIME);
   if (text.includes("	") || isTsv) {
     const matrix = parseDelimited(text, "	");
-    return matrix.some((row) => row.length > 1) || matrix.length > 1 ? matrix : null;
+    return matrix.some((row2) => row2.length > 1) || matrix.length > 1 ? matrix : null;
   }
   if (isCsv || text.includes("\n") || text.includes("\r")) {
     const matrix = parseCsv(text);
-    return matrix.some((row) => row.length > 1) || matrix.length > 1 ? matrix : null;
+    return matrix.some((row2) => row2.length > 1) || matrix.length > 1 ? matrix : null;
   }
   if (isCsv) return parseCsv(text);
   return null;
@@ -29005,7 +29005,7 @@ function clipboardHtmlToMatrix(html) {
   const table = parsed.querySelector("table");
   if (!table) return null;
   const rows = Array.from(table.rows).map(
-    (row) => Array.from(row.cells).map((cell) => cell.textContent ?? "")
+    (row2) => Array.from(row2.cells).map((cell) => cell.textContent ?? "")
   );
   return rows.length ? rows : null;
 }
@@ -29077,12 +29077,12 @@ function appendSpreadsheetToTable(current, incoming) {
     }
     sourceToTarget.set(sourceField.id, targetIndex);
   }
-  const existingRows = current.rows.map((row) => {
-    const cells = { ...row.cells };
+  const existingRows = current.rows.map((row2) => {
+    const cells = { ...row2.cells };
     for (const field of fields.slice(current.fields.length)) {
       cells[field.id] = emptyCellValue(field.type);
     }
-    return { ...row, cells };
+    return { ...row2, cells };
   });
   let nextAuto = Math.max(current.autoNumberNext ?? 1, nextAutoNumber(fields, current.rows));
   const appendedRows = [];
@@ -29133,15 +29133,15 @@ function nextAutoNumber(fields, rows) {
   let next = 1;
   for (const field of fields) {
     if (field.type !== "autoNumber") continue;
-    for (const row of rows) {
-      const value = row.cells[field.id];
+    for (const row2 of rows) {
+      const value = row2.cells[field.id];
       if (typeof value === "number") next = Math.max(next, value + 1);
     }
   }
   return next;
 }
-function normalizeHeader(name) {
-  return name.trim().toLocaleLowerCase();
+function normalizeHeader(name2) {
+  return name2.trim().toLocaleLowerCase();
 }
 function sourceCellAsRaw(field, value) {
   if (field.type === "singleSelect") {
@@ -29190,12 +29190,12 @@ function coerceForTargetField(fields, fieldIndex, raw) {
       return Number.isNaN(date.getTime()) ? text : date.toISOString();
     }
     case "singleSelect": {
-      const name = String(raw).trim();
+      const name2 = String(raw).trim();
       let option = field.options.find(
-        (candidate) => candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+        (candidate) => candidate.name.toLocaleLowerCase() === name2.toLocaleLowerCase()
       );
       if (!option) {
-        option = createSelectOption(name);
+        option = createSelectOption(name2);
         field = { ...field, options: [...field.options, option] };
         fields[fieldIndex] = field;
       }
@@ -29205,13 +29205,13 @@ function coerceForTargetField(fields, fieldIndex, raw) {
       const values = Array.isArray(raw) ? raw : [raw];
       const ids = [];
       for (const value of values) {
-        const name = String(value).trim();
-        if (!name) continue;
+        const name2 = String(value).trim();
+        if (!name2) continue;
         let option = field.options.find(
-          (candidate) => candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+          (candidate) => candidate.name.toLocaleLowerCase() === name2.toLocaleLowerCase()
         );
         if (!option) {
-          option = createSelectOption(name);
+          option = createSelectOption(name2);
           field = { ...field, options: [...field.options, option] };
           fields[fieldIndex] = field;
         }
@@ -29230,7 +29230,7 @@ function parseCsv(text) {
 }
 function parseDelimited(text, delimiter) {
   const rows = [];
-  let row = [];
+  let row2 = [];
   let cell = "";
   let i = 0;
   let inQuotes = false;
@@ -29258,7 +29258,7 @@ function parseDelimited(text, delimiter) {
       continue;
     }
     if (c === delimiter) {
-      row.push(cell);
+      row2.push(cell);
       cell = "";
       i += 1;
       continue;
@@ -29268,9 +29268,9 @@ function parseDelimited(text, delimiter) {
       continue;
     }
     if (c === "\n") {
-      row.push(cell);
-      rows.push(row);
-      row = [];
+      row2.push(cell);
+      rows.push(row2);
+      row2 = [];
       cell = "";
       i += 1;
       continue;
@@ -29278,9 +29278,9 @@ function parseDelimited(text, delimiter) {
     cell += c;
     i += 1;
   }
-  if (cell.length > 0 || row.length > 0) {
-    row.push(cell);
-    rows.push(row);
+  if (cell.length > 0 || row2.length > 0) {
+    row2.push(cell);
+    rows.push(row2);
   }
   return rows;
 }
@@ -29360,9 +29360,9 @@ function coerceCell(field, raw) {
     }
     case "singleSelect": {
       if (field.type !== "singleSelect") return null;
-      const name = String(raw).trim();
+      const name2 = String(raw).trim();
       const opt = field.options.find(
-        (o) => o.name.toLowerCase() === name.toLowerCase()
+        (o) => o.name.toLowerCase() === name2.toLowerCase()
       );
       return opt?.id ?? null;
     }
@@ -29402,15 +29402,15 @@ function PasteSpreadsheetModal(props) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
   const columnCount = (0, import_react.useMemo)(
-    () => matrix.reduce((max2, row) => Math.max(max2, row.length), 0),
+    () => matrix.reduce((max2, row2) => Math.max(max2, row2.length), 0),
     [matrix]
   );
   const rowCount = (0, import_react.useMemo)(
-    () => matrix.filter((row) => row.some((cell) => String(cell ?? "").trim() !== "")).length - (firstRowIsHeader ? 1 : 0),
+    () => matrix.filter((row2) => row2.some((cell) => String(cell ?? "").trim() !== "")).length - (firstRowIsHeader ? 1 : 0),
     [matrix, firstRowIsHeader]
   );
   const preview = matrix.slice(0, 6).map(
-    (row) => Array.from({ length: Math.min(columnCount, 6) }, (_, index) => String(row[index] ?? ""))
+    (row2) => Array.from({ length: Math.min(columnCount, 6) }, (_, index) => String(row2[index] ?? ""))
   );
   const buildIncoming = () => matrixToTable(matrix, sourceName, firstRowIsHeader);
   const handleReplace = () => {
@@ -29506,11 +29506,11 @@ function PasteSpreadsheetModal(props) {
           ),
           "First row contains column names"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-preview-wrap", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", { className: "tabula-paste-preview", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: preview.map((row, rowIndex) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "tabula-paste-preview-wrap", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", { className: "tabula-paste-preview", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: preview.map((row2, rowIndex) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
           "tr",
           {
             className: firstRowIsHeader && rowIndex === 0 ? "is-header" : void 0,
-            children: row.map(
+            children: row2.map(
               (cell, cellIndex) => firstRowIsHeader && rowIndex === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { children: cell || `Column ${cellIndex + 1}` }, cellIndex) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { children: cell }, cellIndex)
             )
           },
@@ -29648,15 +29648,15 @@ function parseCellClipboardText(field, text) {
       return { ok: true, value: added.id, field: updatedField };
     }
     case "multiSelect": {
-      const names = text.split(/\r?\n|,\s*/).map((name) => name.trim()).filter(Boolean);
+      const names = text.split(/\r?\n|,\s*/).map((name2) => name2.trim()).filter(Boolean);
       let options = [...field.options];
       const ids = [];
-      for (const name of names) {
+      for (const name2 of names) {
         let option = options.find(
-          (candidate) => candidate.id === name || candidate.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+          (candidate) => candidate.id === name2 || candidate.name.toLocaleLowerCase() === name2.toLocaleLowerCase()
         );
         if (!option) {
-          option = createSelectOption(name);
+          option = createSelectOption(name2);
           options = [...options, option];
         }
         if (!ids.includes(option.id)) ids.push(option.id);
@@ -29831,8 +29831,8 @@ function operatorLabel(op) {
 }
 function getVisibleRows(doc) {
   const { search, filters, sorts } = doc.view;
-  let rows = doc.rows.filter((row) => matchesSearch(doc, row, search));
-  rows = rows.filter((row) => matchesFilterGroup(doc, row, filters));
+  let rows = doc.rows.filter((row2) => matchesSearch(doc, row2, search));
+  rows = rows.filter((row2) => matchesFilterGroup(doc, row2, filters));
   if (sorts.length > 0) {
     rows = [...rows].sort((a, b) => compareRows(doc, a, b, sorts));
   }
@@ -29849,11 +29849,11 @@ function getGroupedRows(doc) {
     return [{ key: "all", label: "", rows }];
   }
   const map = /* @__PURE__ */ new Map();
-  for (const row of rows) {
-    const { key, label } = groupKeyForCell(field, row.cells[field.id]);
+  for (const row2 of rows) {
+    const { key, label } = groupKeyForCell(field, row2.cells[field.id]);
     const existing = map.get(key);
-    if (existing) existing.rows.push(row);
-    else map.set(key, { key, label, rows: [row] });
+    if (existing) existing.rows.push(row2);
+    else map.set(key, { key, label, rows: [row2] });
   }
   return Array.from(map.values());
 }
@@ -29883,11 +29883,11 @@ function groupKeyForCell(field, value) {
   }
   return { key: String(value), label: String(value) };
 }
-function matchesSearch(doc, row, search) {
+function matchesSearch(doc, row2, search) {
   const q = search.trim().toLowerCase();
   if (!q) return true;
   for (const field of doc.fields) {
-    const value = row.cells[field.id];
+    const value = row2.cells[field.id];
     if (isTextLikeField(field)) {
       if (String(value ?? "").toLowerCase().includes(q)) return true;
     } else if (isNumericField(field)) {
@@ -29905,18 +29905,18 @@ function matchesSearch(doc, row, search) {
   }
   return false;
 }
-function matchesFilterGroup(doc, row, group) {
+function matchesFilterGroup(doc, row2, group) {
   const active = group.conditions.filter((c) => c.fieldId);
   if (active.length === 0) return true;
   if (group.logic === "and") {
-    return active.every((c) => matchesCondition(doc, row, c));
+    return active.every((c) => matchesCondition(doc, row2, c));
   }
-  return active.some((c) => matchesCondition(doc, row, c));
+  return active.some((c) => matchesCondition(doc, row2, c));
 }
-function matchesCondition(doc, row, condition) {
+function matchesCondition(doc, row2, condition) {
   const field = doc.fields.find((f) => f.id === condition.fieldId);
   if (!field) return true;
-  const value = row.cells[field.id];
+  const value = row2.cells[field.id];
   const op = condition.operator;
   const target = condition.value;
   if (isTextLikeField(field)) {
@@ -29932,14 +29932,14 @@ function matchesCondition(doc, row, condition) {
     return true;
   }
   if (isNumericField(field)) {
-    const num = typeof value === "number" ? value : null;
-    if (op === "isEmpty") return num == null;
-    if (num == null) return false;
+    const num2 = typeof value === "number" ? value : null;
+    if (op === "isEmpty") return num2 == null;
+    if (num2 == null) return false;
     const t = typeof target === "number" ? target : Number(target);
     if (Number.isNaN(t)) return false;
-    if (op === "equals") return num === t;
-    if (op === "gt") return num > t;
-    if (op === "lt") return num < t;
+    if (op === "equals") return num2 === t;
+    if (op === "gt") return num2 > t;
+    if (op === "lt") return num2 < t;
     return true;
   }
   if (field.type === "checkbox") {
@@ -30118,10 +30118,10 @@ function buildConditionFromQuery(field, requestedOp, rawValue) {
     return { id, fieldId: field.id, operator: finalOp, value: rawValue };
   }
   if (isNumericField(field)) {
-    const num = Number(rawValue);
-    if (Number.isNaN(num)) return null;
+    const num2 = Number(rawValue);
+    if (Number.isNaN(num2)) return null;
     const op = requestedOp === "gt" || requestedOp === "lt" ? requestedOp : "equals";
-    return { id, fieldId: field.id, operator: op, value: num };
+    return { id, fieldId: field.id, operator: op, value: num2 };
   }
   if (field.type === "checkbox") {
     const truthy = ["true", "1", "yes", "checked"].includes(rawValue.toLowerCase());
@@ -30163,9 +30163,9 @@ function buildConditionFromQuery(field, requestedOp, rawValue) {
   }
   return null;
 }
-function resolveOptionId(options, name) {
+function resolveOptionId(options, name2) {
   const found = options.find(
-    (o) => o.name.toLowerCase() === name.toLowerCase() || o.id === name
+    (o) => o.name.toLowerCase() === name2.toLowerCase() || o.id === name2
   );
   return found?.id ?? null;
 }
@@ -30177,46 +30177,46 @@ function filtersToQueryString(group, fields) {
   for (const condition of group.conditions) {
     const field = fields.find((f) => f.id === condition.fieldId);
     if (!field) continue;
-    const name = field.name.includes(" ") ? `"${field.name}"` : field.name;
+    const name2 = field.name.includes(" ") ? `"${field.name}"` : field.name;
     if (condition.operator === "isEmpty") {
-      parts.push(`${name}:empty`);
+      parts.push(`${name2}:empty`);
       continue;
     }
     if (condition.operator === "isNotEmpty") continue;
     if (condition.operator === "contains" && (field.type === "text" || field.type === "longText" || field.type === "url" || field.type === "email" || field.type === "phone")) {
-      parts.push(`${name}:~${String(condition.value ?? "")}`);
+      parts.push(`${name2}:~${String(condition.value ?? "")}`);
       continue;
     }
     if (condition.operator === "gt") {
-      parts.push(`${name}:>${String(condition.value ?? "")}`);
+      parts.push(`${name2}:>${String(condition.value ?? "")}`);
       continue;
     }
     if (condition.operator === "lt") {
-      parts.push(`${name}:<${String(condition.value ?? "")}`);
+      parts.push(`${name2}:<${String(condition.value ?? "")}`);
       continue;
     }
     if (condition.operator === "isNot") {
       const label = optionLabel(field, condition.value ?? null);
-      parts.push(`${name}:!${label}`);
+      parts.push(`${name2}:!${label}`);
       continue;
     }
     if (condition.operator === "isAnyOf" || condition.operator === "containsAny" || condition.operator === "containsAll") {
       const ids = Array.isArray(condition.value) ? condition.value : [];
       const labels = ids.map((id) => optionLabel(field, id));
-      parts.push(`${name}:${labels.join(",")}`);
+      parts.push(`${name2}:${labels.join(",")}`);
       continue;
     }
     if (field.type === "checkbox") {
       parts.push(
-        `${name}:${condition.operator === "isTrue" ? "true" : "false"}`
+        `${name2}:${condition.operator === "isTrue" ? "true" : "false"}`
       );
       continue;
     }
     if (isSelectField(field)) {
-      parts.push(`${name}:${optionLabel(field, condition.value ?? null)}`);
+      parts.push(`${name2}:${optionLabel(field, condition.value ?? null)}`);
       continue;
     }
-    parts.push(`${name}:${String(condition.value ?? "")}`);
+    parts.push(`${name2}:${String(condition.value ?? "")}`);
   }
   return parts.join(" ");
 }
@@ -30393,12 +30393,12 @@ function fieldsFromAirtableTable(table) {
 function airtableFieldToLocal(rf) {
   const type = mapAirtableType(rf.type);
   const id = createId("f");
-  const name = rf.name;
+  const name2 = rf.name;
   if (type === "singleSelect" || type === "multiSelect") {
     const choices = rf.options?.choices ?? [];
     return {
       id,
-      name,
+      name: name2,
       type,
       options: choices.map((c, i) => ({
         id: createId("o"),
@@ -30408,42 +30408,42 @@ function airtableFieldToLocal(rf) {
     };
   }
   if (type === "currency") {
-    return { id, name, type, symbol: rf.options?.symbol ?? "$" };
+    return { id, name: name2, type, symbol: rf.options?.symbol ?? "$" };
   }
   if (type === "rating") {
-    return { id, name, type, max: rf.options?.max ?? 5 };
+    return { id, name: name2, type, max: rf.options?.max ?? 5 };
   }
   switch (type) {
     case "text":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "longText":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "number":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "percent":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "duration":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "checkbox":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "date":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "datetime":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "url":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "email":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "phone":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "attachment":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "autoNumber":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "createdTime":
-      return { id, name, type };
+      return { id, name: name2, type };
     case "lastModifiedTime":
-      return { id, name, type };
+      return { id, name: name2, type };
   }
 }
 function createLinkConfig(baseId, baseName, table, doc, replaceSchema) {
@@ -30513,9 +30513,9 @@ async function pullFromAirtable(client, doc) {
     }
     nextRows.push({ id: localId, cells });
   }
-  for (const row of doc.rows) {
-    if (!seenLocal.has(row.id) && !sync.recordMap[row.id]) {
-      nextRows.push(row);
+  for (const row2 of doc.rows) {
+    if (!seenLocal.has(row2.id) && !sync.recordMap[row2.id]) {
+      nextRows.push(row2);
     }
   }
   return {
@@ -30552,11 +30552,11 @@ async function pushToAirtable(client, doc) {
   if (!table) throw new Error("Linked Airtable table not found");
   const toCreate = [];
   const toUpdate = [];
-  for (const row of doc.rows) {
-    const fields = rowToAirtableFields(row, doc.fields, sync, table);
-    const remoteId = sync.recordMap[row.id];
+  for (const row2 of doc.rows) {
+    const fields = rowToAirtableFields(row2, doc.fields, sync, table);
+    const remoteId = sync.recordMap[row2.id];
     if (remoteId) toUpdate.push({ id: remoteId, fields });
-    else toCreate.push({ localId: row.id, fields });
+    else toCreate.push({ localId: row2.id, fields });
   }
   const nextRecordMap = { ...sync.recordMap };
   if (toUpdate.length) {
@@ -30581,7 +30581,7 @@ async function pushToAirtable(client, doc) {
     }
   };
 }
-function rowToAirtableFields(row, fields, sync, table) {
+function rowToAirtableFields(row2, fields, sync, table) {
   const out = {};
   for (const field of fields) {
     if (isReadOnlyField(field)) continue;
@@ -30595,7 +30595,7 @@ function rowToAirtableFields(row, fields, sync, table) {
     )) {
       continue;
     }
-    const value = toAirtableValue(field, row.cells[field.id]);
+    const value = toAirtableValue(field, row2.cells[field.id]);
     if (value !== void 0) {
       out[airField.name] = value;
     }
@@ -30627,9 +30627,9 @@ function fromAirtableValue(field, raw) {
       return Boolean(raw);
     case "singleSelect": {
       if (!isSelectField(field)) return null;
-      const name = String(raw);
+      const name2 = String(raw);
       const opt = field.options.find(
-        (o) => o.name.toLowerCase() === name.toLowerCase()
+        (o) => o.name.toLowerCase() === name2.toLowerCase()
       );
       return opt?.id ?? null;
     }
@@ -31445,12 +31445,12 @@ function SelectEditor({
     onChange(next);
   };
   const createAndSelect = () => {
-    const name = q.trim();
-    if (!name) return;
+    const name2 = q.trim();
+    if (!name2) return;
     const existing = field.options.find(
-      (o) => o.name.toLowerCase() === name.toLowerCase()
+      (o) => o.name.toLowerCase() === name2.toLowerCase()
     );
-    const option = existing ?? onAddOption(name);
+    const option = existing ?? onAddOption(name2);
     if (field.type === "singleSelect") {
       onChange(option.id);
       setOpen(false);
@@ -31777,8 +31777,8 @@ function formatReadOnly(field, value) {
 function toDatetimeLocal(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const pad2 = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 function TextCell({
   value,
@@ -32341,37 +32341,37 @@ function TableGrid(props) {
       );
       if (isCollapsed) continue;
     }
-    for (const row of group.rows) {
+    for (const row2 of group.rows) {
       rowIndex += 1;
       const index = rowIndex;
-      const isDragSource = dragState?.kind === "row" && dragState.sourceId === row.id;
-      const dropClass = dragState?.kind === "row" && dragState.targetId === row.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
+      const isDragSource = dragState?.kind === "row" && dragState.sourceId === row2.id;
+      const dropClass = dragState?.kind === "row" && dragState.targetId === row2.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
       body.push(
         /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
           "tr",
           {
             "data-reorder-kind": props.canReorderRows ? "row" : void 0,
-            "data-reorder-id": props.canReorderRows ? row.id : void 0,
-            onContextMenu: (event) => showRowContextMenu(event, row.id),
+            "data-reorder-id": props.canReorderRows ? row2.id : void 0,
+            onContextMenu: (event) => showRowContextMenu(event, row2.id),
             className: [
-              props.selectedRowId === row.id ? "is-selected" : "",
+              props.selectedRowId === row2.id ? "is-selected" : "",
               isDragSource ? "is-dragging" : "",
               dropClass
             ].filter(Boolean).join(" ") || void 0,
-            onClick: () => props.onSelectRow(row.id),
+            onClick: () => props.onSelectRow(row2.id),
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                 "td",
                 {
                   className: "tabula-select-col sticky-col",
-                  onContextMenu: (event) => showRowContextMenu(event, row.id),
+                  onContextMenu: (event) => showRowContextMenu(event, row2.id),
                   children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
                     "input",
                     {
                       type: "checkbox",
                       className: "tabula-row-check",
-                      checked: props.checkedRowIds.has(row.id),
-                      onChange: () => props.onToggleRowChecked(row.id),
+                      checked: props.checkedRowIds.has(row2.id),
+                      onChange: () => props.onToggleRowChecked(row2.id),
                       onClick: (event) => event.stopPropagation(),
                       "aria-label": `Select row ${index}`
                     }
@@ -32382,7 +32382,7 @@ function TableGrid(props) {
                 "td",
                 {
                   className: "tabula-row-num sticky-rownum",
-                  onContextMenu: (event) => showRowContextMenu(event, row.id),
+                  onContextMenu: (event) => showRowContextMenu(event, row2.id),
                   children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "tabula-row-num-content", children: [
                     /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { children: index }),
                     /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
@@ -32394,7 +32394,7 @@ function TableGrid(props) {
                         "aria-label": `Drag row ${index} to reorder`,
                         title: props.canReorderRows ? "Drag to reorder row" : "Clear sorting to manually reorder rows",
                         disabled: !props.canReorderRows,
-                        onPointerDown: (event) => startReorder("row", row.id, event),
+                        onPointerDown: (event) => startReorder("row", row2.id, event),
                         onClick: (event) => event.stopPropagation(),
                         children: "\u283F"
                       }
@@ -32408,7 +32408,7 @@ function TableGrid(props) {
                   "data-cell-row": index - 1,
                   "data-cell-col": fi,
                   className: fi === 0 && frozen ? "sticky-primary" : void 0,
-                  onContextMenu: (event) => showCellContextMenu(event, row.id, field),
+                  onContextMenu: (event) => showCellContextMenu(event, row2.id, field),
                   style: {
                     width: widths[field.id] ?? 160,
                     minWidth: widths[field.id] ?? 160
@@ -32417,9 +32417,9 @@ function TableGrid(props) {
                     CellEditor,
                     {
                       field,
-                      value: row.cells[field.id],
-                      onChange: (value) => props.onSetCell(row.id, field.id, value),
-                      onAddOption: (name) => props.onAddOption(field.id, name),
+                      value: row2.cells[field.id],
+                      onChange: (value) => props.onSetCell(row2.id, field.id, value),
+                      onAddOption: (name2) => props.onAddOption(field.id, name2),
                       onManageOptions: () => props.onManageOptions(field.id)
                     }
                   )
@@ -32428,7 +32428,7 @@ function TableGrid(props) {
               ))
             ]
           },
-          row.id
+          row2.id
         )
       );
     }
@@ -33278,25 +33278,25 @@ function TableApp({
     setPasteCandidate({ matrix, sourceName: "Clipboard Data" });
   };
   const addRow = () => {
-    const { row, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
+    const { row: row2, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
     updateDoc({
       ...doc,
-      rows: [...doc.rows, row],
+      rows: [...doc.rows, row2],
       autoNumberNext: nextAuto
     });
   };
   const insertRow = (rowId, side) => {
     if (doc.view.sorts.length > 0) return;
-    const sourceIndex = doc.rows.findIndex((row2) => row2.id === rowId);
+    const sourceIndex = doc.rows.findIndex((row3) => row3.id === rowId);
     if (sourceIndex < 0) return;
-    const { row, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
+    const { row: row2, nextAuto } = createRow(doc.fields, doc.autoNumberNext ?? 1);
     const rows = [...doc.rows];
-    rows.splice(sourceIndex + (side === "after" ? 1 : 0), 0, row);
+    rows.splice(sourceIndex + (side === "after" ? 1 : 0), 0, row2);
     updateDoc({ ...doc, rows, autoNumberNext: nextAuto });
-    setSelectedRowId(row.id);
+    setSelectedRowId(row2.id);
   };
   const duplicateRow = (rowId) => {
-    const sourceIndex = doc.rows.findIndex((row2) => row2.id === rowId);
+    const sourceIndex = doc.rows.findIndex((row3) => row3.id === rowId);
     if (sourceIndex < 0) return;
     const source = doc.rows[sourceIndex];
     const generated = createRow(doc.fields, doc.autoNumberNext ?? 1);
@@ -33306,11 +33306,11 @@ function TableApp({
       const value = source.cells[field.id];
       cells[field.id] = Array.isArray(value) ? [...value] : value;
     }
-    const row = touchLastModified({ ...generated.row, cells }, doc.fields);
+    const row2 = touchLastModified({ ...generated.row, cells }, doc.fields);
     const rows = [...doc.rows];
-    rows.splice(sourceIndex + 1, 0, row);
+    rows.splice(sourceIndex + 1, 0, row2);
     updateDoc({ ...doc, rows, autoNumberNext: generated.nextAuto });
-    setSelectedRowId(row.id);
+    setSelectedRowId(row2.id);
   };
   const deleteRow = (rowId) => {
     const recordMap = { ...doc.sync?.recordMap ?? {} };
@@ -33342,7 +33342,7 @@ function TableApp({
     if (atIndex == null) fields.push(field);
     else fields.splice(atIndex, 0, field);
     let autoNumberNext = doc.autoNumberNext ?? 1;
-    const rows = doc.rows.map((row) => {
+    const rows = doc.rows.map((row2) => {
       let cell = emptyCellValue(type);
       if (type === "autoNumber") {
         cell = autoNumberNext;
@@ -33350,7 +33350,7 @@ function TableApp({
       } else if (type === "createdTime" || type === "lastModifiedTime") {
         cell = (/* @__PURE__ */ new Date()).toISOString();
       }
-      return { ...row, cells: { ...row.cells, [field.id]: cell } };
+      return { ...row2, cells: { ...row2.cells, [field.id]: cell } };
     });
     updateDoc({ ...doc, fields, rows, autoNumberNext });
   };
@@ -33360,10 +33360,10 @@ function TableApp({
     updateDoc({
       ...doc,
       fields: doc.fields.filter((f) => f.id !== fieldId),
-      rows: doc.rows.map((row) => {
-        const cells = { ...row.cells };
+      rows: doc.rows.map((row2) => {
+        const cells = { ...row2.cells };
         delete cells[fieldId];
-        return { ...row, cells };
+        return { ...row2, cells };
       }),
       view: {
         ...doc.view,
@@ -33381,10 +33381,10 @@ function TableApp({
       sync: doc.sync ? { ...doc.sync, fieldMap } : doc.sync
     });
   };
-  const renameField = (fieldId, name) => {
+  const renameField = (fieldId, name2) => {
     updateDoc({
       ...doc,
-      fields: doc.fields.map((f) => f.id === fieldId ? { ...f, name } : f)
+      fields: doc.fields.map((f) => f.id === fieldId ? { ...f, name: name2 } : f)
     });
   };
   const updateCellValue = (rowId, fieldId, value, fieldUpdate) => {
@@ -33392,11 +33392,11 @@ function TableApp({
     updateDoc({
       ...doc,
       fields,
-      rows: doc.rows.map((row) => {
-        if (row.id !== rowId) return row;
+      rows: doc.rows.map((row2) => {
+        if (row2.id !== rowId) return row2;
         const next = {
-          ...row,
-          cells: { ...row.cells, [fieldId]: value }
+          ...row2,
+          cells: { ...row2.cells, [fieldId]: value }
         };
         return touchLastModified(next, fields);
       })
@@ -33405,14 +33405,14 @@ function TableApp({
   const setCell = (rowId, fieldId, value) => updateCellValue(rowId, fieldId, value);
   const copyCell = async (rowId, fieldId) => {
     const field = doc.fields.find((candidate) => candidate.id === fieldId);
-    const row = doc.rows.find((candidate) => candidate.id === rowId);
-    if (!field || !row) return false;
+    const row2 = doc.rows.find((candidate) => candidate.id === rowId);
+    if (!field || !row2) return false;
     if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
       new import_obsidian3.Notice("Clipboard access is unavailable on this device");
       return false;
     }
     try {
-      await navigator.clipboard.writeText(cellClipboardText(field, row.cells[fieldId]));
+      await navigator.clipboard.writeText(cellClipboardText(field, row2.cells[fieldId]));
       return true;
     } catch (error2) {
       console.error(error2);
@@ -33457,8 +33457,8 @@ function TableApp({
       fields: doc.fields.map((f) => f.id === field.id ? field : f)
     });
   };
-  const addOption = (fieldId, name) => {
-    const option = createSelectOption(name);
+  const addOption = (fieldId, name2) => {
+    const option = createSelectOption(name2);
     updateDoc({
       ...doc,
       fields: doc.fields.map((f) => {
@@ -33592,7 +33592,7 @@ function TableApp({
             onUnlink: () => updateDoc({ ...doc, sync: null })
           }
         ),
-        onRename: (name) => updateDoc({ ...doc, name }),
+        onRename: (name2) => updateDoc({ ...doc, name: name2 }),
         onSearch: setSearch,
         onToggleFilters: () => setShowFilters((v) => !v),
         onToggleSorts: () => setShowSorts((v) => !v),
@@ -33702,8 +33702,8 @@ function TableApp({
   ] });
 }
 function isSpreadsheetFile(file) {
-  const name = file.name.toLowerCase();
-  return name.endsWith(".csv") || name.endsWith(".xlsx") || file.type === "text/csv" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  const name2 = file.name.toLowerCase();
+  return name2.endsWith(".csv") || name2.endsWith(".xlsx") || file.type === "text/csv" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 }
 
 // src/ui/TableFileApp.tsx
@@ -33896,6 +33896,119 @@ function updateTableFileApp(root, props) {
   root.render((0, import_react15.createElement)(TableFileApp, props));
 }
 
+// src/ui/DebugOverlay.ts
+var OUTSIDE = [
+  ".tabula-view",
+  ".workspace-leaf-content",
+  ".workspace-leaf",
+  ".workspace-tab-container",
+  ".workspace-tabs",
+  ".workspace-split",
+  ".workspace",
+  ".horizontal-main-container",
+  ".app-container"
+];
+var INSIDE = [
+  ".tabula-mount",
+  ".tabula-file-root",
+  ".tabula-file-table",
+  ".tabula-root",
+  ".tabula-toolbar",
+  ".tabula-grid-area",
+  ".tabula-grid-wrap",
+  ".tabula-grid"
+];
+var pad = (s, n) => (s.length > n ? s.slice(0, n - 1) + "~" : s).padEnd(n);
+var num = (n) => String(Math.round(n)).padStart(5) + " ";
+function name(el) {
+  const cls = typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).slice(0, 2).join(".") : "";
+  return el.tagName.toLowerCase() + cls;
+}
+function row(el) {
+  const c = getComputedStyle(el);
+  const r = el.getBoundingClientRect();
+  const scroll = c.overflowY === "auto" || c.overflowY === "scroll" ? " +" + (el.scrollHeight - el.clientHeight) : "";
+  return [
+    pad(name(el), 20),
+    num(r.height),
+    num(r.top),
+    pad(c.height, 10),
+    pad(c.minHeight, 6),
+    pad(c.flex || "-", 10),
+    pad(c.overflowY, 6)
+  ].join(" ") + scroll;
+}
+var HEAD = pad("element", 20) + "     h    top   css-height  min-h  flex        ovf-y";
+function installDebugOverlay(host) {
+  const pre = document.createElement("pre");
+  pre.style.cssText = [
+    "position:fixed",
+    "left:0",
+    "right:0",
+    "top:0",
+    "z-index:2147483647",
+    "background:#000",
+    "color:#3f6",
+    "font:9px/1.25 ui-monospace,monospace",
+    "padding:4px",
+    "margin:0",
+    "max-height:78vh",
+    "overflow:auto",
+    "white-space:pre",
+    "border-bottom:2px solid #0f0"
+  ].join(";");
+  host.appendChild(pre);
+  const refresh = () => {
+    const lines = [];
+    const page = document.querySelector(".tabula-file-root");
+    const pageH = page ? Math.round(page.getBoundingClientRect().height) : 0;
+    const viewH = Math.round(host.getBoundingClientRect().height);
+    lines.push(
+      "vh=" + window.innerHeight + " vv=" + (window.visualViewport ? Math.round(window.visualViewport.height) : "?") + "  rows=" + document.querySelectorAll(".tabula-grid tbody tr").length
+    );
+    lines.push(
+      "VIEW " + viewH + "px   PAGE " + pageH + "px   FILL " + (viewH ? Math.round(pageH / viewH * 100) : 0) + "%"
+    );
+    lines.push("");
+    lines.push("-- outside --");
+    for (const sel of OUTSIDE) {
+      const el = sel === ".tabula-view" ? host : document.querySelector(sel);
+      lines.push(el ? row(el) : pad(sel, 30) + "  (none)");
+    }
+    lines.push("");
+    lines.push("-- inside --");
+    for (const sel of INSIDE) {
+      const el = document.querySelector(sel);
+      lines.push(el ? row(el) : pad(sel, 30) + "  (none)");
+    }
+    lines.push("");
+    lines.push("-- possible overlays in .tabula-view --");
+    const view = host;
+    let found = 0;
+    view.querySelectorAll("*").forEach((el) => {
+      if (el === pre) return;
+      const c = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      const big = r.height > 60 && r.width > 60;
+      if (!big) return;
+      if (c.position !== "fixed" && c.position !== "absolute" && c.position !== "sticky") return;
+      found++;
+      lines.push([pad(name(el), 30), num(r.height), num(r.top), pad(c.position, 9), "z=" + c.zIndex].join(" "));
+    });
+    if (!found) lines.push("(none)");
+    pre.textContent = lines.join("\n");
+  };
+  const events = ["focusin", "focusout", "resize", "scroll", "touchstart"];
+  events.forEach((e) => document.addEventListener(e, refresh, true));
+  const timer = window.setInterval(refresh, 400);
+  refresh();
+  return () => {
+    window.clearInterval(timer);
+    events.forEach((e) => document.removeEventListener(e, refresh, true));
+    pre.remove();
+  };
+}
+
 // src/views/TableView.ts
 var VIEW_TYPE_TABULA = "airtable-tabula-view";
 var TABULA_EXTENSION = "tabula";
@@ -33908,6 +34021,7 @@ var TableView = class extends import_obsidian5.TextFileView {
     this.saveTimer = null;
     this.applyingExternal = false;
     this.clipboardPasteHandler = null;
+    this.disposeDebugOverlay = null;
     this.registerClipboardPaste = (handler) => {
       this.clipboardPasteHandler = handler;
     };
@@ -33952,8 +34066,11 @@ var TableView = class extends import_obsidian5.TextFileView {
     this.contentEl.addClass("tabula-view");
     this.mountEl = this.contentEl.createDiv({ cls: "tabula-mount" });
     this.remount();
+    this.disposeDebugOverlay = installDebugOverlay(this.contentEl);
   }
   async onClose() {
+    this.disposeDebugOverlay?.();
+    this.disposeDebugOverlay = null;
     if (this.saveTimer != null) {
       window.clearTimeout(this.saveTimer);
       this.saveTimer = null;
@@ -34283,7 +34400,7 @@ var TabulaPlugin = class extends import_obsidian7.Plugin {
       folderPath = folder.path === "/" || folder.path === "" ? "" : folder.path;
     }
     const safeBase = baseName.replace(/[\\/:*?"<>|]/g, "-").trim() || "Untitled Table";
-    const makePath = (name) => folderPath ? `${folderPath}/${name}.${TABULA_EXTENSION}` : `${name}.${TABULA_EXTENSION}`;
+    const makePath = (name2) => folderPath ? `${folderPath}/${name2}.${TABULA_EXTENSION}` : `${name2}.${TABULA_EXTENSION}`;
     let fullPath = makePath(safeBase);
     let i = 1;
     while (this.app.vault.getAbstractFileByPath(fullPath)) {
