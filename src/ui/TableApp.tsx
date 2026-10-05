@@ -69,6 +69,7 @@ export function TableApp({
 	const [optionFieldId, setOptionFieldId] = useState<string | null>(null);
 	const [queryError, setQueryError] = useState<string | undefined>();
 	const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+	const [checkedRowIds, setCheckedRowIds] = useState<ReadonlySet<string>>(() => new Set());
 	const [showLinkModal, setShowLinkModal] = useState(false);
 	const [syncBusy, setSyncBusy] = useState(false);
 	const [pasteCandidate, setPasteCandidate] = useState<{
@@ -78,6 +79,53 @@ export function TableApp({
 
 	const groups = useMemo(() => getGroupedRows(doc), [doc]);
 	const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
+
+	// Row-checkbox selection is view-only state: it is never written to the
+	// document, so it cannot affect persisted data or Airtable sync.
+	const visibleRowIds = useMemo(
+		() => groups.flatMap((g) => g.rows.map((r) => r.id)),
+		[groups]
+	);
+	const allVisibleChecked =
+		visibleRowIds.length > 0 && visibleRowIds.every((id) => checkedRowIds.has(id));
+
+	const toggleRowChecked = useCallback((rowId: string) => {
+		setCheckedRowIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(rowId)) next.delete(rowId);
+			else next.add(rowId);
+			return next;
+		});
+	}, []);
+
+	const setAllRowsChecked = useCallback(
+		(checked: boolean) => {
+			setCheckedRowIds((prev) => {
+				const next = new Set(prev);
+				for (const id of visibleRowIds) {
+					if (checked) next.add(id);
+					else next.delete(id);
+				}
+				return next;
+			});
+		},
+		[visibleRowIds]
+	);
+
+	// Drop ids for rows that no longer exist, so the set cannot grow unbounded.
+	useEffect(() => {
+		setCheckedRowIds((prev) => {
+			if (prev.size === 0) return prev;
+			const live = new Set(doc.rows.map((r) => r.id));
+			let changed = false;
+			const next = new Set<string>();
+			for (const id of prev) {
+				if (live.has(id)) next.add(id);
+				else changed = true;
+			}
+			return changed ? next : prev;
+		});
+	}, [doc.rows]);
 	const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
 	const hasToken = Boolean(airtableToken.trim());
 
@@ -548,6 +596,10 @@ export function TableApp({
 				groups={groups}
 				showTopScrollbar={showTopScrollbar}
 				selectedRowId={selectedRowId}
+				checkedRowIds={checkedRowIds}
+				allVisibleChecked={allVisibleChecked}
+				onToggleRowChecked={toggleRowChecked}
+				onSetAllRowsChecked={setAllRowsChecked}
 				canReorderRows={doc.view.sorts.length === 0}
 				onSelectRow={setSelectedRowId}
 				onSetCell={setCell}

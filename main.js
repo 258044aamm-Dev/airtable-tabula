@@ -31644,22 +31644,29 @@ function RatingCell({
   const current = typeof value === "number" ? value : 0;
   const [hoverRating, setHoverRating] = (0, import_react6.useState)(null);
   const activeStars = hoverRating ?? current;
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "tabula-rating", onMouseLeave: () => setHoverRating(null), children: Array.from({ length: max2 }, (_, i) => {
-    const n = i + 1;
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-      "button",
-      {
-        type: "button",
-        tabIndex: -1,
-        className: `tabula-star ${n <= activeStars ? "is-on" : ""}`,
-        onMouseEnter: () => setHoverRating(n),
-        onClick: () => onChange(current === n ? null : n),
-        "aria-label": `${n} star`,
-        children: "\u2605"
-      },
-      n
-    );
-  }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "tabula-rating", onMouseLeave: () => setHoverRating(null), children: [
+    Array.from({ length: max2 }, (_, i) => {
+      const n = i + 1;
+      return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        "button",
+        {
+          type: "button",
+          tabIndex: -1,
+          className: `tabula-star ${n <= activeStars ? "is-on" : ""}`,
+          onMouseEnter: () => setHoverRating(n),
+          onClick: () => onChange(current === n ? null : n),
+          "aria-label": `${n} star`,
+          children: "\u2605"
+        },
+        n
+      );
+    }),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "tabula-rating-score", children: [
+      current,
+      "/",
+      max2
+    ] })
+  ] });
 }
 function formatReadOnly(field, value) {
   if (field.type === "autoNumber") {
@@ -31962,6 +31969,11 @@ function TableGrid(props) {
   const gridWrapRef = (0, import_react8.useRef)(null);
   const topScrollbarRef = (0, import_react8.useRef)(null);
   const topScrollbarInnerRef = (0, import_react8.useRef)(null);
+  const selectAllRef = (0, import_react8.useRef)(null);
+  const someVisibleChecked = !props.allVisibleChecked && props.groups.some((g) => g.rows.some((r) => props.checkedRowIds.has(r.id)));
+  (0, import_react8.useEffect)(() => {
+    if (selectAllRef.current) selectAllRef.current.indeterminate = someVisibleChecked;
+  }, [someVisibleChecked, props.allVisibleChecked]);
   const toggleGroup = (key) => {
     setCollapsedGroups((prev) => {
       const next = new Set(prev);
@@ -32221,7 +32233,7 @@ function TableGrid(props) {
             className: "tabula-group-row",
             onClick: () => toggleGroup(group.key),
             title: "Click to collapse / expand group",
-            children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("td", { colSpan: fields.length + 1, children: [
+            children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("td", { colSpan: fields.length + 2, children: [
               /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-group-chevron", "aria-hidden": "true", children: isCollapsed ? "\u25B8" : "\u25BE" }),
               /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-group-label", children: group.label }),
               /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { className: "tabula-muted", children: [
@@ -32258,7 +32270,25 @@ function TableGrid(props) {
               /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                 "td",
                 {
-                  className: "tabula-row-num sticky-col",
+                  className: "tabula-select-col sticky-col",
+                  onContextMenu: (event) => showRowContextMenu(event, row.id),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                    "input",
+                    {
+                      type: "checkbox",
+                      className: "tabula-row-check",
+                      checked: props.checkedRowIds.has(row.id),
+                      onChange: () => props.onToggleRowChecked(row.id),
+                      onClick: (event) => event.stopPropagation(),
+                      "aria-label": `Select row ${index}`
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                "td",
+                {
+                  className: "tabula-row-num sticky-rownum",
                   onContextMenu: (event) => showRowContextMenu(event, row.id),
                   children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "tabula-row-num-content", children: [
                     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { children: index }),
@@ -32336,7 +32366,19 @@ function TableGrid(props) {
               className: `tabula-grid ${frozen ? "is-frozen" : ""} height-${props.doc.view.rowHeight}`,
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tr", { children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-num sticky-col", children: "#" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-select-col sticky-col", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+                    "input",
+                    {
+                      ref: selectAllRef,
+                      type: "checkbox",
+                      className: "tabula-row-check",
+                      checked: props.allVisibleChecked,
+                      onChange: (event) => props.onSetAllRowsChecked(event.currentTarget.checked),
+                      onClick: (event) => event.stopPropagation(),
+                      "aria-label": props.allVisibleChecked ? "Clear row selection" : "Select all rows"
+                    }
+                  ) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("th", { className: "tabula-row-num sticky-rownum", children: "#" }),
                   fields.map((field, fi) => {
                     const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
                     const dropClass = dragState?.kind === "field" && dragState.targetId === field.id ? dragState.side === "before" ? "is-drop-before" : "is-drop-after" : "";
@@ -32376,12 +32418,15 @@ function TableGrid(props) {
                 ] }) }),
                 /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("tbody", { children: [
                   body,
-                  totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 1, className: "tabula-empty", children: "No rows match the current search/filters." }) })
+                  totalRows === 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("td", { colSpan: fields.length + 2, className: "tabula-empty", children: "No rows match the current search/filters." }) })
                 ] })
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: "+ New row" })
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("button", { className: "tabula-add-row-footer", type: "button", onClick: props.onAddRow, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { className: "tabula-add-row-plus", "aria-hidden": "true", children: "+" }),
+            "New row"
+          ] })
         ]
       }
     )
@@ -33023,11 +33068,51 @@ function TableApp({
   const [optionFieldId, setOptionFieldId] = (0, import_react12.useState)(null);
   const [queryError, setQueryError] = (0, import_react12.useState)();
   const [selectedRowId, setSelectedRowId] = (0, import_react12.useState)(null);
+  const [checkedRowIds, setCheckedRowIds] = (0, import_react12.useState)(() => /* @__PURE__ */ new Set());
   const [showLinkModal, setShowLinkModal] = (0, import_react12.useState)(false);
   const [syncBusy, setSyncBusy] = (0, import_react12.useState)(false);
   const [pasteCandidate, setPasteCandidate] = (0, import_react12.useState)(null);
   const groups = (0, import_react12.useMemo)(() => getGroupedRows(doc), [doc]);
   const visibleCount = groups.reduce((n, g) => n + g.rows.length, 0);
+  const visibleRowIds = (0, import_react12.useMemo)(
+    () => groups.flatMap((g) => g.rows.map((r) => r.id)),
+    [groups]
+  );
+  const allVisibleChecked = visibleRowIds.length > 0 && visibleRowIds.every((id) => checkedRowIds.has(id));
+  const toggleRowChecked = (0, import_react12.useCallback)((rowId) => {
+    setCheckedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(rowId)) next.delete(rowId);
+      else next.add(rowId);
+      return next;
+    });
+  }, []);
+  const setAllRowsChecked = (0, import_react12.useCallback)(
+    (checked) => {
+      setCheckedRowIds((prev) => {
+        const next = new Set(prev);
+        for (const id of visibleRowIds) {
+          if (checked) next.add(id);
+          else next.delete(id);
+        }
+        return next;
+      });
+    },
+    [visibleRowIds]
+  );
+  (0, import_react12.useEffect)(() => {
+    setCheckedRowIds((prev) => {
+      if (prev.size === 0) return prev;
+      const live = new Set(doc.rows.map((r) => r.id));
+      let changed = false;
+      const next = /* @__PURE__ */ new Set();
+      for (const id of prev) {
+        if (live.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [doc.rows]);
   const optionField = doc.fields.find((f) => f.id === optionFieldId) ?? null;
   const hasToken = Boolean(airtableToken.trim());
   const requestClipboardPaste = (0, import_react12.useCallback)(() => {
@@ -33433,6 +33518,10 @@ function TableApp({
         groups,
         showTopScrollbar,
         selectedRowId,
+        checkedRowIds,
+        allVisibleChecked,
+        onToggleRowChecked: toggleRowChecked,
+        onSetAllRowsChecked: setAllRowsChecked,
         canReorderRows: doc.view.sorts.length === 0,
         onSelectRow: setSelectedRowId,
         onSetCell: setCell,

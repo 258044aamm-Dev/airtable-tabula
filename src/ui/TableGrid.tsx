@@ -36,6 +36,10 @@ interface Props {
 	groups: RowGroup[];
 	showTopScrollbar: boolean;
 	selectedRowId: string | null;
+	checkedRowIds: ReadonlySet<string>;
+	allVisibleChecked: boolean;
+	onToggleRowChecked: (rowId: string) => void;
+	onSetAllRowsChecked: (checked: boolean) => void;
 	canReorderRows: boolean;
 	onSelectRow: (rowId: string | null) => void;
 	onSetCell: (rowId: string, fieldId: string, value: CellValue) => void;
@@ -70,6 +74,15 @@ export function TableGrid(props: Props) {
 	const gridWrapRef = useRef<HTMLDivElement | null>(null);
 	const topScrollbarRef = useRef<HTMLDivElement | null>(null);
 	const topScrollbarInnerRef = useRef<HTMLDivElement | null>(null);
+	const selectAllRef = useRef<HTMLInputElement | null>(null);
+
+	// Indeterminate is a DOM-only property, so it has to be set imperatively.
+	const someVisibleChecked =
+		!props.allVisibleChecked &&
+		props.groups.some((g) => g.rows.some((r) => props.checkedRowIds.has(r.id)));
+	useEffect(() => {
+		if (selectAllRef.current) selectAllRef.current.indeterminate = someVisibleChecked;
+	}, [someVisibleChecked, props.allVisibleChecked]);
 
 	const toggleGroup = (key: string) => {
 		setCollapsedGroups((prev) => {
@@ -379,7 +392,7 @@ export function TableGrid(props: Props) {
 					onClick={() => toggleGroup(group.key)}
 					title="Click to collapse / expand group"
 				>
-					<td colSpan={fields.length + 1}>
+					<td colSpan={fields.length + 2}>
 						<span className="tabula-group-chevron" aria-hidden="true">
 							{isCollapsed ? "▸" : "▾"}
 						</span>
@@ -416,7 +429,20 @@ export function TableGrid(props: Props) {
 					onClick={() => props.onSelectRow(row.id)}
 				>
 					<td
-						className="tabula-row-num sticky-col"
+						className="tabula-select-col sticky-col"
+						onContextMenu={(event) => showRowContextMenu(event, row.id)}
+					>
+						<input
+							type="checkbox"
+							className="tabula-row-check"
+							checked={props.checkedRowIds.has(row.id)}
+							onChange={() => props.onToggleRowChecked(row.id)}
+							onClick={(event) => event.stopPropagation()}
+							aria-label={`Select row ${index}`}
+						/>
+					</td>
+					<td
+						className="tabula-row-num sticky-rownum"
 						onContextMenu={(event) => showRowContextMenu(event, row.id)}
 					>
 						<div className="tabula-row-num-content">
@@ -489,7 +515,20 @@ export function TableGrid(props: Props) {
 				>
 					<thead>
 						<tr>
-							<th className="tabula-row-num sticky-col">#</th>
+							<th className="tabula-select-col sticky-col">
+							<input
+								ref={selectAllRef}
+								type="checkbox"
+								className="tabula-row-check"
+								checked={props.allVisibleChecked}
+								onChange={(event) => props.onSetAllRowsChecked(event.currentTarget.checked)}
+								onClick={(event) => event.stopPropagation()}
+								aria-label={
+									props.allVisibleChecked ? "Clear row selection" : "Select all rows"
+								}
+							/>
+						</th>
+						<th className="tabula-row-num sticky-rownum">#</th>
 							{fields.map((field, fi) => {
 								const isDragSource = dragState?.kind === "field" && dragState.sourceId === field.id;
 								const dropClass =
@@ -536,7 +575,7 @@ export function TableGrid(props: Props) {
 						{body}
 						{totalRows === 0 && (
 							<tr>
-								<td colSpan={fields.length + 1} className="tabula-empty">
+								<td colSpan={fields.length + 2} className="tabula-empty">
 									No rows match the current search/filters.
 								</td>
 							</tr>
@@ -544,7 +583,10 @@ export function TableGrid(props: Props) {
 					</tbody>
 				</table>
 				<button className="tabula-add-row-footer" type="button" onClick={props.onAddRow}>
-					+ New row
+					<span className="tabula-add-row-plus" aria-hidden="true">
+						+
+					</span>
+					New row
 				</button>
 			</div>
 		</div>

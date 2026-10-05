@@ -6,6 +6,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.20] - 2026-10-05
+
+Rebuilds the table view against the warm terracotta `Anthropic Table Workspace` reference, replacing the indigo chrome introduced in v0.1.19. This release does touch TSX: a row-select column and a rating score were added, and the frozen-column bands were re-pointed to make room.
+
+### Added
+- **Row-select column.** A 32px checkbox band is now the leftmost column, with a select-all checkbox in the header and a per-row checkbox in each body row. The header checkbox shows an indeterminate state when only some visible rows are checked, and "select all" respects the active search and filters. Selection is view-only state held in `TableApp` and is never written to the document, so it cannot affect persisted data or Airtable sync. Ids for deleted rows are pruned automatically.
+- **Rating score.** Rating cells now render an `N/5` readout right-aligned inside the cell capsule, matching the reference.
+
+### Changed
+- **Palette moved from indigo to warm terracotta.** The indigo hexes (`#818CB8`, `#939DC7`, `#282635`, `#716C7E`, `#1C1A26`) are all gone from `styles.css`. Accent and chrome are now `#CC785C` (dark-theme focus/accent-strong `#D97757`), with cream surfaces (`#FAF7F2` page, `#F4EFE6` grid) and warm greys.
+- **Status pills are now light tints in both themes**, matching the reference, instead of the dark saturated fills shipped in v0.1.19.
+- **Select/model pills are tinted a step richer than status pills.** Scoped to `.tabula-select-trigger` / `.tabula-select-option` and derived from `currentColor`, so it is hue-agnostic and correct in both themes.
+- **Geometry matched to the reference:** outer card radius 24px -> 32px, cell capsule 56px -> 34px, column header 42px -> 50px, toolbar title 23px -> 30px serif, buttons and search 34px -> 38px with a 16px radius, `border-spacing` vertical gap 10px -> 8px.
+- **Pill shape:** fully rounded 999px -> 6px radius, 11px monospace.
+- **Frozen columns re-pointed.** The select band is the new `sticky-col` (left: 0), the row number became `sticky-rownum` (left: 32px) and the first data column's `sticky-primary` offset is now `calc(select + row-number)`. The row-number band is pinned to its token width with `box-sizing: border-box; overflow: hidden` and a smaller drag handle, so a long row number can never grow the band and slide under the first data column.
+- **Row height control** now scales cell vertical padding (short 5px, medium 8px, tall 13px). `medium` is the 34px reference default. `--tabula-cell-h` is no longer used; cells size to their content.
+- **"+ New row"** now renders the `+` in the terracotta accent.
+- **Focus rings** unified to a 2px `--tabula-focus-ring` on the search field, cell inputs and select triggers.
+
+### Corrected against the measured reference
+
+Ten properties were wrong when the styling was written from a visual reading of the
+reference. They were re-measured in a real browser and corrected: the header capsule
+is 40px tall (not 50px), the **status** pill is a full pill in 12px sans (only the
+model badge is 6px / 11px monospace), the title's `letter-spacing` is `normal`, the
+header label tracking is 0.3px, the search field is `9999px` with a 40px left inset
+and a themed magnifier icon, the star glyph is 12px, the card border uses the plain
+border colour (`#E6E0D5` light, `#38342E` dark), and the model badge needed a
+three-class selector because `.theme-dark .tabula-color-*` was outranking it.
+
+### Fixed
+
+- **Clicking a cell no longer highlights the whole row.** The `<tr>` carried
+  `is-selected` on any row click and `tr.is-selected td { background: … !important }`
+  repainted every cell, outranking the focused cell's own surface. Both the row tint
+  and the focus-within resets that existed only to counteract it are gone. The
+  reference has no row-click handler and no row-selected styling. `selectedRowId`
+  still tracks the click so Escape-to-clear keeps working; it simply no longer paints.
+- **The table is now full horizontal width.** The card had gained a 28px padding to
+  match the reference's `p-7`, which inset the table 28px per side. Removed, along
+  with the compensating toolbar and add-row insets it had displaced. This is a
+  deliberate departure from the reference. The 6px `border-spacing` gutter between
+  cells is unchanged.
+
+### Verification
+
+An interactive verifier was built that inlines this exact `styles.css` and diffs live
+computed styles against values measured from the reference in both themes: **58 of
+59 properties match exactly in light, 55 of 59 in dark**, with the card padding
+reported as a labelled intentional deviation. The three remaining dark differences
+are the status pill, which stays a light tint in both themes per an earlier decision,
+whereas the reference switches to a dark saturated fill in dark mode.
+
+A Playwright regression additionally asserts: the table is a real `<table>`,
+`.tabula-grid-wrap` is still the inner card, the three frozen bands pin at exactly
+0 / 32 / 64px and do not overlap while scrolled, the data column scrolls the full
+distance, the header pins flush and body content passes behind it, the add-row button
+is not sticky, the select column is first in every row, `colSpan` covers the new
+column, the `N/5` score is flush to the cell's content edge, and an `is-selected` row
+is painted identically to a normal row.
+
+### Not included
+Per scope: the `v2.4` version chip, the "Saved to Anthropic Cloud" title, the Prompt Evaluations / Model Benchmarks tab bar, and the "Dataset:" title.
+
+### Verified
+`tsc` clean, production build clean, and a Playwright regression asserting: the table is still a real `<table>`, `.tabula-grid-wrap` is still the inner card, the three frozen bands pin at exactly 0 / 32 / 64px and do not overlap while scrolled 180px, the data column scrolls by the full 180px, the header pins flush to the scroll edge, body content passes behind it, the add-row button is not sticky, the select column is first in every row with one checkbox each, `colSpan` spans cover the new column, the `N/5` score is flush to the cell's content edge, and the `+` is the terracotta chrome colour.
+
 ## [0.1.19] - 2026-10-04
 
 Adopts the indigo chrome and component styling from the `database_table_view.html` reference, on top of the v0.1.18 card-cell layout. Visual only - no TypeScript, JSX or logic changes; `main.js` rebuilds byte-identical.

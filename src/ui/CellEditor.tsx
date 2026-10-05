@@ -201,6 +201,7 @@ function RatingCell({
 					</button>
 				);
 			})}
+			<span className="tabula-rating-score">{current}/{max}</span>
 		</div>
 	);
 }
